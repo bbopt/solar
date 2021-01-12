@@ -1,2 +1,2 @@
 # solar
-The SOLAR blackbox optimization problem
+The **SOLAR** blackbox optimization problem
