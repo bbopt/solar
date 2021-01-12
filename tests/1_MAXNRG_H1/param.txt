@@ -1,0 +1,15 @@
+DIMENSION        9
+BB_EXE           "$../../bin/solar $1"
+
+BB_OUTPUT_TYPE   OBJ CSTR CSTR CSTR CSTR CSTR
+
+BB_INPUT_TYPE    (    R    R     R    R    R   I    R    R    R )
+LOWER_BOUND      (  1.0  1.0  20.0  1.0  1.0   1  1.0  0.0  0.0 )
+X0               (  8.0  8.0 150.0  7.0  7.0 250 45.0  0.5  5.0 )
+UPPER_BOUND      ( 40.0 40.0 250.0 30.0 30.0   - 89.0 20.0 20.0 )
+
+
+display_stats bbe ( sol ) [ bbo ] obj
+display_all_eval yes
+
+# MAX_BB_EVAL 10
