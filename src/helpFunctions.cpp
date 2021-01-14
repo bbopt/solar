@@ -1,4 +1,5 @@
 #include "helpFunctions.hpp"
+#include <iomanip>  // for setw
 
 /*-----------------------------------------------------------*/
 /*                   display list of problems                */
