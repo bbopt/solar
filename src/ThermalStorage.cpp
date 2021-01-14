@@ -623,7 +623,7 @@ double ThermalStorage::fSolveForT(double coef_T4, double coef_T, double T_max, d
 			throw noConvergence;
 		}
 	}
-	catch (logic_error e){
+	catch (logic_error &e){
 		T_2 = (T_max + T_min) / 2.;
 	}
 	return T_2;
