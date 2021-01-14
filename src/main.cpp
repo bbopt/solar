@@ -149,7 +149,7 @@ int main ( int argc , char ** argv ) {
       // scenario.print();  // TOTO permettre en mode verbose
     }
   }
-  catch ( invalid_argument e ) {
+  catch ( invalid_argument &e ) {
     // problem with simulation (e.g. bad input): Simulation cannot be used by solver;
     // error message must be printed since outputs are not displayed.
     if ( verbose )
@@ -162,7 +162,7 @@ int main ( int argc , char ** argv ) {
   }
   // (controlled) problem with the simulation (e.g. a priori constraint violated): Simulation should be usable by solver;
   // some of the outputs are displayed with 1e20 values.
-  catch ( logic_error e ) {
+  catch ( logic_error &e ) {
     if ( verbose ) {
       std::cout << std::endl
 		<< "simulation completed: " << simulation_completed << std::endl
