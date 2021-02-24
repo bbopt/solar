@@ -6,7 +6,7 @@ Go to the [./src](src) directory and type `make`. It will generate the binary
 executable `solar` located in the [./bin](bin) directory.
 
 #### Check
-Your **SOLAR** must be validated. For this, type `./bin/solar -check`.
+Your **SOLAR** installation must be validated. For this, type `./bin/solar -check`.
 This will execute several tests during 10 to 20 minutes.
 
 If the validation fails, please send an email to nomad@gerad.ca with the full output.
