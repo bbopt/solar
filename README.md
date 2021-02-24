@@ -67,6 +67,7 @@ Help for a problem: solar pb_id or solar -h pb_id
 And the list of instances is:
 
 ```
+	#	          pb_id	                              obj.(f)	# of objectives(p)	   # of var.(n)	# of constr.(m)
 	1	      MAXNRG_H1	   total solar energy on the receiver	              1	              9	              5
 	2	     MINSURF_H1	       total heliostats field surface	              1	             14	             13
 	3	     MINCOST_C1	                total investment cost	              1	             20	             13
