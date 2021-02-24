@@ -26,7 +26,7 @@ Help(1)   : solar -h
 Help(2)   : solar -h pb_id
 Info      : solar -i
 ```
-To run simulation, type `solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
+To run a simulation, type `solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
 
 The different options are:
 
@@ -78,3 +78,6 @@ And the list of instances is:
 	8	  MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
 	9	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
 ```
+
+#### Example
+
