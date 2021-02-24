@@ -1,3 +1,26 @@
+/*-------------------------------------------------------------------------------*/
+/*  SOLAR - The solar thermal power plant simulator                              */
+/*  https://github.com/bbopt/solar                                               */
+/*                                                                               */
+/*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
+/*                                                                               */
+/*  Polytechnique Montreal / GERAD                                               */
+/*  sebastien.le-digabel@polymtl.ca                                              */
+/*                                                                               */
+/*  This program is free software: you can redistribute it and/or modify it      */
+/*  under the terms of the GNU Lesser General Public License as published by     */
+/*  the Free Software Foundation, either version 3 of the License, or (at your   */
+/*  option) any later version.                                                   */
+/*                                                                               */
+/*  This program is distributed in the hope that it will be useful, but WITHOUT  */
+/*  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        */
+/*  FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  */
+/*  for more details.                                                            */
+/*                                                                               */
+/*  You should have received a copy of the GNU Lesser General Public License     */
+/*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
 #include "helpFunctions.hpp"
 
 /*-----------------------------------------------------------*/
@@ -7,6 +30,7 @@ void display_problems ( std::ostream & out , const std::vector<Problem> & proble
 
   out << "\t#\t" << std::setw(15) << "pb_id"
       << "\t"    << std::setw(37) << "obj.(f)"
+      << "\t"    << std::setw(15) << "# of objectives(p)"
       << "\t"    << std::setw(15) << "# of var.(n)"
       << "\t"    << std::setw(15) << "# of constr.(m)\n\n";
 
@@ -14,6 +38,7 @@ void display_problems ( std::ostream & out , const std::vector<Problem> & proble
     out << "\t" << i+1
 	<< "\t" << std::setw(15) << problems[i].get_pb_id()
 	<< "\t" << std::setw(37) << problems[i].get_f_description()
+      	<< "\t" << std::setw(15) << problems[i].get_p()
 	<< "\t" << std::setw(15) << problems[i].get_n()
       	<< "\t" << std::setw(15) << problems[i].get_m()
 	<< std::endl;
@@ -23,10 +48,16 @@ void display_problems ( std::ostream & out , const std::vector<Problem> & proble
 /*                        display usage                      */
 /*-----------------------------------------------------------*/
 void display_usage ( std::ostream & out ) {
-  out << "Run SOLAR : solar pb_id x.txt (add -v for verbose mode)" << std::endl
+  out << std::endl
+      << "Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)" << std::endl
+      << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -prec=P -rep=R -v" << std::endl
+      << "     S: Random seed : integer >=0 or \"diff\"; Default=0"           << std::endl
+      << "     P: Precision   : real in ]0;1]; Default=1.0 (truth)" << std::endl
+      << "     R: Replications: integer >= 1 ; Default=1"           << std::endl << std::endl
+      << "Validation: solar -check (can take several minutes)"      << std::endl
       << "Help(1)   : solar -h"               << std::endl
       << "Help(2)   : solar -h pb_id"         << std::endl
-      << "Info      : solar -i"               << std::endl;
+      << "Info      : solar -i"               << std::endl << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -36,8 +67,8 @@ void display_info ( std::ostream & out , const std::string & version ) {
   out << std::endl << "SOLAR, the solar thermal power plant simulator, version "
       << version << std::endl << std::endl
       << "Contributors: M. Diago, S. Le Digabel, M. Lemyre-Garneau, B. Talgorn;"
-      << " GERAD and Polytechnique Montreal"                      << std::endl << std::endl
-      << "This code is distributed under the LGPL license"       << std::endl // TOTO: peut-etre autre licence
+      << " GERAD and Polytechnique Montreal"               << std::endl << std::endl
+      << "This code is distributed under the LGPL license" << std::endl
       << "https://github.com/bbopt/solar" << std::endl << std::endl
       << "Please report bugs to sebastien.le-digabel@polymtl.ca" << std::endl << std::endl;
 }
@@ -47,11 +78,32 @@ void display_info ( std::ostream & out , const std::string & version ) {
 /*-----------------------------------------------------------*/
 void display_help ( std::ostream & out , const std::vector<Problem> & problems ) {
   out << std::endl
-      << "Run simulation    : solar pb_id x.txt"             << std::endl
-      << "Help for a problem: solar pb_id or solar -h pb_id" << std::endl << std::endl
-      << "\tpb_id: Problem ID"      << std::endl
-      << "\tx.txt: Input vector (values separated with spaces, tabs, or line breaks)" << std::endl
-      << std::endl
+      << "Run simulation: solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)\n\n"
+      << " pb_id: Problem ID (see list of problems below)\n\n"
+      << " x.txt: Input vector: Point at which the simulator is evaluated\n"
+      << "        Values separated with spaces\n"
+      << "        It is possible to specify several vectors: Use one line for each\n\n"
+      << "    -v: Verbose option\n\n"
+      << "     S: Random seed:\n"
+      << "          Some SOLAR instances are stochastic. This parameter impacts the value of stochastic outputs\n"
+      << "          The seed is a natural integer\n"
+      << "          If SOLAR is run twice at the same point with the same seed, it will give the same outputs\n"
+      << "          The default value is 0\n"
+      << "          Use -seed=diff to let SOLAR use a different random seed each time\n"
+      << "          The random number generator can be validated by running 'solar -check'\n\n"
+      << "     P: Precision of the simulator\n"
+      << "          Real value in ]0;1]\n"
+      << "          Default: 1.0, which corresponds to the \"true blackbox\", or the \"truth\"\n"
+      << "          Any value in ]0;1[ corresponds to a \"static surrogate\" of the truth\n"
+      << "          The execution time increases with the precision\n"
+      << "          A good default static surrogate is -prec=0.5\n\n"
+      << "     R: Number of replications\n"
+      << "          Integer >= 1, default=1\n"
+      << "          Number of times that the simulator is run at the same point\n"
+      << "          Each replication uses a different random seed dependent on the -seed option\n"
+      << "          The mean value of stochastic outputs is displayed\n"
+      << "          It is not possible to use R>1 with deterministic instances\n"
+      << "\nHelp for a problem: solar pb_id or solar -h pb_id" << std::endl << std::endl
       << "List of problems:" << std::endl << std::endl;
   display_problems ( out , problems );
   out << std::endl;
@@ -64,13 +116,13 @@ void display_help ( std::ostream               & out      ,
 		    const std::vector<Problem> & problems ,
 		    const std::string          & pb_id      ) {
  
-  out << "DISPLAY HELP FOR PROBLEM \"" << pb_id << "\"" << std::endl << std::endl;
+  out << "Display help for Problem \"" << pb_id << "\":" << std::endl << std::endl;
   
   const Problem * pb = find_problem ( problems, pb_id );
 
   if ( pb ) {
    
-    out << "PROBLEM: " << pb->get_pb_id() << " (solar" << pb->get_index() << ")"
+    out << "Problem: " << pb->get_pb_id() << " (solar" << pb->get_index() << ")"
 	<< "\t"        << pb->get_f_description()
 	<< "\tn="      << pb->get_n()
 	<< "\tm="      << pb->get_m()
@@ -137,8 +189,9 @@ void print_maxNrg_H1 ( std::ostream & out ) {
       << "\tMaximum field surface: 195 hectares\n"
       << "\tBudget: $50M\n"
       << "\tMust provide 100% of the demand requirement\n"
+      << "\tPrecision cannot be changed (must be 100%)\n"
       << std::endl
-      << "Objective (first output)\n"
+      << "Objective (first output, stochastic)\n"
       << "\tMaximize the total solar energy concentrated on the receiver aperture through one day (kWh)\n"
       << std::endl
       << "Variables:\n"
@@ -206,19 +259,19 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
       << "\t c1: Field surface\n"
-      << "\t c2: Demand compliance\n"
+      << "\t c2: Demand compliance (stochastic)\n"
       << "\t c3: Budget\n"
       << "\t c4: Tower is at least twice as high as heliostats\n"
       << "\t c5: Min. distance to tower <= Max. distance to tower\n"
       << "\t c6: Max. number of heliostats\n"
-      << "\t c7: Pressure in receiver tubes <= yield pressure\n"
+      << "\t c7: Pressure in receiver tubes <= yield pressure (stochastic)\n"
       << "\t c8: Molten salt melting point <= hot storage lowest temperature\n"
-      << "\t c9: Molten salt melting point <= cold storage lowest temperature\n"
+      << "\t c9: Molten salt melting point <= cold storage lowest temperature (stochastic)\n"
       << "\tc10: Molten salt melting point <= steam generatour outlet temperature\n"
       << "\tc11: Receiver inside/outside diameter\n"
       << "\tc12: Tubes fit in receiver\n" 
       << "\tc13: Receiver outlet temperature > steam turbine inlet temperature\n";
-
+  
   out << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 14 << std::endl
@@ -273,17 +326,17 @@ void print_minCost_C1 ( std::ostream & out ) {
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
       << "\tc1: Surface area\n"
-      << "\tc2: Compliance to demand\n"
+      << "\tc2: Compliance to demand (stochastic)\n"
       << "\tc3: Tower is at least twice as high as heliostats\n"
       << "\tc4: Min. distance to tower <= max. distance to tower\n"
       << "\tc5: Number of heliostats <= number of positions in the field\n"
-      << "\tc6: Pressure in tubes does not exceed yield pressure\n"
+      << "\tc6: Pressure in tubes does not exceed yield pressure (stochastic)\n"
       << "\tc7, c8, c9: Molten salt temperature does not fall below the melting point in storages and\n"
-      << "\t            at the steam generator outlet\n"
+      << "\t            at the steam generator outlet (c7 and c8: stochastic)\n"
       << "\tc10: Tubes inside diameter is smaller than outter diameter\n"
       << "\tc11: Tubes can fit inside the receiver\n"
       << "\tc12: Central receiver outlet temperature is higher than that required by the turbine\n"
-      << "\tc13: Check if storage is back to initial conditions\n"
+      << "\tc13: Check if storage is back to initial conditions (stochastic)\n"
       << "\n-----------------------------------------------------------------\n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 20       << std::endl
@@ -351,18 +404,18 @@ void print_minCost_C2 ( std::ostream & out ) {
 
       << "Constraints (outputs 2 to 17 with format ci <= 0):\n"
       << "\t c1: Maximum heliostats field surface\n"
-      << "\t c2: Compliance to the demand\n"
+      << "\t c2: Compliance to the demand (stochastic)\n"
       << "\t c3: Central tower higher than heliostats\n"
       << "\t c4: Min. distance to tower <= max. distance to tower\n"   
       << "\t c5: Number of heliostats <= number of positions in the grid\n"
-      << "\t c6: Pressure in receiver tubes does not exceed yield pressure\n"
-      << "\t c7: Hot storage temperature >= molten salt melting point\n"
-      << "\t c8: Cold storage temperature >= molten salt melting point\n"
-      << "\t c9: Steam generator outlet temperature >= molten salt melting point\n"
+      << "\t c6: Pressure in receiver tubes does not exceed yield pressure (stochastic)\n"
+      << "\t c7: Hot storage temperature >= molten salt melting point (stochastic)\n"
+      << "\t c8: Cold storage temperature >= molten salt melting point (stochastic)\n"
+      << "\t c9: Steam generator outlet temperature >= molten salt melting point (stochastic)\n"
       << "\tc10: Receiver inside diameter <= receiver outside diameter\n"
       << "\tc11: Number of tubes in receiver fit inside receiver\n"
       << "\tc12: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
-      << "\tc13: Parasitics do not exceed 20% of energy production\n"
+      << "\tc13: Parasitics do not exceed 20% of energy production (stochastic)\n"
       << "\tc14: Steam generator outer tubes diameter <= tubes spacing\n"
       << "\tc15: Steam generator inside diameter <=  steam generator outside diameter\n"
       << "\tc16: Pressure in steam generator tubes <= yield pressure\n"
@@ -390,6 +443,8 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\tDemand: 12 MW\n"
       << "\tBudget: $300M\n"
       << "\tPre-determined sunlight input for a period of 1 month\n"
+      << "\tDeterministic instance\n"
+      << "\tPrecision cannot be changed (must be 100%)\n"
       << std::endl
 
       << "Objective (first output)\n"
@@ -462,6 +517,8 @@ void print_minCost_TS ( std::ostream & out ) {
       << "\tThe objective is to minimize the cost of the thermal storage units so that the power plant is able\n"
       << "\tto sustain a 120 MW electrical power output during 24 hours. Since the heliostat field is not being\n"
       << "\toptimized, its hourly power output is taken from prerecorded data instead of being simulated.\n"
+      << "\tDeterministic instance\n"
+      << "\tPrecision cannot be changed (must be 100%)\n"
       << std::endl;
 
   out << "Objective (first output)\n"
@@ -507,7 +564,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << "\tDuration: 24 hours\n"
       << std::endl;
   
-  out << "Objective (first output)\n"
+  out << "Objective (first output, stochastic)\n"
       << "\tMaximize receiver efficiency, i.e the energy transfered to the molten salt\n"
       << std::endl;
 
@@ -524,12 +581,11 @@ void print_maxEff_RE ( std::ostream & out ) {
      
       << "Constraints (outputs 2 to 7 with format ci <= 0):\n"
       << "\tc1: Budget\n"
-      << "\tc2: Pressure in tubes does not exceed yield pressure\n"
+      << "\tc2: Pressure in tubes does not exceed yield pressure (stochastic)\n"
       << "\tc3: Receiver inside diameter <= receiver outside diameter\n"
       << "\tc4: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
       << "\tc5: Tubes fit in receiver\n"
-      << "\tc6: Parasitics do not exceed 5% of the absorbed power\n"
-    
+      << "\tc6: Parasitics do not exceed 5% of the absorbed power (stochastic)\n"   
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 7 << std::endl
@@ -581,21 +637,21 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\tc2: Tower is at least twice as high as heliostats\n"
       << "\tc3: Min. distance to tower <= max. distance to tower\n"   
       << "\tc4: Number of heliostats <= number of positions in the grid\n"
-      << "\tc5: Pressure in receiver tubes <= yield pressure\n"
+      << "\tc5: Pressure in receiver tubes <= yield pressure (stochastic)\n"
       << "\tc6: Receiver inside diameter <= receiver outside diameter\n"
       << "\tc7: Tubes fit in receiver\n"
-      << "\tc8: Minimal acceptable energy production\n"
-      << "\tc9: Parasitics must not exceed 8% of absorbed energy\n"
+      << "\tc8: Minimal acceptable energy production (stochastic)\n"
+      << "\tc9: Parasitics must not exceed 8% of absorbed energy (stochastic)\n"
   
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
-      << "DIMENSION        " << 13 << std::endl
+      << "\tDIMENSION        " << 13 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $8" << std::endl
-      << "BB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "BB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R  I    R     R      R )" << std::endl
-      << "LOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0  1 0.01 0.005 0.0060 )" << std::endl
-      << "X0               " << "( 11.0 11.0 200.0 10.0 10.0 2650 89.0  0.5  8.0 36 0.30 0.020 0.0216 )" << std::endl
-      << "UPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0  - 5.00 0.100 0.1000 )" << std::endl;
+      << "\tBB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R  I    R     R      R )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0  1 0.01 0.005 0.0060 )" << std::endl
+      << "\tX0               " << "( 11.0 11.0 200.0 10.0 10.0 2650 89.0  0.5  8.0 36 0.30 0.020 0.0216 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0  - 5.00 0.100 0.1000 )" << std::endl;
 }
 
 /*--------------  #9  ---------------------------*/
@@ -613,7 +669,7 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tMinimum energy production: 250MWh\n"
       << std::endl;
   
-  out << "Objectives (first and second outputs)\n"
+  out << "Objectives (first and second outputs; second objective is stochastic)\n"
       << "\tMaximize power and minimize losses\n"
       << std::endl;
   
@@ -659,25 +715,25 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\t c4: Tower is at least twice as high as heliostats\n"
       << "\t c5: Min. distance to tower <= max. distance to tower\n"  
       << "\t c6: Number of heliostats <= number of positions in the field\n"
-      << "\t c7: Pressure in receiver tubes <= yield pressure\n"
-      << "\t c8: Molten salt melting point <= hot storage lowest temperature\n"
-      << "\t c9: Molten salt melting point <= cold storage lowest temperature\n"
-      << "\tc10: Molten salt melting point <= steam generatour outlet temperature\n"
+      << "\t c7: Pressure in receiver tubes <= yield pressure (stochastic)\n"
+      << "\t c8: Molten salt melting point <= hot storage lowest temperature (stochastic)\n"
+      << "\t c9: Molten salt melting point <= cold storage lowest temperature (stochastic)\n"
+      << "\tc10: Molten salt melting point <= steam generatour outlet temperature (stochastic)\n"
       << "\tc11: Receiver inside diameter <= receiver outside diameter\n"
       << "\tc12: Tubes fit in receiver\n"
       << "\tc13: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
-      << "\tc14: Ratio parasitics vs power output <= 20%\n"
+      << "\tc14: Ratio parasitics vs power output <= 20% (stochastic)\n"
       << "\tc15: Steam generator outer tubes diameter <= tubes spacing\n"
       << "\tc16: Steam generator inside diameter <= steam generator outside diameter\n"
       << "\tc17: Pressure in steam generator tubes <= yield pressure\n";
   
   out << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
-      << "DIMENSION        " << 29 << std::endl
+      << "\tDIMENSION        " << 29 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $9" << std::endl
-      << "BB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "BB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R  I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
-      << "LOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0  1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
-      << "X0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 50 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 2 12000  1 2 2 )" << std::endl    
-      << "UPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0  - 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
+      << "\tBB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R   I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0   1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
+      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl   
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0   - 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
 }

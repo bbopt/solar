@@ -1,369 +1,339 @@
+/*-------------------------------------------------------------------------------*/
+/*  SOLAR - The solar thermal power plant simulator                              */
+/*  https://github.com/bbopt/solar                                               */
+/*                                                                               */
+/*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
+/*                                                                               */
+/*  Polytechnique Montreal / GERAD                                               */
+/*  sebastien.le-digabel@polymtl.ca                                              */
+/*                                                                               */
+/*  This program is free software: you can redistribute it and/or modify it      */
+/*  under the terms of the GNU Lesser General Public License as published by     */
+/*  the Free Software Foundation, either version 3 of the License, or (at your   */
+/*  option) any later version.                                                   */
+/*                                                                               */
+/*  This program is distributed in the hope that it will be useful, but WITHOUT  */
+/*  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        */
+/*  FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  */
+/*  for more details.                                                            */
+/*                                                                               */
+/*  You should have received a copy of the GNU Lesser General Public License     */
+/*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
 #include "Powerplant.hpp"
 
-Powerplant::Powerplant ( Clock          & time       ,
-			 Sun            & sun        ,
-			 int              model_type ,
-			 HeliostatField * field      ,
-			 HtfCycle       * htfCycle   ,
-			 Powerblock     * powerblock ,
-			 Economics      * economics    ) :
-  _time            ( time       ) ,
-  _sun             ( sun        ) ,
-  _model_type      ( model_type ) ,
-  _moltenSaltLoop  ( htfCycle   ) ,
-  _heliostatsField ( field      ) ,
-  _powerblock      ( powerblock ) ,
-  _investmentCost  ( economics  )   {}
+/*-------------------------------------------------------------------------------*/
+/*                                   constructeur                                */
+/*-------------------------------------------------------------------------------*/
+Powerplant::Powerplant ( const Time_Manager & time       ,
+			 int                  model_type ,
+			 HeliostatField     * field      ,
+			 HtfCycle           * htfCycle   ,
+			 Powerblock         * powerblock ,
+			 Economics          * economics    ) :
+  _time                       ( time       ) ,
+  _model_type                 ( model_type ) ,
+  _heliostatsFieldModel       ( 0          ) ,
+  _moltenSaltLoop             ( htfCycle   ) ,
+  _heliostatsField            ( field      ) ,
+  _powerblock                 ( powerblock ) ,
+  _investmentCost             ( economics  ) ,
+  _reflectiveSurface          ( 0.0        ) ,
+  _fieldSurface               ( 0.0        ) ,
+  _costOfHeliostatsField      ( 0.0        ) ,
+  _totalEnergyConcentrated    ( 0.0        ) ,
+  _maximumPressureInReceiver  ( 0.0        ) ,
+  _maximumPressureInExchanger ( 0.0        ) ,
+  _yieldPressureReceiver      ( 0.0        ) ,
+  _yieldPressureExchanger     ( 0.0        ) ,
+  _overallComplianceToDemand  ( 0.0        )   {
 
-class foncteurSum
-{
+  if ( _model_type != 1 && _model_type != 2 ) {
+    clean();
+    throw std::invalid_argument ( "model_type can only be 1 or 2" );
+  }
+}
+
+/*----------------------------------*/
+void Powerplant::clean ( void ) {
+/*----------------------------------*/
+
+  if ( _heliostatsField ) {
+    delete _heliostatsField;
+    _heliostatsField = NULL;
+  }
+
+  if ( _moltenSaltLoop ) {
+    delete _moltenSaltLoop;
+    _moltenSaltLoop = NULL;
+  }
+  
+  if ( _powerblock ) {
+    delete _powerblock;
+    _powerblock = NULL;
+  }
+    
+  if ( _investmentCost ) {
+    delete _investmentCost;
+    _investmentCost = NULL;
+  }
+}
+
+/*----------------------------------*/
+class foncteurSum {
+/*----------------------------------*/
 private:
-	double* _sum;
-
+  double* _sum;
 public:
-	foncteurSum(double* sum) { _sum = sum; }
-
-	void operator()(double d){ (*_sum) += d; }
+  foncteurSum     ( double* sum ) { _sum = sum;   }
+  void operator() ( double  d   ) { (*_sum) += d; }
 };
 
-//This function simply runs the simulation
-void Powerplant::fSimulatePowerplant()
-{
+/*--------------------------------------------*/
+/*  This function simply runs the simulation  */
+/*--------------------------------------------*/
+void Powerplant::fSimulatePowerplant ( void ) {
 
-	//Options:
-	//1- Simulate the heliostats field or replace it with an input file
-	//2- Simulate the heat exchanger or use the energy balance basic model
-	//3- Use a dT dependant model for poweblock efficiency or use a simple
-	//   constant efficiency model to convert thermal energy in expected electrical power
-	//4- Simulate only the heliostat field
-	//5- Use a demand model based on an input file, use a constant demand with 
-	//   a fixated value, or use a daily demand model (summer or winter options) with data from ontario.
+  // Options:
+  // 1- Simulate the heliostats field or replace it with an input file
+  // 2- Simulate the heat exchanger or use the energy balance basic model
+  // 3- Use a dT dependant model for poweblock efficiency or use a simple
+  //    constant efficiency model to convert thermal energy in expected electrical power
+  // 4- Simulate only the heliostat field
+  // 5- Use a demand model based on an input file, use a constant demand with 
+  //    a fixated value, or use a daily demand model (summer or winter options) with data from ontario.
 
-	if ( _model_type == 1 ) // heliostats field
-	{
-		fSimulateHeliostatField();
+  // heliostats field:
+  if ( _model_type == 1 )
+    fSimulateHeliostatField();
+
+  // whole plant:
+  else if ( _model_type == 2 ) {
+       
+    fSimulateHeliostatField();
+    
+    //Pre-setting the reserves
+
+    int kk = _time.get_numberOfIncrements() * _time.get_sizeOfIncrements() * 60;
+
+    _receiverPumpHead.reserve(kk);
+    _powerplantPowerOutput.reserve(kk);
+    _powerblock->reserve(kk);
+    _steamRate.reserve(kk);
+    _msRateSteamGen.reserve(kk);
+    _receiverOutletFlow.reserve(kk);
+    _heliostatsFieldPar.reserve(kk);
+
+    // Determining yield pressure for the receiver
+    if (_moltenSaltLoop->get_exchangerModel() == 2) {
+      _pressureTubesSide.reserve(kk);
+      _maximumPressureInExchanger = 0.0;
+    }
+    _maximumPressureInReceiver = 0.0;
+    _yieldPressureReceiver  = _moltenSaltLoop->compute_CR_YieldPressure();
+    _yieldPressureExchanger = _moltenSaltLoop->compute_SG_YieldPressure();
+
+    double tmp_sum  = 0.0;
+    int    tmp_size = 0;
+    
+    double thermalPowerNeeded, turbineThermalPower, steamRate;
+    int    imax = _time.get_sizeOfIncrements() * 60;
+    
+    for ( int j = 0; j < _time.get_numberOfIncrements(); ++j ) {
+
+      for ( int i = 0; i < imax; ++i ) {
+
+	turbineThermalPower = _powerblock->fComputeRequiredThermalEnergy(_demand[j]);	
+	steamRate = fComputeSteamRate(turbineThermalPower);
+
+	thermalPowerNeeded = fComputeThermalEnergy(steamRate);
+	
+	_powerblock->add_requiredThermalPower(thermalPowerNeeded);
+
+	_moltenSaltLoop->fOperateCycle (1, _heliostatFieldPowerOutput[j], thermalPowerNeeded );
+    
+	if (_heliostatFieldPowerOutput[j] > 0 && _heliostatsFieldModel == 1)
+	  _heliostatsFieldPar.push_back(55.0 * _heliostatsField->get_nb_heliostats());
+	else
+	  _heliostatsFieldPar.push_back(0.0);
+	    
+	if ( _moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow() > 0.0 ) {
+
+	  //Filling powerplant power output vector
+	  _powerplantPowerOutput.push_back(_powerblock->get_Pout());
+		
+	  //Filling demand compliance vector
+	  if ( _powerplantPowerOutput.back() >= _demand[j] && _demand[j] > 0.0 ) {   
+	    tmp_sum += 1.0;
+	    ++tmp_size;
+	  }
+	  else if ( _demand[j] > 0.0 ) {
+	    tmp_sum += _powerplantPowerOutput.back() / _demand[j];
+	    ++tmp_size;
+	  }
 	}
-	else if ( _model_type == 2 ) // whole plant
-	{
-		fSimulateHeliostatField();
-
-		//Pre-setting the reserves
-		_hotStorageLevel.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_coldStorageLevel.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_hotStorageTemp.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_coldStorageTemp.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_energyToPowerBlockWatts.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_receiverPumpHead.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_powerplantPowerOutput.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_demandCompliance.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_powerblock->get_powerOutput().reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_steamRate.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_msRateSteamGen.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_receiverOutletFlow.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		_heliostatsFieldPar.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-		//Determining yield pressure for the receiver
-
-		if (_moltenSaltLoop->get_steamGenerator().get_exchangerModel() == 2)
-		{
-			_pressureTubesSide.reserve(_time.get_numberOfIncrements()* _time.get_sizeOfIncrements() * 60);
-			_maximumPressureInExchanger = 0.;
-		}
-		_maximumPressureInReceiver = 0.;
-		_yieldPressureReceiver = _moltenSaltLoop->get_centralReceiver().computeYieldPressure();
-		_yieldPressureExchanger = _moltenSaltLoop->get_steamGenerator().computeYieldPressure();
-		// double pressureInReceiver, pressureInExchangerTubes;
-		double thermalPowerNeeded, turbineThermalPower, steamRate;
-
-		for (int j = 0; j < _time.get_numberOfIncrements(); ++j)
-		{
-			for (int i = 0; i < _time.get_sizeOfIncrements() * 60; ++i)
-			{
-				turbineThermalPower = _powerblock->fComputeRequiredThermalEnergy(_demand[j]);
-				steamRate = fComputeSteamRate(turbineThermalPower);
-				thermalPowerNeeded = fComputeThermalEnergy(steamRate);
-				_powerblock->get_requiredThermalPower().push_back(thermalPowerNeeded);
-				_moltenSaltLoop->fOperateCycle(1, _heliostatFieldPowerOutput[j], thermalPowerNeeded);
-
-				/*Data gathering*/
-				_hotStorageLevel.push_back(_moltenSaltLoop->get_hotStorage().get_heightOfVolumeStored());
-				_coldStorageLevel.push_back(_moltenSaltLoop->get_coldStorage().get_heightOfVolumeStored());
-				_hotStorageTemp.push_back(_moltenSaltLoop->get_hotStorage().get_storedTemperature());
-				_coldStorageTemp.push_back(_moltenSaltLoop->get_coldStorage().get_storedTemperature());
-				_energyToPowerBlockWatts.push_back(_moltenSaltLoop->get_steamGenerator().fEnergyToPowerBlock(1/**/));
-
-
-				if (_heliostatFieldPowerOutput[j] > 0 && _heliostatsFieldModel == 1)
-				{ _heliostatsFieldPar.push_back(55. * _heliostatsField->get_listOfHeliostats().size()); }
-				else { _heliostatsFieldPar.push_back(0.); }
-
-				if (_moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow() > 0.)
-				{
-					//Filling powerplant power output vector
-					_powerplantPowerOutput.push_back(_powerblock->get_Pout());
-
-					//Filling demand compliance vector
-					if (_powerplantPowerOutput.back() >= _demand[j]
-						&& _demand[j] > 0.){
-						_demandCompliance.push_back(1);
-					}
-					else if (_demand[j] > 0.){ _demandCompliance.push_back(_powerplantPowerOutput.back() / _demand[j]); }
-				}
-				else 
-				{
-					_powerplantPowerOutput.push_back(0.);
-					//Filling demand compliance vector
-					if (_demand[j] > 0.){ _demandCompliance.push_back(0.); }
-				}
-
-				//recording pressure in receiver tubes
-				_receiverPumpHead.push_back(_moltenSaltLoop->get_centralReceiver().computePressureInTubes());
-				_receiverPumpHead.back() > _maximumPressureInReceiver ? _maximumPressureInReceiver = _receiverPumpHead.back() : 1;
-
-				if (_moltenSaltLoop->get_steamGenerator().get_exchangerModel() == 2)
-				{
-					//recording pressure in steam generator tubes
-					_pressureTubesSide.push_back(_moltenSaltLoop->get_steamGenerator().computePressureInTubes(steamRate));
-
-					//recording pressure in steam generator shell
-					_pressureShellSide.push_back(_moltenSaltLoop->get_steamGenerator().computePressureInShells());
-
-					_pressureTubesSide.back() + _powerblock->get_pressure() > _maximumPressureInExchanger ? _maximumPressureInExchanger = _pressureTubesSide.back() : 1;
-				}
-
-				//recording molten salt flows to receiver and exchanger
-				_receiverOutletFlow.push_back(_moltenSaltLoop->get_centralReceiverOutlet().get_massFlow());
-				_msRateSteamGen.push_back(_moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow());
-
-				//recording steam rate
-				_steamRate.push_back(steamRate);
-			}
-		}
-
-		double sumCompliance = 0;
-		foncteurSum somme(&sumCompliance);
-		std::for_each(_demandCompliance.begin(), _demandCompliance.end(), somme);
-		unsigned int compliance = 0;
-		if (_demandCompliance.size() > 0){ compliance = _demandCompliance.size(); }
-		else{ compliance = 1; }
-		_overallComplianceToDemand = sumCompliance*100. / compliance;
+	else {
+	  _powerplantPowerOutput.push_back(0.0);
+	  if ( _demand[j] > 0.0 )
+	    ++tmp_size;
 	}
-}
+	    
+	// recording pressure in receiver tubes
+	_receiverPumpHead.push_back(_moltenSaltLoop->compute_CR_PressureInTubes());
+	_receiverPumpHead.back() > _maximumPressureInReceiver ? _maximumPressureInReceiver = _receiverPumpHead.back() : 1;
+	
+	if ( _moltenSaltLoop->get_exchangerModel() == 2 ) {
 
-
-
-void Powerplant::fSimulateHeliostatField()
-{
-	if (_heliostatsFieldModel == 1)
-	{
-		//Generating heliostats field
-		_heliostatsField->fGenerateField();
-		_heliostatFieldPowerOutput.reserve(_time.get_numberOfIncrements());
-
-		//Economics
-		int numberOfHeliostats = static_cast<int>(_heliostatsField->get_listOfHeliostats().size());
-		_investmentCost->set_nbOfHeliostats(numberOfHeliostats);
-
-		_totalEnergyConcentrated = 0.;
-
-		//Simulating heliostats field
-		_heliostatsField->fGenerateSunrays();
-		for (int i = 0; i < _time.get_numberOfIncrements(); ++i)
-		{
-			_heliostatFieldPowerOutput.push_back(_heliostatsField->fCalculateTotalEnergyOutput());
-			_heliostatsField->get_sun()->get_time().fTimeIncrement();
-			_totalEnergyConcentrated += _heliostatFieldPowerOutput[i] * _time.get_sizeOfIncrements() * 60;
-		}
-
-		_reflectiveSurface = _heliostatsField->get_listOfHeliostats().size() *
-			_heliostatsField->get_heliostatLength() * _heliostatsField->get_heliostatWidth();
-		_investmentCost->set_reflectiveArea(_reflectiveSurface);
-
-		_fieldSurface = _heliostatsField->get_maxAngularDeviation() * 2 * (M_PI / 180.)*
-			(pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_maxDistanceFromTower(), 2.)
-			- pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_minDistanceFromTower(), 2.));
-
-		_heliostatFieldEfficiency = _heliostatsField->get_fieldEfficiency();
-
-		//converting to kWh
-		_totalEnergyConcentrated /= (1000. * 3600); // TOTO calculer direct
-	}
-	else if (_heliostatsFieldModel == 2)
-	{
-
-	  // _heliostatFieldPowerOutput has been filled with pre-fixed values
-	  // (see methods set_heliostatFieldPowerOutput_XXX at the end of this file)
+	  //recording pressure in steam generator tubes
+	  _pressureTubesSide.push_back(_moltenSaltLoop->compute_SG_PressureInTubes(steamRate));
 	  
+	  //recording pressure in steam generator shell
+	  _pressureShellSide.push_back(_moltenSaltLoop->computePressureInShells());
 	  
-	  // TOTO TUTU  Virer tout ca ci-dessous
-
-	  
-	  // //std::string pathToSunData = pathToBlackbox;
-	  // //int pos = pathToSunData.find_last_of(separatorString());
-	  // //pathToSunData = pathToBlackbox.substr(0, pos);
-	  // //	pathToSunData.append(_pathToFieldData);
-
-	  // //Reading input file
-	  // ifstream sunData("TOTO TATA", ios::in);
-	  // if (sunData)
-	  // 	{
-	  // 		for (int i = 0; i < _time.get_numberOfIncrements(); ++i)
-	  // 		{
-	  // 			if (!sunData.eof())
-	  // 			{
-	  // 				sunData >> pwrOutput;
-	  // 				_heliostatFieldPowerOutput.push_back(pwrOutput);
-	  // 			}
-	  // 			else{
-	  // 				std::invalid_argument data("couldn't read solar energy output from file \n");
-	  // 				throw data;
-	  // 			}
-	  // 		}
-	  // 		sunData.close();
-	  // 	}
-	  // 	else
-	  // 	{
-	  // 		std::invalid_argument data("couldn't read solar energy output from file \n");
-	  // 		throw data;
-	  // 	}
-
+	  _pressureTubesSide.back() + _powerblock->get_pressure() > _maximumPressureInExchanger ?
+	    _maximumPressureInExchanger = _pressureTubesSide.back() : 1;
 	}
+	
+	//recording molten salt flows to receiver and exchanger
+	_receiverOutletFlow.push_back(_moltenSaltLoop->get_centralReceiverOutlet().get_massFlow());
+	_msRateSteamGen.push_back(_moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow());
+	
+	//recording steam rate
+	_steamRate.push_back(steamRate);
+      }
+    }
+    
+    if ( tmp_size == 0 )
+      tmp_size = 1;
+
+    _overallComplianceToDemand = tmp_sum*100.0 / tmp_size;
+  }
 }
 
-double Powerplant::fComputeSteamRate(double& turbineEnergy)
-{
-	double steamRate = turbineEnergy /
-		(_powerblock->get_hotEnthalpy() - _powerblock->get_turbineOutletEnthalpy());
+/*--------------------------------------------------*/
+void Powerplant::fSimulateHeliostatField ( void ) {
+/*--------------------------------------------------*/
+  
+  if (_heliostatsFieldModel == 1) {
+    
+    //Generating heliostats field
+    _heliostatsField->fGenerateField();
+    _heliostatFieldPowerOutput.reserve(_time.get_numberOfIncrements());
 
-	_powerblock->set_steamRate(steamRate);
+    //Economics
+    _investmentCost->set_nbOfHeliostats ( static_cast<int>(_heliostatsField->get_nb_heliostats()) );
+    _totalEnergyConcentrated = 0.;
+ 
+    //Simulating heliostats field
+    _heliostatsField->fGenerateSunrays();
+    for (int i = 0; i < _time.get_numberOfIncrements(); ++i) {
+      _heliostatFieldPowerOutput.push_back ( _heliostatsField->fCalculateTotalEnergyOutput() );
+      _heliostatsField->fTimeIncrement();
+      _totalEnergyConcentrated += _heliostatFieldPowerOutput[i] * _time.get_sizeOfIncrements() * 60;     
+    }
 
-	return steamRate;
+    _reflectiveSurface = _heliostatsField->get_nb_heliostats() *
+      _heliostatsField->get_heliostatLength() * _heliostatsField->get_heliostatWidth();
+    _investmentCost->set_reflectiveArea(_reflectiveSurface);
+    
+    _fieldSurface = _heliostatsField->get_maxAngularDeviation() * 2 * (PI / 180.0)*
+      (pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_maxDistanceFromTower(), 2.0) -
+       pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_minDistanceFromTower(), 2.0));
+
+    //converting to kWh
+    _totalEnergyConcentrated /= 3600000.0;
+  }  
 }
 
-double Powerplant::fComputeThermalEnergy(double& steamRate)
-{
-	double thermalEnergy = steamRate * (_powerblock->get_hotEnthalpy() - WATER_300K_1ATM_ENTHALPY);
-
-	return thermalEnergy;
+/*--------------------------------------------------------------*/
+double Powerplant::fComputeSteamRate ( double turbineEnergy ) {
+/*--------------------------------------------------------------*/
+  double steamRate = turbineEnergy / (_powerblock->get_hotEnthalpy() - _powerblock->get_turbineOutletEnthalpy());
+  _powerblock->set_steamRate(steamRate);
+  return steamRate;
 }
 
-//Computes energy lost in main components in order to either maintain temperature or
-//drive the main pumps.
-class foncteurSum9
-{
+/*--------------------------------------------------------------*/
+/*  Computes energy lost in main components in order to either  */
+/*  maintain temperature or drive the main pumps                */
+/*--------------------------------------------------------------*/
+class foncteurSum9 {
 private:
-	double* _sum;
-
+  double* _sum;
 public:
-	foncteurSum9(double* s){ _sum = s; }
-
-	void operator()(double d){ (*_sum) = (*_sum) + d; }
+  foncteurSum9(double* s){ _sum = s; }
+  void operator()(double d){ (*_sum) = (*_sum) + d; }
 };
 
-double Powerplant::fComputeParasiticLosses()
-{
-	double W_rec, W_shell, W_steam, Q_helios, Q_heat;
-	double total = 0.;
-	W_rec = 0;
-	W_shell = 0;
-	W_steam = 0;
-	Q_helios = 0;
-	Q_heat = 0;
+/*--------------------------------------------------------------*/
+double Powerplant::fComputeParasiticLosses ( void ) const {
+/*--------------------------------------------------------------*/
 
-	W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
-		_receiverOutletFlow.begin(), 0.0);
+  double Q_helios = 0.0;
+  double Q_heat   = 0.0;
 
-	W_rec /= MS_DENSITY;
+  double W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
+				    _receiverOutletFlow.begin(), 0.0) / MS_DENSITY;
 
-	W_shell = std::inner_product(_pressureShellSide.begin(), _pressureShellSide.end(),
-		_msRateSteamGen.begin(), 0.0);
-	W_shell /= MS_DENSITY;
+  double W_shell = std::inner_product(_pressureShellSide.begin(), _pressureShellSide.end(),
+				      _msRateSteamGen.begin(), 0.0) / MS_DENSITY;
 
-	W_steam = std::inner_product(_pressureTubesSide.begin(), _pressureTubesSide.end(),
-		_steamRate.begin(), 0.0);
-	W_steam /= WATER_DENSITY;
+  double W_steam = std::inner_product(_pressureTubesSide.begin(), _pressureTubesSide.end(),
+				      _steamRate.begin(), 0.0) / WATER_DENSITY;
 
-	foncteurSum9 sumQ_heat(&Q_heat);
-	std::for_each(_moltenSaltLoop->get_storageHeatV().begin(),
+  foncteurSum9 sumQ_heat(&Q_heat);
+  std::for_each(_moltenSaltLoop->get_storageHeatV().begin(),
 		_moltenSaltLoop->get_storageHeatV().end(),
 		sumQ_heat);
 
-	foncteurSum9 sumQ_helios(&Q_helios);
-	std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
+  foncteurSum9 sumQ_helios(&Q_helios);
+  std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
 		sumQ_helios);
 
-	total = W_rec + W_shell + W_steam + Q_heat + Q_helios;
-
-	return total;
+  return W_rec + W_shell + W_steam + Q_heat + Q_helios;
 }
 
-double Powerplant::fComputeParasiticsForPb3()
-{
-	double W_rec, W_shell, W_steam, Q_helios, Q_heat;
-	double total = 0.;
-	W_rec = 0;
-	W_shell = 0;
-	W_steam = 0;
-	Q_helios = 0;
-	Q_heat = 0;
+/*--------------------------------------------------------------*/
+double Powerplant::fComputeParasiticsForPb3 ( void ) const {
+/*--------------------------------------------------------------*/
 
-	W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
-		_receiverOutletFlow.begin(), 0.0);
+  double Q_helios = 0.0;
+  double Q_heat   = 0.0;
 
-	W_rec /= MS_DENSITY;
-
-	foncteurSum9 sumQ_heat(&Q_heat);
-	std::for_each(_moltenSaltLoop->get_storageHeatV().begin(),
+  double W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
+			     _receiverOutletFlow.begin(), 0.0) / MS_DENSITY;
+	
+  foncteurSum9 sumQ_heat(&Q_heat);
+  std::for_each(_moltenSaltLoop->get_storageHeatV().begin(),
 		_moltenSaltLoop->get_storageHeatV().end(),
 		sumQ_heat);
-
-	foncteurSum9 sumQ_helios(&Q_helios);
-	std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
+  
+  foncteurSum9 sumQ_helios(&Q_helios);
+  std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
 		sumQ_helios);
-
-	total = 2.*W_rec + Q_heat + Q_helios;
-
-	return total;
+  
+  return 2.0 * W_rec + Q_heat + Q_helios;
 }
 
-double Powerplant::fComputeParasiticsForPb7()
-{
-	double W_rec;
+/*--------------------------------------------------------------*/
+double Powerplant::fComputeParasiticsForPb9 ( void ) const {
+/*--------------------------------------------------------------*/
 
-	W_rec = 0.;
-	W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
-		_receiverOutletFlow.begin(), 0.0);
+  double Q_helios = 0.0;
+  double W_rec    = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
+				       _receiverOutletFlow.begin(), 0.0) / MS_DENSITY;
 
-	W_rec /= MS_DENSITY;
+  foncteurSum9 somme(&Q_helios);
+  std::for_each ( _heliostatsFieldPar.begin(), _heliostatsFieldPar.end(), somme );
 
-	return W_rec;
+
+  return W_rec + Q_helios;
 }
 
-
-double Powerplant::fComputeParasiticsForPb9()
-{
-	double W_rec, Q_helios;
-	double total = 0.;
-
-	W_rec = 0.;
-	Q_helios = 0.;
-	
-	W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
-		_receiverOutletFlow.begin(), 0.0);
-	W_rec /= MS_DENSITY;
-
-	foncteurSum9 somme(&Q_helios);
-	std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
-		somme);
-	
-
-	total = W_rec + Q_helios;
-	return total;
-}
-
-
-// TOTO TUTU
-
-// For solar6:
+/*--------------------------------------------------------------*/
+/*                          For solar6                          */
+/*--------------------------------------------------------------*/
 bool Powerplant::set_heliostatFieldPowerOutput_MINCOST_TS ( void ) {
   
   if ( _time.get_numberOfIncrements() != 24 )
@@ -390,7 +360,9 @@ bool Powerplant::set_heliostatFieldPowerOutput_MINCOST_TS ( void ) {
   return true;
 }
 
-// For solar5:
+/*--------------------------------------------------------------*/
+/*                          For solar5                          */
+/*--------------------------------------------------------------*/
 bool Powerplant::set_heliostatFieldPowerOutput_MAXCOMP_HTF1 ( void ) {
 
   if ( _time.get_numberOfIncrements() != 720 )
@@ -400,50 +372,50 @@ bool Powerplant::set_heliostatFieldPowerOutput_MAXCOMP_HTF1 ( void ) {
   for ( int i = 0 ; i < 720 ; ++i )
     _heliostatFieldPowerOutput[i] = 0.0;
 
-  _heliostatFieldPowerOutput[7]=6380504;
-  _heliostatFieldPowerOutput[8]=31279320;
-  _heliostatFieldPowerOutput[9]=37648690;
-  _heliostatFieldPowerOutput[10]=40425920;
-  _heliostatFieldPowerOutput[11]=41574850;
-  _heliostatFieldPowerOutput[12]=42259420;
-  _heliostatFieldPowerOutput[13]=42785530;
-  _heliostatFieldPowerOutput[14]=41391120;
-  _heliostatFieldPowerOutput[15]=40368350;
-  _heliostatFieldPowerOutput[16]=32116270;
-  _heliostatFieldPowerOutput[17]=6488462;
-  _heliostatFieldPowerOutput[31]=5742453.6;
-  _heliostatFieldPowerOutput[32]=28151388;
-  _heliostatFieldPowerOutput[33]=33883821;
-  _heliostatFieldPowerOutput[34]=36383328;
-  _heliostatFieldPowerOutput[35]=37417365;
-  _heliostatFieldPowerOutput[36]=38033478;
-  _heliostatFieldPowerOutput[37]=38506977;
-  _heliostatFieldPowerOutput[38]=37252008;
-  _heliostatFieldPowerOutput[39]=36331515;
-  _heliostatFieldPowerOutput[40]=28904643;
-  _heliostatFieldPowerOutput[41]=5839615.8;
-  _heliostatFieldPowerOutput[55]=6061478.8;
-  _heliostatFieldPowerOutput[56]=29715354;
-  _heliostatFieldPowerOutput[57]=35766255.5;
-  _heliostatFieldPowerOutput[58]=38404624;
-  _heliostatFieldPowerOutput[59]=39496107.5;
-  _heliostatFieldPowerOutput[60]=40146449;
-  _heliostatFieldPowerOutput[61]=40646253.5;
-  _heliostatFieldPowerOutput[62]=39321564;
-  _heliostatFieldPowerOutput[63]=38349932.5;
-  _heliostatFieldPowerOutput[64]=30510456.5;
-  _heliostatFieldPowerOutput[65]=6164038.9;
-  _heliostatFieldPowerOutput[79]=5104403.2;
-  _heliostatFieldPowerOutput[80]=25023456;
-  _heliostatFieldPowerOutput[81]=30118952;
-  _heliostatFieldPowerOutput[82]=30319440;
-  _heliostatFieldPowerOutput[83]=31181137.5;
-  _heliostatFieldPowerOutput[84]=29581594;
-  _heliostatFieldPowerOutput[85]=29949871;
-  _heliostatFieldPowerOutput[86]=28973784;
-  _heliostatFieldPowerOutput[87]=28257845;
-  _heliostatFieldPowerOutput[88]=22481389;
-  _heliostatFieldPowerOutput[89]=4541923.4;
+  _heliostatFieldPowerOutput[  7]=6380504;
+  _heliostatFieldPowerOutput[  8]=31279320;
+  _heliostatFieldPowerOutput[  9]=37648690;
+  _heliostatFieldPowerOutput[ 10]=40425920;
+  _heliostatFieldPowerOutput[ 11]=41574850;
+  _heliostatFieldPowerOutput[ 12]=42259420;
+  _heliostatFieldPowerOutput[ 13]=42785530;
+  _heliostatFieldPowerOutput[ 14]=41391120;
+  _heliostatFieldPowerOutput[ 15]=40368350;
+  _heliostatFieldPowerOutput[ 16]=32116270;
+  _heliostatFieldPowerOutput[ 17]=6488462;
+  _heliostatFieldPowerOutput[ 31]=5742453.6;
+  _heliostatFieldPowerOutput[ 32]=28151388;
+  _heliostatFieldPowerOutput[ 33]=33883821;
+  _heliostatFieldPowerOutput[ 34]=36383328;
+  _heliostatFieldPowerOutput[ 35]=37417365;
+  _heliostatFieldPowerOutput[ 36]=38033478;
+  _heliostatFieldPowerOutput[ 37]=38506977;
+  _heliostatFieldPowerOutput[ 38]=37252008;
+  _heliostatFieldPowerOutput[ 39]=36331515;
+  _heliostatFieldPowerOutput[ 40]=28904643;
+  _heliostatFieldPowerOutput[ 41]=5839615.8;
+  _heliostatFieldPowerOutput[ 55]=6061478.8;
+  _heliostatFieldPowerOutput[ 56]=29715354;
+  _heliostatFieldPowerOutput[ 57]=35766255.5;
+  _heliostatFieldPowerOutput[ 58]=38404624;
+  _heliostatFieldPowerOutput[ 59]=39496107.5;
+  _heliostatFieldPowerOutput[ 60]=40146449;
+  _heliostatFieldPowerOutput[ 61]=40646253.5;
+  _heliostatFieldPowerOutput[ 62]=39321564;
+  _heliostatFieldPowerOutput[ 63]=38349932.5;
+  _heliostatFieldPowerOutput[ 64]=30510456.5;
+  _heliostatFieldPowerOutput[ 65]=6164038.9;
+  _heliostatFieldPowerOutput[ 79]=5104403.2;
+  _heliostatFieldPowerOutput[ 80]=25023456;
+  _heliostatFieldPowerOutput[ 81]=30118952;
+  _heliostatFieldPowerOutput[ 82]=30319440;
+  _heliostatFieldPowerOutput[ 83]=31181137.5;
+  _heliostatFieldPowerOutput[ 84]=29581594;
+  _heliostatFieldPowerOutput[ 85]=29949871;
+  _heliostatFieldPowerOutput[ 86]=28973784;
+  _heliostatFieldPowerOutput[ 87]=28257845;
+  _heliostatFieldPowerOutput[ 88]=22481389;
+  _heliostatFieldPowerOutput[ 89]=4541923.4;
   _heliostatFieldPowerOutput[103]=4466352.8;
   _heliostatFieldPowerOutput[104]=21895524;
   _heliostatFieldPowerOutput[105]=26354083;

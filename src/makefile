@@ -4,9 +4,10 @@ COMPILATOR_OPTIONS = -O2 -Wall -Wextra -pedantic -Wcast-align
 LIBS               = -lc -lm
 INCLUDE            = -I.
 COMPILE            = $(COMPILATOR) $(COMPILATOR_OPTIONS) $(INCLUDE) -c
-OBJS               = main.o CentralReceiver.o Clock.o Economics.o Global.o Turbine.o \
-                     HeatExchanger.o Heliostat.o HeliostatField.o HtfCycle.o helpFunctions.o \
-                     MoltenSalt.o Powerblock.o Powerplant.o Problem.o Scenario.o Sunray.o Sun.o ThermalStorage.o
+OBJS               = main.o CentralReceiver.o Time_Manager.o Economics.o Global.o Turbine.o \
+                     HeatExchanger.o Heliostat.o HeliostatField.o HtfCycle.o helpFunctions.o RNG.o \
+                     MoltenSalt.o Powerblock.o Powerplant.o Problem.o Scenario.o Sunray.o Sun.o ThermalStorage.o \
+                     Clock.o Evaluator.o
 
 $(EXE): $(OBJS)
 	$(COMPILATOR) -o $(EXE) $(OBJS) $(LIBS) $(COMPILATOR_OPTIONS)
@@ -14,8 +15,8 @@ $(EXE): $(OBJS)
 CentralReceiver.o: CentralReceiver.cpp CentralReceiver.hpp MoltenSalt.o Constants.hpp
 	$(COMPILE) CentralReceiver.cpp
 
-Clock.o: Clock.cpp Clock.hpp
-	$(COMPILE) Clock.cpp
+Time_Manager.o: Time_Manager.cpp Time_Manager.hpp
+	$(COMPILE) Time_Manager.cpp
 
 Economics.o: Economics.cpp Economics.hpp Global.o
 	$(COMPILE) Economics.cpp
@@ -29,7 +30,7 @@ HeatExchanger.o: HeatExchanger.cpp HeatExchanger.hpp MoltenSalt.o Powerblock.o P
 Heliostat.o: Heliostat.cpp Heliostat.hpp Sun.hpp Constants.hpp
 	$(COMPILE) Heliostat.cpp
 
-HeliostatField.o: HeliostatField.cpp HeliostatField.hpp Sun.o Heliostat.o
+HeliostatField.o: HeliostatField.cpp HeliostatField.hpp Sun.o Heliostat.o Global.o
 	$(COMPILE) HeliostatField.cpp
 
 helpFunctions.o: helpFunctions.hpp helpFunctions.cpp Scenario.o
@@ -38,8 +39,14 @@ helpFunctions.o: helpFunctions.hpp helpFunctions.cpp Scenario.o
 HtfCycle.o: HtfCycle.cpp HtfCycle.hpp CentralReceiver.o ThermalStorage.o HeatExchanger.o MoltenSalt.o Global.o Constants.hpp
 	$(COMPILE) HtfCycle.cpp
 
-main.o: main.cpp helpFunctions.o Global.o
+main.o: main.cpp Evaluator.o
 	$(COMPILE) main.cpp
+
+Evaluator.o: Evaluator.cpp Evaluator.hpp helpFunctions.o Global.o Clock.o
+	$(COMPILE) Evaluator.cpp
+
+Clock.o: Clock.cpp Clock.hpp
+	$(COMPILE) Clock.cpp
 
 MoltenSalt.o: MoltenSalt.cpp MoltenSalt.hpp Constants.hpp
 	$(COMPILE) MoltenSalt.cpp
@@ -47,22 +54,25 @@ MoltenSalt.o: MoltenSalt.cpp MoltenSalt.hpp Constants.hpp
 Powerblock.o: Powerblock.cpp Powerblock.hpp Turbine.o Global.o
 	$(COMPILE) Powerblock.cpp
 
-Powerplant.o: Powerplant.cpp Powerplant.hpp HtfCycle.o HeliostatField.o Economics.o Powerblock.o Constants.hpp Global.o Clock.o
+Powerplant.o: Powerplant.cpp Powerplant.hpp HtfCycle.o HeliostatField.o Economics.o Powerblock.o Constants.hpp Global.o Time_Manager.o
 	$(COMPILE) Powerplant.cpp
 
-Problem.o: Problem.cpp Problem.hpp
+Problem.o: Problem.cpp Problem.hpp Global.o
 	$(COMPILE) Problem.cpp
 
 Scenario.o: Scenario.cpp Scenario.hpp Global.o Powerplant.o Problem.o
 	$(COMPILE) Scenario.cpp
 
-Sun.o: Sun.cpp Sun.hpp Clock.o Sunray.o
+RNG.o: RNG.cpp RNG.hpp
+	$(COMPILE) RNG.cpp
+
+Sun.o: Sun.cpp Sun.hpp Time_Manager.o Sunray.o RNG.o
 	$(COMPILE) Sun.cpp
 
 Sunray.o: Sunray.cpp Sunray.hpp Heliostat.o
 	$(COMPILE) Sunray.cpp
 
-ThermalStorage.o: ThermalStorage.cpp ThermalStorage.hpp Constants.hpp MoltenSalt.o
+ThermalStorage.o: ThermalStorage.cpp ThermalStorage.hpp Constants.hpp MoltenSalt.o Global.o
 	$(COMPILE) ThermalStorage.cpp
 
 Turbine.o: Turbine.cpp Turbine.hpp Constants.hpp Global.o

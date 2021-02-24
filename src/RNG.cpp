@@ -21,72 +21,50 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __CLOCK__
-#define __CLOCK__
+#include "RNG.hpp"
 
-#include <ctime>
 
+// Default values for the provided number seed:
+int RNG::_s = 0;
+
+
+uint32_t RNG::x_def = 123456789;
+uint32_t RNG::y_def = 362436069;
+uint32_t RNG::z_def = 521288629;
+uint32_t RNG::_x = x_def;
+uint32_t RNG::_y = y_def;
+uint32_t RNG::_z = z_def;
+
+int RNG::get_pid ( void ) {
 #ifdef _MSC_VER
-#pragma warning(disable:4275)
-#pragma warning(disable:4251)
+  return _getpid();
+#else
+  return getpid();
 #endif
+}
 
+void RNG::set_seed ( int s ) {
+  
+  if( s<=INT_MAX && s>=0 )
+    _s=s;
+  else
+    throw std::invalid_argument ( "RNG::set_seed(): invalid seed. Seed should be in [0,INT_MAX]" );
+  RNG::reset_private_seed_to_default();
+  for ( int i = 0 ; i < _s ; i++)
+    RNG::rand();
+}
 
-class Clock {
-        
-private:
-        
-  time_t              _real_t0;          ///< Wall clock time measurement.
-  clock_t             _CPU_t0;           ///< CPU time measurement.
-  static const double _D_CLOCKS_PER_SEC; ///< System constant for CPU time measurement.
-        
-public:
-        
-  /// Constructor.
-  Clock ( void ) : _CPU_t0 ( clock() ) { time (&_real_t0); }
-        
-  /// Copy constructor.
-  /**
-     \param c The copied object -- \b IN.
-  */
-  Clock ( const Clock & c ) : _real_t0 ( c._real_t0 ) , _CPU_t0 ( c._CPU_t0 ) {}
-        
-  /// Affectation operator.
-  /**
-     \param  c The right-hand side object -- \b IN.
-     \return \c *this as the result of the affectation.
-  */
-  Clock & operator = ( const Clock & c )
-  {
-    _real_t0 = c._real_t0;
-    _CPU_t0  = c._CPU_t0;
-    return *this;
-  }
-        
-  /// Destructor.
-  virtual ~Clock ( void ) {}
-        
-  /// Reset the clock.
-  void reset ( void )
-  {
-    time ( &_real_t0 );
-    _CPU_t0 = clock();
-  }
-        
-  /// Get wall clock time.
-  /**
-     \return The wall clock time.
-  */
-  int get_real_time ( void ) const;
-        
-  /// Get the CPU time.
-  /**
-     \return The CPU time.
-  */
-  double get_CPU_time ( void ) const
-  {
-    return ( static_cast<double>(clock()) - _CPU_t0 ) / _D_CLOCKS_PER_SEC;
-  }
-};
-
-#endif
+// http://madrabbit.org/~ray/code/xorshf96.c //period 2^96-1
+uint32_t RNG::rand ( void ) {
+  
+  uint32_t t;
+  _x ^= _x << 16;
+  _x ^= _x >> 5;
+  _x ^= _x << 1;
+  t = _x;
+  _x = _y;
+  _y = _z;
+  _z = t ^ _x ^ _y;
+  
+  return _z;
+}

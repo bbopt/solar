@@ -4,7 +4,8 @@ BB_EXE           "$../../bin/solar $2"
 BB_OUTPUT_TYPE   OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR
 BB_INPUT_TYPE    (    R    R     R    R    R    I    R    R     R     R  I    R      R      R )
 LOWER_BOUND      (  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0   1.0 793.0  1 0.01  0.005 0.0050 )
-X0               ( 11.0 11.0 140.0 10.0 10.0 2650 89.0  0.5   5.0 838.0 36 0.30  0.020 0.0216 )
+# X0               ( 11.0 11.0 140.0 10.0 10.0 2650 89.0  0.5   5.0 838.0 36 0.30  0.020 0.0216 )
+X0 xs.txt
 UPPER_BOUND      ( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0  20.0 995.0  - 5.00  0.100 0.1000 )
 
 
