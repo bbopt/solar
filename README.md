@@ -28,6 +28,8 @@ Info      : solar -i
 ```
 To run simulation, type `solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
 
+The different options are:
+
 ```
  pb_id: Problem ID (see list of problems below)
 
