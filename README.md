@@ -89,6 +89,8 @@ which corresponds to the feasible point
 *(8, 8, 150, 7, 7, 250, 45, 0.5, 5)*
 of value *-122505.5978*.
 
+Other points and NOMAD parameters files can be found in the
+[./tests](tests) directory.
 
 ### How to cite
 
