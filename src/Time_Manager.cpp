@@ -21,33 +21,14 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __PARASITICS_H__
-#define __PARASITICS_H__
+#include "Time_Manager.hpp"
 
-#include <vector>
+void Time_Manager::fTimeIncrement ( void ) {
+  _currentTime += _sizeOfIncrements;
+  ++_incrementsCounter;
+}
 
-struct Parasitics {
-
-  std::vector<double> _recPressure;   // Pa
-  std::vector<double> _recFlow;       // kg/s
-  std::vector<double> _sGenMsPressure;
-  std::vector<double> _sGenMsFlow;    // kg/s
-  std::vector<double> _turbineStRate; // kg/s
-  std::vector<double> _sGenStPressure;
-  std::vector<double> _vRecPumpPower;
-  std::vector<double> _vSGenMsPumpPower;
-  std::vector<double> _vSGenStPumpPower;
-  std::vector<double> _vCoolerPumpPower;
-  std::vector<double> _vCompressorPower;
-  std::vector<double> _vHelConsPower;
-  double _recPumpNrg;
-  double _sGenMsNrg;
-  double _sGenStNrg;
-  double _coolerNrg;
-  double _compressNrg;
-  double _helConsNrg;
-
-  Parasitics();
-};
-
-#endif
+void Time_Manager::fResetTime ( void ) {
+  _currentTime       = 0;
+  _incrementsCounter = 0;
+}

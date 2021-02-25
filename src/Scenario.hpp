@@ -1,12 +1,35 @@
-#ifndef _SCENARIO_H_
-#define _SCENARIO_H_
+/*-------------------------------------------------------------------------------*/
+/*  SOLAR - The solar thermal power plant simulator                              */
+/*  https://github.com/bbopt/solar                                               */
+/*                                                                               */
+/*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
+/*                                                                               */
+/*  Polytechnique Montreal / GERAD                                               */
+/*  sebastien.le-digabel@polymtl.ca                                              */
+/*                                                                               */
+/*  This program is free software: you can redistribute it and/or modify it      */
+/*  under the terms of the GNU Lesser General Public License as published by     */
+/*  the Free Software Foundation, either version 3 of the License, or (at your   */
+/*  option) any later version.                                                   */
+/*                                                                               */
+/*  This program is distributed in the hope that it will be useful, but WITHOUT  */
+/*  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        */
+/*  FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  */
+/*  for more details.                                                            */
+/*                                                                               */
+/*  You should have received a copy of the GNU Lesser General Public License     */
+/*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
+#ifndef __SCENARIO_H__
+#define __SCENARIO_H__
 
 #include "Problem.hpp"
 #include "Global.hpp"
 #include "Powerplant.hpp"
-
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
@@ -17,194 +40,170 @@ class Scenario {
 /*----------------*/
   
 private:
-
-  int      _n; // number of variables
-  double * _x; // vector of variables
   
   std::string _problem; // problem id
-
+  
   // Scenario parameters:
   int _model_type; // 1:heliostats field; 2: whole plant
   int _heliostatsFieldModel;
   int _exchangerModel;
   
-  // std::string _pathToFieldData;  // TOTO VIRER
+  int _storageStartupCondition; // % of hot storage level
 
+  // 1- constant from t_0 to t_f with value X
+  // 2- Winter say profile
+  // 3- Summer day profile
+  // 4- customized profile using external file (not done yet)
+  int    _demandProfile;
+  double _maximumPowerDemand;
+  int    _tStart;
+  int    _tEnd;
+  std::vector<double> _demand;
+
+  double _latitude;
+  int    _day;
+
+  // Simulation parameters:
+  int    _numberOfTimeIncrements;
+  int    _minutesPerTimeIncrement;
+  double _fixedPointsPrecision; //in percent
+  double _raysPerSquareMeters;
+
+  //Problem-dependant constraints:
+  double _cBudget;                    // $
+  double _cEnergy;                    // kWh
+  double _cDemandComplianceRatio;     // %
+  double _cMaximumDifferenceToDemand; // W
+  double _cFieldEfficiency;           // %
+  double _cFieldSurface;              // m^2
+  double _cReflectiveSurface;         // m^2
+  double _cParasitics;                // %
+
+  //Heliostats Field:
+  double _heliostatHeight;        // m
+  double _heliostatWidth;         // m
+  double _towerHeight;            // m
+  double _receiverApertureHeight; // m
+  double _receiverApertureWidth;  // m
+  int    _maxNumberOfHeliostats; 
+  double _fieldMaxAngularSpan;    // degrees
+  double _minimumDistanceToTower; // fraction of tower height
+  double _maximumDistanceToTower; // fraction of tower height
   
-	int _storageStartupCondition; //% of hot storage level //[6]
-
-	//1- constant from t_0 to t_f with value X
-	//2- Winter say profile
-	//3- Summer day profile
-	//4- customized profile using external file (not done yet)
-	int _demandProfile; //[7]
-	double _maximumPowerDemand;//[8]
-	int _tStart;//[9]
-	int _tEnd;//[10]
-	std::vector<double> _demand;
-
-	double _latitude; //[11]
-	int _day;//[12]
-	//-------------------------------------------------------------------
-	
-	//Simulation parameters
-	//-------------------------------------------------------------------
-	int _numberOfTimeIncrements; //[13]
-	int _minutesPerTimeIncrement;//[14]
-	double _fixedPointsPrecision;//[15] //in percent
-	double _raysPerSquareMeters;//[16]
-
-	//Problem-dependant constraints
-	//-------------------------------------------------------------------
-	double _cBudget; //$ //[17]
-	double _cEnergy; //kWh //[18]
-	double _cDemandComplianceRatio; //% //[19]
-	double _cMaximumDifferenceToDemand; //W //[20]
-	double _cFieldEfficiency; // % //[21]
-	double _cFieldSurface; //m^2 //[22]
-	double _cReflectiveSurface; //m^2 //[23]
-	double _cParasitics; // %
-
-	//Variables
-	//-------------------------------------------------------------------
-	//Heliostats Field
-	double _heliostatHeight;//m //[24]
-	double _heliostatWidth; //m //[25]
-	double _towerHeight; //m //[26]
-	double _receiverApertureHeight; //m //[27]
-	double _receiverApertureWidth;//m //[28]
-	int _maxNumberOfHeliostats; //[29]
-	double _fieldMaxAngularSpan; //degrees //[30]
-	double _minimumDistanceToTower;//fraction of tower height //[31]
-	double _maximumDistanceToTower;//fraction of tower height //[32]
-
-	//Heat Transfer loop
-	double _centralReceiverOutletTemperature; //K //[33]
-	double _hotStorageHeight; //m //[34]
-	double _hotStorageDiameter; //m //[35]
-	double _hotStorageInsulThickness; //m //[36]
-	double _coldStorageInsulThickness; //m //[37]
-	double _coldMoltenSaltMinTemperature; //K //[38]
-	int    _receiverNbOfTubes; //[39]
-	double _receiverInsulThickness; //m //[40]
-	double _receiverTubesInsideDiam;//m //[41]
-	double _receiverTubesOutsideDiam;//m //[42]
-	
-	//steam generator
-	double _exchangerTubesSpacing; //m   //[43]
-	double _exchangerTubesLength; //m    //[44]
-	double _exchangerTubesDin; //m       //[45]
-	double _exchangerTubesDout;//m       //[46]
-	double _exchangerBaffleCut;    //
-	int    _exchangerNbOfBaffles;	   //
-	int    _exchangerNbOfTubes;             //[47]
-	int    _exchangerNbOfShells;            //[48]
-	int    _exchangerNbOfPassesPerShell;    //[49]
-
-	//powerblock
-	int _typeOfTurbine;       //[50]
-
-	//-----------------------------------------------------------------------
-	double _minReceiverOutletTemp; //for validation. not an input parameter
-	void fFillDemandVector();
-
-	Clock      * _time;
-	Sun        * _sun;
-	Powerplant * _powerplant;
-
-public:
-  Scenario  ( const std::string & problem , const std::string & x_file_name );
-  ~Scenario ( void ) { delete_x(); }
-
-private:
-
-  void init_maxNrg_H1     ( void ); // #1
-  void init_minSurf_H1    ( void ); // #2
-  void init_minCost_C1    ( void ); // #3
-  void init_minCost_C2    ( void ); // #4
-  void init_maxComp_HTF1  ( void ); // #5
-  void init_minCost_TS    ( void ); // #6
-  void init_maxEff_RE     ( void ); // #7
-  void init_maxHF_minCost ( void ); // #8
-  void init_maxNrg_minPar ( void ); // #9
+  //Heat Transfer loop:
+  double _centralReceiverOutletTemperature; // K
+  double _hotStorageHeight;                 // m
+  double _hotStorageDiameter;               // m
+  double _hotStorageInsulThickness;         // m
+  double _coldStorageInsulThickness;        // m
+  double _coldMoltenSaltMinTemperature;     // K
+  int    _receiverNbOfTubes;
+  double _receiverInsulThickness;           // m
+  double _receiverTubesInsideDiam;          // m
+  double _receiverTubesOutsideDiam;         // m
   
-  bool read               ( const std::string & x_file_name );
-  bool read_x             ( const std::string & x_file_name );
-  bool read21_ST1_DEM1    ( const std::string & x_file_name );
+  //steam generator:
+  double _exchangerTubesSpacing; // m
+  double _exchangerTubesLength;  // m
+  double _exchangerTubesDin;     // m
+  double _exchangerTubesDout;    // m
+  double _exchangerBaffleCut;
+  int    _exchangerNbOfBaffles;
+  int    _exchangerNbOfTubes;
+  int    _exchangerNbOfShells;
+  int    _exchangerNbOfPassesPerShell;
+  
+  //powerblock:
+  int _typeOfTurbine;
+  
+  double _minReceiverOutletTemp; //for validation; not an input parameter
 
-  bool read_maxNrg_H1     ( const std::string & x_file_name ); // #1
-  bool read_minSurf_H1    ( const std::string & x_file_name ); // #2
-  bool read_minCost_C1    ( const std::string & x_file_name ); // #3
-  bool read_minCost_C2    ( const std::string & x_file_name ); // #4
-  bool read_maxComp_HTF1  ( const std::string & x_file_name ); // #5
-  bool read_minCost_TS    ( const std::string & x_file_name ); // #6
-  bool read_maxEff_RE     ( const std::string & x_file_name ); // #7
-  bool read_maxHF_minCost ( const std::string & x_file_name ); // #8
-  bool read_maxNrg_minPar ( const std::string & x_file_name ); // #9
-
-	//add function to return instantaneous power requirement depending on scenario.
+  Powerplant * _powerplant;
+  
 private:
-  bool validateInputValues    ( void ) const;
-  bool validate_maxNrg_H1     ( void ) const; // #1
-  bool validate_minSurf_H1    ( void ) const; // #2
-  bool validate_minCost_C1    ( void ) const; // #3
-  bool validate_minCost_C2    ( void ) const; // #4
-  bool validate_maxComp_HTF1  ( void ) const; // #5
-  bool validate_minCost_TS    ( void ) const; // #6
-  bool validate_maxEff_RE     ( void ) const; // #7
-  bool validate_maxHF_minCost ( void ) const; // #8
-  bool validate_maxNrg_minPar ( void ) const; // #9
 
-	//construct powerplant
-private:
-  void construct2H1ST1();
-  void construct_maxNrg_H1();
-  void construct_minSurf_H1();
-  void construct_minCost_C1();
-  void construct_minCost_C2();
-  void construct_maxComp_HTF1();
-  void construct_minCost_TS();
-  void construct_maxEff_RE();
-  void construct_maxHF_minCost();
-  void construct_maxNrg_minPar();
+  // for the variable precisions surrogates:
+  static int compute_numberOfTimeIncrements ( int min, int max, double precision ) {
+    return min + static_cast<int>(floor(precision*(max-min)));
+  }
 
+  static double compute_raysPerSquareMeters ( double min, double max, double precison ) {
+    return min + precison*(max-min);
+  }
+  
+  void init_maxNrg_H1     ( void );             // #1
+  void init_minSurf_H1    ( double precision ); // #2
+  void init_minCost_C1    ( double precision ); // #3
+  void init_minCost_C2    ( double precision ); // #4
+  void init_maxComp_HTF1  ( void );             // #5
+  void init_minCost_TS    ( void );             // #6
+  void init_maxEff_RE     ( double precision ); // #7
+  void init_maxHF_minCost ( double precision ); // #8
+  void init_maxNrg_minPar ( double precision ); // #9
+
+  bool set_typeOfTurbine ( int tot );
+  
+  bool set_x_maxNrg_H1     ( const double * x ); // #1
+  bool set_x_minSurf_H1    ( const double * x ); // #2
+  bool set_x_minCost_C1    ( const double * x ); // #3
+  bool set_x_minCost_C2    ( const double * x ); // #4
+  bool set_x_maxComp_HTF1  ( const double * x ); // #5
+  bool set_x_minCost_TS    ( const double * x ); // #6
+  bool set_x_maxEff_RE     ( const double * x ); // #7
+  bool set_x_maxHF_minCost ( const double * x ); // #8
+  bool set_x_maxNrg_minPar ( const double * x ); // #9
+
+  bool check_bounds_maxNrg_H1     ( void ) const; // #1
+  bool check_bounds_minSurf_H1    ( void ) const; // #2
+  bool check_bounds_minCost_C1    ( void ) const; // #3
+  bool check_bounds_minCost_C2    ( void ) const; // #4
+  bool check_bounds_maxComp_HTF1  ( void ) const; // #5
+  bool check_bounds_minCost_TS    ( void ) const; // #6
+  bool check_bounds_maxEff_RE     ( void ) const; // #7
+  bool check_bounds_maxHF_minCost ( void ) const; // #8
+  bool check_bounds_maxNrg_minPar ( void ) const; // #9
+  
+  bool check_apriori_constraints_maxNrg_H1     ( void ) const; // #1
+  bool check_apriori_constraints_minSurf_H1    ( void ) const; // #2
+  bool check_apriori_constraints_minCost_C1    ( void ) const; // #3
+  bool check_apriori_constraints_minCost_C2    ( void ) const; // #4
+  bool check_apriori_constraints_maxComp_HTF1  ( void ) const; // #5
+  bool check_apriori_constraints_minCost_TS    ( void ) const; // #6
+  bool check_apriori_constraints_maxEff_RE     ( void ) const; // #7
+  bool check_apriori_constraints_maxHF_minCost ( void ) const; // #8
+  bool check_apriori_constraints_maxNrg_minPar ( void ) const; // #9
+  
+  void fFillDemandVector ( void );
+
+  void construct_maxNrg_H1     ( void ); // #1
+  void construct_minSurf_H1    ( void ); // #2
+  void construct_minCost_C1    ( void ); // #3
+  void construct_minCost_C2    ( void ); // #4
+  void construct_maxComp_HTF1  ( void ); // #5
+  void construct_minCost_TS    ( void ); // #6
+  void construct_maxEff_RE     ( void ); // #7
+  void construct_maxHF_minCost ( void ); // #8
+  void construct_maxNrg_minPar ( void ); // #9
+
+  bool simulate_maxNrg_H1     ( double * outputs, bool & cnt_eval ); // #1
+  bool simulate_minSurf_H1    ( double * outputs, bool & cnt_eval ); // #2
+  bool simulate_minCost_C1    ( double * outputs, bool & cnt_eval ); // #3
+  bool simulate_minCost_C2    ( double * outputs, bool & cnt_eval ); // #4
+  bool simulate_maxComp_HTF1  ( double * outputs, bool & cnt_eval ); // #5
+  bool simulate_minCost_TS    ( double * outputs, bool & cnt_eval ); // #6
+  bool simulate_maxEff_RE     ( double * outputs, bool & cnt_eval ); // #7
+  bool simulate_maxHF_minCost ( double * outputs, bool & cnt_eval ); // #8
+  bool simulate_maxNrg_minPar ( double * outputs, bool & cnt_eval ); // #9
+
+  void display_x ( const double * , std::ostream & out ) const;
+  
 public:
-  bool simulate ( std::ostream & out , bool & cnt_eval , bool verbose );
-private:
-  bool simulate_maxNrg_H1     ( std::ostream & out , bool & cnt_eval ); // #1
-  bool simulate_minSurf_H1    ( std::ostream & out , bool & cnt_eval ); // #2
-  bool simulate_minCost_C1    ( std::ostream & out , bool & cnt_eval ); // #3
-  bool simulate_minCost_C2    ( std::ostream & out , bool & cnt_eval ); // #4
-  bool simulate_maxComp_HTF1  ( std::ostream & out , bool & cnt_eval ); // #5
-  bool simulate_minCost_TS    ( std::ostream & out , bool & cnt_eval ); // #6
-  bool simulate_maxEff_RE     ( std::ostream & out , bool & cnt_eval ); // #7
-  bool simulate_maxHF_minCost ( std::ostream & out , bool & cnt_eval ); // #8
-  bool simulate_maxNrg_minPar ( std::ostream & out , bool & cnt_eval ); // #9
 
-	//Print
-public:
-  void print() const;   // TOTO: en verbose mode plutot
-  void display_x ( std::ostream & out ) const;
-
-private:
-        // void printColdStorage();
-	// void printHotStorage();
-        // void printSteamGeneratorOutlet();
-	// void printRequiredThermalPower();
-	// void printReceiver();
-	// void printHeliostatsFieldLayout();
-	// void printHeliostatsFieldPerformance();
-	// void printPowerOutput();
-	// void printDemand();
-	// void printFlows();
-
-private:
-
-  static bool is_int ( const double x ) { return (round(x)==x); }
-  static int  round  ( const double x ) { return static_cast<int> ((x < 0.0 ? -std::floor(.5-x) : std::floor(.5+x))); }
-
-  void delete_x ( void );
-
+  Scenario  ( const std::string & problem, double precision );
+  ~Scenario ( void );
+  
+  bool set_x    ( const double * x );
+  bool simulate ( double * outputs , bool & cnt_eval );
 };
 
 /*------------------*/
@@ -215,14 +214,6 @@ private:
 public:
   foncteurSum(double* sum) { _sum = sum; }
   void operator()(double d){ (*_sum) = (*_sum) + d; }
-};
-
-/*------------------------*/
-struct foncteurPrintPower {
-/*------------------------*/
-  std::ofstream* _stream;
-  foncteurPrintPower(std::ofstream* stream) { _stream = stream; }
-  void operator()(double pwr) { *_stream << pwr << std::endl; }
 };
 
 #endif

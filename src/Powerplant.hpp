@@ -1,5 +1,28 @@
-#ifndef _POWERPLANT_H_
-#define _POWERPLANT_H_
+/*-------------------------------------------------------------------------------*/
+/*  SOLAR - The solar thermal power plant simulator                              */
+/*  https://github.com/bbopt/solar                                               */
+/*                                                                               */
+/*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
+/*                                                                               */
+/*  Polytechnique Montreal / GERAD                                               */
+/*  sebastien.le-digabel@polymtl.ca                                              */
+/*                                                                               */
+/*  This program is free software: you can redistribute it and/or modify it      */
+/*  under the terms of the GNU Lesser General Public License as published by     */
+/*  the Free Software Foundation, either version 3 of the License, or (at your   */
+/*  option) any later version.                                                   */
+/*                                                                               */
+/*  This program is distributed in the hope that it will be useful, but WITHOUT  */
+/*  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        */
+/*  FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  */
+/*  for more details.                                                            */
+/*                                                                               */
+/*  You should have received a copy of the GNU Lesser General Public License     */
+/*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
+#ifndef __POWERPLANT_H__
+#define __POWERPLANT_H__
 
 #include "HtfCycle.hpp"
 #include "MoltenSalt.hpp"
@@ -8,7 +31,7 @@
 #include "Powerblock.hpp"
 #include "Constants.hpp"
 #include "Global.hpp"
-#include "Clock.hpp"
+#include "Time_Manager.hpp"
 
 #include <cmath>
 #include <numeric>
@@ -21,11 +44,9 @@ class Powerplant
 private:
 
   //Simulation components
-  Clock       _time;
-  Sun         _sun;
-  int         _model_type; // 1:heliostats field; 2: whole plant
-  int         _heliostatsFieldModel;
-  // std::string _pathToFieldData;  TOTO VIRER
+  Time_Manager _time;
+  int  _model_type; // 1:heliostats field; 2: whole plant
+  int  _heliostatsFieldModel;
 
   //Powerplant components
   HtfCycle      * _moltenSaltLoop;
@@ -33,121 +54,89 @@ private:
   Powerblock    * _powerblock;
   Economics     * _investmentCost;
 
+  std::vector<double> _heliostatFieldPowerOutput;
+  
   //Include day, starting hour, demand info, storage starting conditions, etc.
 	
-	//Data gathering
-	std::vector<double> _sunElevation;
-	std::vector<double> _sunAzimuth;
-	std::vector<double> _sunEnergyGathered;
-	std::vector<double> _heliostatFieldEfficiency;
-	std::vector<double> _heliostatFieldPowerOutput;
-	std::vector<double> _hotStorageLevel;
-	std::vector<double> _hotStorageTemp;
-	std::vector<double> _coldStorageLevel;
-	std::vector<double> _coldStorageTemp;
-	//
-	std::vector<double> _receiverOutletFlow;
-	std::vector<double> _receiverPumpHead;
-	std::vector<double> _pressureShellSide;
-	std::vector<double> _pressureTubesSide;
-	std::vector<double> _steamRate;
-	std::vector<double> _msRateSteamGen;
-	std::vector<double> _heliostatsFieldPar;
-	//
-	std::vector<double> _energyToPowerBlockWatts;
-	std::vector<double> _steamGeneratorInletTemperature;
-	std::vector<double> _hotStoragePowerLosses;
-	std::vector<double> _coldStoragePowerLosses;
-	std::vector<double> _powerplantPowerOutput;
-	std::vector<double> _demand;
-	std::vector<double> _demandCompliance;
-	double _reflectiveSurface;
-	double _fieldSurface;
-	double _costOfHeliostatsField;
-	double _totalEnergyConcentrated;
-	double _maximumPressureInReceiver;
-	double _maximumPressureInExchanger;
-	double _yieldPressureReceiver;
-	double _yieldPressureExchanger;
-	double _overallComplianceToDemand;
+  std::vector<double> _receiverOutletFlow;
+  std::vector<double> _receiverPumpHead;
+  std::vector<double> _pressureShellSide;
+  std::vector<double> _pressureTubesSide;
+  std::vector<double> _steamRate;
+  std::vector<double> _msRateSteamGen;
+  std::vector<double> _heliostatsFieldPar;
+  std::vector<double> _hotStoragePowerLosses;
+  std::vector<double> _coldStoragePowerLosses;
+  std::vector<double> _powerplantPowerOutput;
+  std::vector<double> _demand;
 
+  double _reflectiveSurface;
+  double _fieldSurface;
+  double _costOfHeliostatsField;
+  double _totalEnergyConcentrated;
+  double _maximumPressureInReceiver;
+  double _maximumPressureInExchanger;
+  double _yieldPressureReceiver;
+  double _yieldPressureExchanger;
+  double _overallComplianceToDemand;
+
+  void clean ( void );
+  
 public:
 
-	Powerplant(Clock&, Sun&,int,  HeliostatField*, HtfCycle*,Powerblock*, Economics* );
+  Powerplant ( const Time_Manager&, int, HeliostatField*, HtfCycle*, Powerblock*, Economics* );
+  ~Powerplant ( void ) { clean(); }
 
-  // TOTO TUTU
+  const HtfCycle* get_moltenSaltLoop ( void ) const { return _moltenSaltLoop;  }
+  HeliostatField* get_heliostatField ( void ) const { return _heliostatsField; }
+  Economics     * get_investmentCost ( void ) const { return _investmentCost;  }
+
+  void   fSimulatePowerplant         ( void   );
+  void   fSimulateHeliostatField     ( void   );
+  double fComputeSteamRate           ( double );
+  double fComputePressureInExchanger ( void   );
+  double fComputeParasiticLosses     ( void   ) const;
+
+  double fComputeParasiticsForPb7 ( void ) const {
+    return std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
+			      _receiverOutletFlow.begin(), 0.0) / MS_DENSITY;
+  }
+  
+  double fComputeParasiticsForPb3 ( void ) const;
+  double fComputeParasiticsForPb9 ( void ) const;
+
+  const std::vector<double> & get_powerplantPowerOutput ( void ) const { return _powerplantPowerOutput; }
+
+  double fComputeThermalEnergy ( double steamRate ) const {
+    return steamRate * (_powerblock->get_hotEnthalpy() - WATER_300K_1ATM_ENTHALPY);
+  }
+  
+  double get_reflectiveSurface            ( void ) const { return _reflectiveSurface; }
+  double get_fieldSurface                 ( void ) const { return _fieldSurface; }
+  double get_costOfHeliostatsField        ( void ) const { return _costOfHeliostatsField; }
+  double get_totalEnergyConcentrated      ( void ) const { return _totalEnergyConcentrated; }
+  double get_costOfHeliostatField         ( void ) const { return _investmentCost->evaluateCostOfField();          }
+  double get_costOfReceiver               ( void ) const { return _investmentCost->evaluateCostOfReceiver();       }
+  double get_costOfTower                  ( void ) const { return _investmentCost->evaluateCostOfTower();          }
+  double get_costOfSteamGenerator         ( void ) const { return _investmentCost->evaluateCostOfSteamGenerator(); }
+  double get_costOfPowerblock             ( void ) const { return _investmentCost->evaluateCostOfPowerblock();     }
+  double get_costOfStorage                ( void ) const { return _investmentCost->evaluateCostOfStorage();        }
+  double get_steamTurbineInletTemperature ( void ) const { return _powerblock->get_temperature();                  }
+  double get_overallComplianceToDemand    ( void ) const { return _overallComplianceToDemand; }
+  double get_maximumPressureInReceiver    ( void ) const { return _maximumPressureInReceiver; }
+  double get_yieldPressureInReceiver      ( void ) const { return _yieldPressureReceiver;                   }
+  double get_yieldPressureInExchanger     ( void ) const { return _yieldPressureExchanger;                  }
+  double get_maximumPressureInExchanger   ( void ) const { return _maximumPressureInExchanger;              }
+  double get_minColdStorageTemp           ( void ) const { return _moltenSaltLoop->get_minColdStorageTemp();}
+  double get_minHotStorageTemp            ( void ) const { return _moltenSaltLoop->get_minHotStorageTemp(); }
+  double get_minSteamGenTemp              ( void ) const { return _moltenSaltLoop->get_minSteamGenTemp();   }
+
+  void set_demand         ( const std::vector<double>& demandVector ) { _demand = demandVector;     }
+  void set_heliostatModel ( int                        hm           ) { _heliostatsFieldModel = hm; }
+
   bool set_heliostatFieldPowerOutput_MINCOST_TS   ( void );
   bool set_heliostatFieldPowerOutput_MAXCOMP_HTF1 ( void );
-
-	HtfCycle* get_moltenSaltLoop(){ return _moltenSaltLoop; }
-	HeliostatField* get_heliostatField() { return _heliostatsField; }
-	Economics* get_investmentCost(){ return _investmentCost; }
-
-	void fSimulatePowerplant();
-	void fSimulateHeliostatField();
-	double fComputeSteamRate(double& );
-	double fComputeThermalEnergy(double&);
-	double fComputePressureInExchanger();
-	double fComputeParasiticLosses();
-	double fComputeParasiticsForPb3();
-	double fComputeParasiticsForPb7();
-	double fComputeParasiticsForPb9();
-
-	//Get functions
-	std::vector<double>& get_sunElevation(){ return _sunElevation; }
-	std::vector<double>& get_sunAzimuth(){ return _sunAzimuth; }
-	std::vector<double>& get_sunEnergyGathered(){ return _sunEnergyGathered; }
-	std::vector<double>& get_heliostatFieldEfficiency(){ return _heliostatFieldEfficiency; }
-	std::vector<double>& get_heliostatFieldPowerOutput(){ return _heliostatFieldPowerOutput; }
-	std::vector<double>& get_hotStorageLevel(){ return _hotStorageLevel; }
-	std::vector<double>& get_hotStorageTemp(){ return _hotStorageTemp; }
-	std::vector<double>& get_coldStorageLevel(){ return _coldStorageLevel; }
-	std::vector<double>& get_coldStorageTemp(){ return _coldStorageTemp; }
-	std::vector<double>& get_receiverSurfaceTemperature(){ return _moltenSaltLoop->get_centralReceiver().get_surfaceTemperature(); }
-	std::vector<double>& get_receiverLosses(){ return _moltenSaltLoop->get_centralReceiver().get_losses(); }
-	std::vector<double>& get_receiverEfficiency(){ return _moltenSaltLoop->get_centralReceiver().get_efficiency(); }
-	std::vector<double>& get_receiverMsRate(){ return _moltenSaltLoop->get_centralReceiver().get_msRate(); }
-	std::vector<double>& get_steamGeneratorInletFlow(){ return _moltenSaltLoop->get_steamGenOutletMsRate(); }
-	std::vector<double>& get_energyToPowerBlockWatts(){/* return _moltenSaltLoop->get_steamGenHeatTransfered();*/ 
-		return _energyToPowerBlockWatts;
-	}
-	std::vector<double>& get_steamGeneratorInletTemperature(){ return _steamGeneratorInletTemperature; }
-	std::vector<double>& get_steamGeneratorOutletTemperature(){ return _moltenSaltLoop->get_steamGenOutletTemp(); }
-	std::vector<double>& get_hotStoragePowerLosses(){ return _hotStoragePowerLosses; }
-	std::vector<double>& get_coldStoragePowerLosses(){ return _coldStoragePowerLosses; }
-	std::vector<double>& get_powerplantPowerOutput(){ return _powerplantPowerOutput; }
-	std::vector<double>& get_thermalPowerNeededFromBlock(){ return _powerblock->get_requiredThermalPower(); }
-
-	double get_reflectiveSurface(){ return _reflectiveSurface; }
-	double get_fieldSurface(){ return _fieldSurface; }
-	double get_costOfHeliostatsField(){ return _costOfHeliostatsField; }
-	double get_totalEnergyConcentrated(){ return _totalEnergyConcentrated; }
-
-	double get_costOfHeliostatField(){ return _investmentCost->evaluateCostOfField(); }
-	double get_costOfReceiver(){ return _investmentCost->evaluateCostOfReceiver(); }
-	double get_costOfTower(){ return _investmentCost->evaluateCostOfTower(); }
-	double get_costOfSteamGenerator(){ return _investmentCost->evaluateCostOfSteamGenerator(); }
-	double get_costOfPowerblock(){ return _investmentCost->evaluateCostOfPowerblock(); }
-	double get_costOfStorage(){ return _investmentCost->evaluateCostOfStorage(); }
-	double get_steamTurbineInletTemperature(){ return _powerblock->get_temperature(); }
-
-	double& get_overallComplianceToDemand(){ return _overallComplianceToDemand; }
-	double& get_maximumPressureInReceiver(){ return _maximumPressureInReceiver; }
-	double& get_yieldPressureInReceiver(){ return _yieldPressureReceiver; }
-	double& get_yieldPressureInExchanger() { return _yieldPressureExchanger; }
-	double& get_maximumPressureInExchanger() { return _maximumPressureInExchanger; }
-	double& get_minColdStorageTemp(){ return _moltenSaltLoop->get_minColdStorageTemp(); }
-	double& get_minHotStorageTemp(){ return _moltenSaltLoop->get_minHotStorageTemp(); }
-	double& get_minSteamGenTemp(){ return _moltenSaltLoop->get_minSteamGenTemp(); }
-	MoltenSalt& get_receiverInlet(){ return _moltenSaltLoop->get_centralReceiverInlet(); }
-	MoltenSalt& get_receiverOutlet(){ return _moltenSaltLoop->get_centralReceiverOutlet(); }
-	MoltenSalt& get_steamGenInlet(){ return _moltenSaltLoop->get_steamGeneratorInlet(); }
-	MoltenSalt& get_steamGenOutlet(){ return _moltenSaltLoop->get_steamGeneratorOutlet(); }
-
-  // Set methods:
-  void set_demand(std::vector<double>& demandVector){ _demand = demandVector; }
-  void set_heliostatModel(int& x){ _heliostatsFieldModel = x; }
-  // void set_pathToFieldData(const std::string x){ _pathToFieldData = x; }  TOTO VIRER
+  
 };
 
 #endif

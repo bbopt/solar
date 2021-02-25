@@ -21,33 +21,47 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __PARASITICS_H__
-#define __PARASITICS_H__
+#ifndef __TIME_MANAGER_H__
+#define __TIME_MANAGER_H__
 
-#include <vector>
+class Time_Manager {
+  
+private:
 
-struct Parasitics {
+  int _numberOfIncrements; 
+  int _currentTime;       // minutes
+  int _sizeOfIncrements;  // minutes
+  int _incrementsCounter;
 
-  std::vector<double> _recPressure;   // Pa
-  std::vector<double> _recFlow;       // kg/s
-  std::vector<double> _sGenMsPressure;
-  std::vector<double> _sGenMsFlow;    // kg/s
-  std::vector<double> _turbineStRate; // kg/s
-  std::vector<double> _sGenStPressure;
-  std::vector<double> _vRecPumpPower;
-  std::vector<double> _vSGenMsPumpPower;
-  std::vector<double> _vSGenStPumpPower;
-  std::vector<double> _vCoolerPumpPower;
-  std::vector<double> _vCompressorPower;
-  std::vector<double> _vHelConsPower;
-  double _recPumpNrg;
-  double _sGenMsNrg;
-  double _sGenStNrg;
-  double _coolerNrg;
-  double _compressNrg;
-  double _helConsNrg;
+public:
 
-  Parasitics();
+  Time_Manager ( int numberOfIncrements, int currentTime, int sizeOfIncrements ) :
+    _numberOfIncrements ( numberOfIncrements ) ,
+    _currentTime        ( currentTime        ) ,
+    _sizeOfIncrements   ( sizeOfIncrements   ) ,
+    _incrementsCounter  ( 0                  )   {}
+
+  Time_Manager ( const Time_Manager & t ) :
+    _numberOfIncrements ( t._numberOfIncrements ) ,
+    _currentTime        ( t._currentTime        ) ,
+    _sizeOfIncrements   ( t._sizeOfIncrements   ) ,
+    _incrementsCounter  ( t._incrementsCounter  )   {}
+  
+  ~Time_Manager ( void ) {}
+
+  void fTimeIncrement ( void );
+  void fResetTime     ( void );
+  
+  // set methods:
+  void set_currentTime       ( int currentTime       ) { _currentTime       = currentTime;       }
+  void set_sizeOfIncrements  ( int sizeOfIncrements  ) { _sizeOfIncrements  = sizeOfIncrements;  }
+  void set_incrementsCounter ( int incrementsCounter ) { _incrementsCounter = incrementsCounter; }
+
+  //get methods:
+  int get_currentTime        ( void ) const { return _currentTime;        }
+  int get_incrementsCounter  ( void ) const { return _incrementsCounter;  }
+  int get_sizeOfIncrements   ( void ) const { return _sizeOfIncrements;   }
+  int get_numberOfIncrements ( void ) const { return _numberOfIncrements; }
 };
 
 #endif

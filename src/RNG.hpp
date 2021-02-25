@@ -21,72 +21,53 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __CLOCK__
-#define __CLOCK__
 
-#include <ctime>
+/*-----------------------------------------------*/
+/*  RNG class imported from NOMAD                */
+/*-----------------------------------------------*/
+#ifndef __RNG__
+#define __RNG__
 
+#include <cmath>
+#include <stdexcept>
+#include <climits>
+
+// use of 'access' or '_access', and getpid() or _getpid():
 #ifdef _MSC_VER
-#pragma warning(disable:4275)
-#pragma warning(disable:4251)
+#include <io.h>
+#include <process.h>
+#else
+#include <unistd.h>
 #endif
 
+#if !defined(UINT32_MAX)
+typedef unsigned int uint32_t;
+#define UINT32_MAX    0xffffffff
+#endif
 
-class Clock {
-        
+class RNG {
+
 private:
-        
-  time_t              _real_t0;          ///< Wall clock time measurement.
-  clock_t             _CPU_t0;           ///< CPU time measurement.
-  static const double _D_CLOCKS_PER_SEC; ///< System constant for CPU time measurement.
-        
-public:
-        
-  /// Constructor.
-  Clock ( void ) : _CPU_t0 ( clock() ) { time (&_real_t0); }
-        
-  /// Copy constructor.
-  /**
-     \param c The copied object -- \b IN.
-  */
-  Clock ( const Clock & c ) : _real_t0 ( c._real_t0 ) , _CPU_t0 ( c._CPU_t0 ) {}
-        
-  /// Affectation operator.
-  /**
-     \param  c The right-hand side object -- \b IN.
-     \return \c *this as the result of the affectation.
-  */
-  Clock & operator = ( const Clock & c )
-  {
-    _real_t0 = c._real_t0;
-    _CPU_t0  = c._CPU_t0;
-    return *this;
+  
+  static uint32_t x_def,y_def,z_def,_x,_y,_z;  ///< Default parameter value for the random number generator (_s used as the seed).
+  static int _s;
+
+  // reset seed to its default value:
+  static void reset_private_seed_to_default ( void ) {
+    _x=x_def;
+    _y=y_def;
+    _z=z_def;
   }
-        
-  /// Destructor.
-  virtual ~Clock ( void ) {}
-        
-  /// Reset the clock.
-  void reset ( void )
-  {
-    time ( &_real_t0 );
-    _CPU_t0 = clock();
-  }
-        
-  /// Get wall clock time.
-  /**
-     \return The wall clock time.
-  */
-  int get_real_time ( void ) const;
-        
-  /// Get the CPU time.
-  /**
-     \return The CPU time.
-  */
-  double get_CPU_time ( void ) const
-  {
-    return ( static_cast<double>(clock()) - _CPU_t0 ) / _D_CLOCKS_PER_SEC;
-  }
+  
+public:  
+  
+  static int  get_seed ( void ) { return static_cast<int>(_s); }
+  static void set_seed ( int s );
+  static int  get_pid  ( void );
+
+  static uint32_t rand ( void );
+  static double   rand ( double a, double b) { return a+((b-a)*RNG::rand())/UINT32_MAX; }
+
 };
 
 #endif

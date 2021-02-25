@@ -1,5 +1,5 @@
 DIMENSION        14
-BB_EXE           "$../../bin/solar $2"
+BB_EXE           "$../../bin/solar $2 $-prec=0.1"
 
 BB_OUTPUT_TYPE   OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR
 BB_INPUT_TYPE    (    R    R     R    R    R    I    R    R     R     R  I    R      R      R )

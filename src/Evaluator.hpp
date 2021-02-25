@@ -21,72 +21,72 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __CLOCK__
-#define __CLOCK__
+#ifndef __EVALUATOR__
+#define __EVALUATOR__
 
-#include <ctime>
+#include "helpFunctions.hpp"
+#include "Global.hpp"
+#include "Clock.hpp"
+#include <iostream>
+#include <ostream>
+#include <fstream>
+#include <algorithm>
 
-#ifdef _MSC_VER
-#pragma warning(disable:4275)
-#pragma warning(disable:4251)
-#endif
-
-
-class Clock {
+class Evaluator {
         
 private:
-        
-  time_t              _real_t0;          ///< Wall clock time measurement.
-  clock_t             _CPU_t0;           ///< CPU time measurement.
-  static const double _D_CLOCKS_PER_SEC; ///< System constant for CPU time measurement.
-        
+
+  const Problem         & _problem;
+  std::vector<double *>   _x;
+  double                * _outputs;
+  std::ostream          & _out;
+  
+  void display_x     ( int x_index ) const;
+  void delete_x      ( void );
+  void reset_outputs ( double v );
+
+  bool compute_mean_var ( std::vector<double> & output       ,
+			  int                   output_index ,
+			  double              & mean         ,
+			  double              & var            ) const;
+
+  // one evaluation:
+  bool eval_x ( int           x_index              ,
+		int           seed                 ,
+		double        precison             ,
+		bool        & simulation_completed ,
+		bool        & cnt_eval             ,
+		std::string & err_msg              ,
+		bool          verbose                );
+  
 public:
         
-  /// Constructor.
-  Clock ( void ) : _CPU_t0 ( clock() ) { time (&_real_t0); }
-        
-  /// Copy constructor.
-  /**
-     \param c The copied object -- \b IN.
-  */
-  Clock ( const Clock & c ) : _real_t0 ( c._real_t0 ) , _CPU_t0 ( c._CPU_t0 ) {}
-        
-  /// Affectation operator.
-  /**
-     \param  c The right-hand side object -- \b IN.
-     \return \c *this as the result of the affectation.
-  */
-  Clock & operator = ( const Clock & c )
-  {
-    _real_t0 = c._real_t0;
-    _CPU_t0  = c._CPU_t0;
-    return *this;
-  }
-        
-  /// Destructor.
-  virtual ~Clock ( void ) {}
-        
-  /// Reset the clock.
-  void reset ( void )
-  {
-    time ( &_real_t0 );
-    _CPU_t0 = clock();
-  }
-        
-  /// Get wall clock time.
-  /**
-     \return The wall clock time.
-  */
-  int get_real_time ( void ) const;
-        
-  /// Get the CPU time.
-  /**
-     \return The CPU time.
-  */
-  double get_CPU_time ( void ) const
-  {
-    return ( static_cast<double>(clock()) - _CPU_t0 ) / _D_CLOCKS_PER_SEC;
-  }
+  Evaluator  ( const Problem & pb, std::ostream & out ) :
+    _problem ( pb                              ) ,
+    _outputs ( new double[pb.get_nb_outputs()] ) ,
+    _out     ( out                             )   { reset_outputs(1e20); }
+
+  ~Evaluator ( void );
+
+  int get_nb_input_points ( void ) const { return static_cast<int>(_x.size()); }
+  
+  bool read_x ( const std::string & x_file_name );
+
+  bool set_x ( const double * x );
+  
+  void display_x ( void ) const;
+
+  // multiple evaluations:
+  bool eval_x ( int           x_index              ,
+		int           seed                 ,
+		double        precison             ,
+		int           replications         ,
+		bool        & simulation_completed ,
+		bool        & cnt_eval             ,
+		std::string & err_msg              ,
+		bool          verbose                );
+
+  void display_outputs ( void ) const;
 };
 
 #endif

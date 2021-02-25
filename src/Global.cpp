@@ -1,7 +1,29 @@
+/*-------------------------------------------------------------------------------*/
+/*  SOLAR - The solar thermal power plant simulator                              */
+/*  https://github.com/bbopt/solar                                               */
+/*                                                                               */
+/*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
+/*                                                                               */
+/*  Polytechnique Montreal / GERAD                                               */
+/*  sebastien.le-digabel@polymtl.ca                                              */
+/*                                                                               */
+/*  This program is free software: you can redistribute it and/or modify it      */
+/*  under the terms of the GNU Lesser General Public License as published by     */
+/*  the Free Software Foundation, either version 3 of the License, or (at your   */
+/*  option) any later version.                                                   */
+/*                                                                               */
+/*  This program is distributed in the hope that it will be useful, but WITHOUT  */
+/*  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        */
+/*  FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  */
+/*  for more details.                                                            */
+/*                                                                               */
+/*  You should have received a copy of the GNU Lesser General Public License     */
+/*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
 #include "Global.hpp"
 
-std::string separatorString()
-{
+std::string separatorString() {
 #ifdef _WIN32
 	return "\\";
 #else
@@ -9,36 +31,120 @@ std::string separatorString()
 #endif
 }
 
-double kernelSmoothing(std::vector<int>& xData, std::vector<double>& yData, int xValue)
-{
-	double kernel;
-	double yOutput = 0.;
-	double sumKernel = 0.;
+/*-------------------------------------------------------------------------------*/
+double kernelSmoothing ( std::vector<int>& xData, std::vector<double>& yData, int xValue ) {
+/*-------------------------------------------------------------------------------*/
 
-	for (unsigned int i = 0; i < yData.size(); ++i)
-	{
-		kernel = exp(-(xValue*1. - xData[i]*1.)*(xValue*1. - xData[i]*1.) / 2.);
-		yOutput += yData[i] * kernel;
-		sumKernel += kernel;
-	}
-	yOutput /= sumKernel;
-	return yOutput;
+  double kernel;
+  double yOutput = 0.;
+  double sumKernel = 0.;
+
+  for (unsigned int i = 0; i < yData.size(); ++i) {
+    kernel = exp(-(xValue*1.0 - xData[i]*1.0)*(xValue*1.0 - xData[i]*1.0) / 2.0);
+    yOutput   += yData[i] * kernel;
+    sumKernel += kernel;
+  }
+  yOutput /= sumKernel;
+  return yOutput;
 }
 
-double kernelSmoothing(std::vector<double>& xData, std::vector<double>& yData, double xValue)
-{
-	double kernel;
-	double yOutput = 0.;
-	double sumKernel = 0.;
+/*-------------------------------------------------------------------------------*/
+double kernelSmoothing ( std::vector<double>& xData, std::vector<double>& yData, double xValue ) {
+/*-------------------------------------------------------------------------------*/
 
-	for (unsigned int i = 0; i < yData.size(); ++i)
-	{
-		kernel = exp(-(xValue - xData[i])*(xValue - xData[i] ) / 2.);
-		yOutput += yData[i] * kernel;
-		sumKernel += kernel;
-	}
-	yOutput /= sumKernel;
-	return yOutput;
+  double kernel;
+  double yOutput   = 0.0;
+  double sumKernel = 0.0;
+
+  for ( unsigned int i = 0; i < yData.size(); ++i ) {
+    kernel     = exp(-(xValue - xData[i])*(xValue - xData[i] ) / 2.0);
+    yOutput   += yData[i] * kernel;
+    sumKernel += kernel;
+  }
+  yOutput /= sumKernel;
+  return yOutput;
+}
+
+/*------------------------------------------*/
+/*           custom round function          */
+/*------------------------------------------*/
+int  myround ( const double x ) {
+  return static_cast<int> ((x < 0.0 ? -std::floor(.5-x) : std::floor(.5+x)));
+}
+
+/*------------------------------------------*/
+/*                  is_int                  */
+/*------------------------------------------*/
+bool is_int ( const double x ) {
+  return (myround(x)==x);
+}
+
+/*------------------------------------------*/
+/*                  toupper                 */
+/*------------------------------------------*/
+std::string toupper ( std::string s ) {
+  for ( size_t i = 0 ; i < s.size() ; ++i )
+    s[i] = std::toupper(s[i]);
+  return s;
+}
+
+/*-----------------------------------------------------------*/
+/*              convert a string to an integer               */
+/*-----------------------------------------------------------*/
+bool string_to_int ( const std::string & s , int & i ) {
+  std::stringstream ss(s);
+  ss >> i;
+  std::ostringstream oss;
+  oss << i;
+  std::string s2 = oss.str();
+  if ( s != s2 )
+    return false;
+  return true;
+}
+
+/*-----------------------------------------------------------*/
+/*              convert a string to a double                 */
+/*-----------------------------------------------------------*/
+/* For testing the function:                                 */
+/*                                                           */
+// std::cout << setprecision(12);
+// std::string s;
+// std::cout << "s: ";
+// std::cin  >> s; 
+// double x;
+// if ( string_to_double(s,x) )
+//   std::cout << "x=" << x << std::endl;
+// else
+//   std::cout << "Error" << std::endl;
+/*                                                           */
+/*-----------------------------------------------------------*/
+bool string_to_double ( const std::string & s , double & x ) {
+  x = 0.0;
+  if ( s.size() == 0 )
+    return false;
+  char * err;
+  x = strtod(s.c_str(),&err);
+  return strcmp(err,"")==0;
+  
+  // C++ 11 version:
+  // ---------------
+  // x = 0.0;
+  // if ( s.size() == 0 )
+  //   return false;
+  // size_t idx = 0;
+  // try {
+  //   x = std::stod(s,&idx);
+  //   idx = s.size();  
+  // }
+  // catch ( std::invalid_argument ) {
+  //   x = 0.0;
+  //   return false;
+  // }
+  // if ( idx != s.size() ) {
+  //   x = 0.0;
+  //   return false;
+  // }
+  // return true;
 }
 
 double Q_heat_hot = 0.;
@@ -88,7 +194,7 @@ double demandProfile_W[24] = {
 	0.912633496,
 	0.943412468,
 	0.993129676,
-	1,
+	1.0,
 	0.981337917,
 	0.959682636,
 	0.924242451,
@@ -114,7 +220,7 @@ double demandProfile_S[24] = {
 	0.991086972,
 	0.993815489,
 	0.999634953,
-	1,
+	1.0,
 	0.982788467,
 	0.9592214,
 	0.94178601,
@@ -141,7 +247,7 @@ double A4_e = -4.522126353628195e6;
 double B4_e = -5.198744177935268e3;
 double C4_e = 1.06667544357578;
 double D4_e = -7.3315284072605e-5;
-double a_e = 0, b_e = 0, c_e = 0, d_e = 0;
+double a_e = 0.0, b_e = 0.0, c_e = 0.0, d_e = 0.0;
 
 //turbine basic efficiency coefficients //  non-Condensing
 double A1_en = 4.3579522488849;
@@ -178,4 +284,4 @@ double A4 = -1.19638058919324e-6;
 double B4 = 7.50620062251362e-7;
 double C4 = -1.899443544787457e-7;
 double D4 = 1.653733711580176e-8;
-double a = 0, b = 0, c = 0, d = 0;
+double a = 0.0, b = 0.0, c = 0.0, d = 0.0;
