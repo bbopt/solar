@@ -88,3 +88,18 @@ The command `./bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should display
 which corresponds to the feasible point
 *(8, 8, 150, 7, 7, 250, 45, 0.5, 5)*
 of value *-122505.5978*.
+
+
+### How to cite
+
+```
+@mastersthesis{MScMLG,
+  Author = {Mathieu Lemyre Garneau},
+  Title  = {{Modelling of a solar thermal power plant for benchmarking blackbox optimization solvers}},
+  School = {Polytechnique Montr\'eal},
+  Year   = {2015},
+  Url    = {https://publications.polymtl.ca/1996/},
+  Note   = {Text available at \url{https://publications.polymtl.ca/1996},
+            code available at \url{https://github.com/bbopt/solar}}
+}
+```
