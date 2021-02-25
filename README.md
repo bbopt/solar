@@ -1,17 +1,17 @@
 # solar
 The **SOLAR** blackbox optimization benchmarking framework.
 
-#### Compilation
+### Compilation
 Go to the [./src](src) directory and type `make`. It will generate the binary
 executable `solar` located in the [./bin](bin) directory.
 
-#### Check
+### Validation
 Your **SOLAR** installation must be validated. For this, type `./bin/solar -check`.
 This will execute several tests during 10 to 20 minutes.
 
 If the validation fails, please send an email to nomad@gerad.ca with the full output.
 
-#### Execution
+### Execution
 Type `./bin/solar` and you will be guided with the following help:
 
 ```
@@ -79,5 +79,7 @@ And the list of instances is:
 	9	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
 ```
 
-#### Example
+### Example
 
+The command `./bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should produce the display
+`-122505.5978 -10881140.5675 -1512631.39776 -134 -4.5 0`.
