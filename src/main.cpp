@@ -2,7 +2,7 @@
 /*  SOLAR - The solar thermal power plant simulator - version 0.2.1              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2021-02-24                                                                   */
+/*  2021-02-26                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -26,7 +26,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.2.1, 2021-02-24";
+const std::string VERSION = "0.2.2, 2021-02-26";
 
 // validation functions:
 bool check ( bool fast );
@@ -773,8 +773,8 @@ bool check ( bool fast ) {
 	      << error << std::endl;
   
   std::cout << std::endl
-	    << "CPU time : " << clock1.get_CPU_time()  << std::endl
-	    << "Real time: " << clock1.get_real_time() << std::endl;
+	    << "CPU time : " << clock1.get_CPU_time()  << "s" << std::endl
+	    << "Real time: " << clock1.get_real_time() << "s" << std::endl;
   
   return chk;
 }
