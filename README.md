@@ -5,6 +5,8 @@ The **SOLAR** blackbox optimization benchmarking framework.
 Go to the [./src](src) directory and type `make`. It will generate the binary
 executable `solar` located in the [./bin](bin) directory.
 
+For Windows users, it is possible to directly use a binary [./bin/solar_WINDOWS.exe](executable).
+
 ### Validation
 Your **SOLAR** installation must be validated. For this, type `./bin/solar -check`.
 This will execute several tests during 10 to 20 minutes.
