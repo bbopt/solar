@@ -85,6 +85,6 @@ The command `./bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should display
 
 `-122505.5978 -10881140.5675 -1512631.39776 -134 -4.5 0`
 
-which correspond to the feasible point
+which corresponds to the feasible point
 *(8, 8, 150, 7, 7, 250, 45, 0.5, 5)*
 of value *-122505.5978*.
