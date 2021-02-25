@@ -2,8 +2,9 @@
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
-Go to the [./src](src) directory and type `make`. It will generate the binary
-executable `solar` located in the [./bin](bin) directory.
+In the following, `$SOLAR_HOME` denotes the directory where **SOLAR** has been downloaded.
+Go to the [$SOLAR_HOME/src](src) directory and type `make`. It will generate the binary
+executable `solar` located in [$SOLAR_HOME/bin](bin).
 
 For Windows users, it is possible to directly use a binary [executable](./bin/solar_WINDOWS.exe).
 
@@ -28,7 +29,7 @@ Help(1)   : solar -h
 Help(2)   : solar -h pb_id
 Info      : solar -i
 ```
-To run a simulation, type `solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
+To run a simulation, type `$SOLAR_HOME/bin/solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
 
 The different options are:
 
@@ -83,7 +84,7 @@ And the list of instances is:
 
 ### Example
 
-The command `./bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should display
+The command `$SOLAR_HOME/bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should display
 
 `-122505.5978 -10881140.5675 -1512631.39776 -134 -4.5 0`
 
