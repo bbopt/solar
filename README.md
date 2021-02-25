@@ -1,4 +1,4 @@
-# solar Version 0.2.1
+# SOLAR 0.2.1
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
