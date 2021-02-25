@@ -82,4 +82,5 @@ And the list of instances is:
 ### Example
 
 The command `./bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should produce the display
+
 `-122505.5978 -10881140.5675 -1512631.39776 -134 -4.5 0`.
