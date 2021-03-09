@@ -1835,7 +1835,7 @@ bool Scenario::check_apriori_constraints_minCost_C1 ( void ) const {
   if (_receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0)
     return false;
 
-    if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
+  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
     return false;
 
   if (_towerHeight < 2 * _heliostatHeight)

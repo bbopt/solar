@@ -162,7 +162,7 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
       m_dot_2 = 0.0;
     }
   }
-  catch (std::runtime_error) {
+  catch ( const std::runtime_error & ) {
     m_dot_2 = 0.0;
     eff = 0.0;
     Q_loss = 0.0;
@@ -271,7 +271,7 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
       throw std::runtime_error ( "Could not find converging value for receiver conduction losses rate" );
 
   }
-  catch ( std::runtime_error ) {
+  catch ( const std::runtime_error & ) {
     q_2 = q_out;
   }
 
@@ -309,7 +309,7 @@ double CentralReceiver::fSolveForT ( double coef_T4, double coef_T, double T_max
     if ( count >= 150 )
       throw std::runtime_error ("Newton method could not converge to an external surface temperature (Receiver)"); 
   }
-  catch ( std::runtime_error ) {
+  catch ( const std::runtime_error & ) {
     T_2 = T_max;
   }
   return T_2;

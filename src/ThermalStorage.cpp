@@ -162,7 +162,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
     if ( count >= 150 )
       throw Simulation_Interruption ("could not converge to storage external surface temperature for wetted section");
   }
-  catch ( Simulation_Interruption ) {
+  catch ( const Simulation_Interruption & ) {
     q_wet_2 = Q_out_wet;
   }
 
@@ -348,7 +348,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 	      throw Simulation_Interruption ( "Cannot converge on heat loss through top surface of storage" );
 	  }
 	}
-	catch ( Simulation_Interruption ) {
+	catch ( const Simulation_Interruption & ) {
 	  //Setting temperature to worst case
 	  T_o_t = (T_ATM + T)/2.;
 	  q_t_cond_2 = (T_i_t_1 - T_ATM) / R_t_cond;
@@ -376,7 +376,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 	      throw Simulation_Interruption ("Cannot converge on heat loss through dry wall surface of storage");
 	  }
 	}
-	catch (Simulation_Interruption) {
+	catch ( const Simulation_Interruption & ) {
 	  //Setting temperature to worst case
 	  T_o_w = (T_ATM + T) / 2.;;
 	  q_w_cond_2 = (T_i_w_1 - T_ATM) / R_w_cond;
@@ -423,7 +423,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
       //The total radiative losses are obtained using the final value of Jm
       Q_out_rad = (BOLTZMANN*pow(T, 4.0) - J_m) / ((1 - EPSILON_MS) / (EPSILON_MS*A_floor));
     }
-    catch (Simulation_Interruption) {
+    catch ( const Simulation_Interruption & ) {
       //Assuming worst case losses
       J_m = BOLTZMANN*pow((T + T_ATM)/2.0,4.0);
       Q_out_rad = (BOLTZMANN*pow(T, 4.0) - J_m) /
@@ -479,7 +479,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 	  throw Simulation_Interruption ("Could not find convergence for conduction losses through top wetted surface");
       }
     }
-    catch (Simulation_Interruption) {
+    catch ( const Simulation_Interruption & ) {
       //Setting to preliminary value
       q_t_cond_2 = Q_top_cond;
     }
@@ -566,7 +566,7 @@ double ThermalStorage::fSolveForT ( double coef_T4,
     if ( count >= 150 )
       throw Simulation_Interruption ("Newton's method could not converge to a valid external temperature for storage");
   }
-  catch ( Simulation_Interruption ) {
+  catch ( const Simulation_Interruption & ) {
     T_2 = (T_max + T_min) / 2.0;
   }
   return T_2;
@@ -621,7 +621,7 @@ double ThermalStorage::fSolveForT_i ( double coef_T4 ,
       T_2 = (T_1 + T_2) / 2.0;
     }
   }
-  catch (Simulation_Interruption) {
+  catch ( const Simulation_Interruption & ) {
     T_2 = T_min;
   }
   return T_2;

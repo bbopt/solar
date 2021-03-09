@@ -1,6 +1,6 @@
 EXE                = ../bin/solar
 COMPILATOR         = g++
-COMPILATOR_OPTIONS = -O2 -Wall -Wextra -pedantic -Wcast-align
+COMPILATOR_OPTIONS = -O3 -Wall -Wextra -pedantic -Wcast-align
 LIBS               = -lc -lm
 INCLUDE            = -I.
 COMPILE            = $(COMPILATOR) $(COMPILATOR_OPTIONS) $(INCLUDE) -c
