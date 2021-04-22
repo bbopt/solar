@@ -312,7 +312,7 @@ void Scenario::init_minCost_C1 ( double precision ) {
   _latitude                = 35.0;
   _day                     = 270;   // https://www.epochconverter.com/days/2019: Sept. 27th
   _demandProfile           = 1;
-  _tStart                  = 900;  // 15*60
+  _tStart                  =  900; // 15*60
   _tEnd                    = 1260; // 21*60;
   _maximumPowerDemand      = 1e7;
   _storageStartupCondition = 0;

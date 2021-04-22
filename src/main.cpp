@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.2.1              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.3.0              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2021-03-09                                                                   */
+/*  2021-04-21                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -26,7 +26,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.2.3, 2021-03-09";
+const std::string VERSION = "0.3.0, 2021-04-21";
 
 // validation functions:
 bool check ( bool fast );
@@ -70,18 +70,19 @@ int main ( int argc , char ** argv ) {
     std::string arg1 = toupper(argv[1]);
 
     // <solar -c> or <solar -check>: call validation function:
-    if ( arg1 == "-C" || arg1 == "-CHECK" )
+    if ( arg1 == "-C" || arg1 == "-CHECK" || arg1 == "--C" || arg1 == "--CHECK" )
       return check(false) ? 0 : 1;
     
     // <solar -i> or <solar -v> or <solar -info>:
-    if ( arg1 == "-I" || arg1 == "-V" || arg1 == "-INFO" ) {
+    if ( arg1 ==  "-I" || arg1 ==  "-V" || arg1 ==  "-INFO" ||
+	 arg1 == "--I" || arg1 == "--V" || arg1 == "--INFO"    ) {
       display_info ( std::cout , VERSION );
       return 1;
     }
    
     if ( argc == 2 ) {
 
-      if ( arg1 == "-H" || arg1 == "-HELP" ) {
+      if ( arg1 == "-H" || arg1 == "-HELP" || arg1 == "--H" || arg1 == "--HELP" ) {
 
 	// display help for all problems: <solar -h> :
 	display_help ( std::cout , problems );
@@ -94,13 +95,14 @@ int main ( int argc , char ** argv ) {
     }
 
     // display help for one problem: <solar -h pb_id> :
-    if ( arg1 == "-H" || arg1 == "-HELP" ) {
+    if ( arg1 == "-H" || arg1 == "-HELP" || arg1 == "--H" || arg1 == "--HELP") {
       display_help ( std::cout, problems, argv[2] );
       return 1;
     }
 
     // display help for one problem: <solar pb_id -v> or <solar pb_id -h> :
-    if ( toupper(argv[2]) == "-V" || toupper(argv[2]) == "-H" ||  toupper(argv[2]) == "-HELP" ) {
+    if ( toupper(argv[2]) ==  "-V" || toupper(argv[2]) ==  "-H" ||  toupper(argv[2]) ==  "-HELP" ||
+	 toupper(argv[2]) == "--V" || toupper(argv[2]) == "--H" ||  toupper(argv[2]) == "--HELP"    ) {
       display_help ( std::cout, problems, argv[1] );
       return 1;
     }
@@ -249,7 +251,7 @@ bool get_options ( int           argc      ,
    
     // verbose:
     // --------
-    if ( arg == "-V" ) {
+    if ( arg == "-V" || arg == "--V" ) {
       if ( verbose )
 	return false;
       verbose = true;
@@ -262,7 +264,7 @@ bool get_options ( int           argc      ,
 
       // random seed:
       // ------------
-      if ( sarg == "-SEED=" ) {
+      if ( sarg == "-SEED=" || sarg == "--SEED=" ) {
 	if ( bseed )
 	  return false;
 	bseed = true;
@@ -276,7 +278,7 @@ bool get_options ( int           argc      ,
 
       // precision:
       // ----------
-      else if ( sarg == "-PREC=" ) {
+      else if ( sarg == "-PREC=" || sarg == "--PREC=" ) {
 	if ( bprec )
 	  return false;
 	bprec = true;
@@ -290,7 +292,7 @@ bool get_options ( int           argc      ,
       // -----------------------
       else {
 	sarg = arg.substr(0,5);
-	if ( sarg == "-REP=" ) {
+	if ( sarg == "-REP=" || sarg == "--REP=" ) {
 	  if ( brep )
 	    return false;
 	  brep = true;
