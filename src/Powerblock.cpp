@@ -80,12 +80,12 @@ double Powerblock::fComputeRequiredThermalEnergy ( double & Pout ) {
 }
 
 /*-------------------------------------------------------------------------------------*/
-void Powerblock::adjustPowerData ( double thermalTransfered , double thermalNeeded ) {
+void Powerblock::adjustPowerData ( double thermalTransferred , double thermalNeeded ) {
 /*-------------------------------------------------------------------------------------*/
-  if ( fabs(thermalTransfered - thermalNeeded) > 1000.0 ) {
+  if ( fabs(thermalTransferred - thermalNeeded) > 1000.0 ) {
     _powerOutput.pop_back();
     _powerOutput.push_back(0.0);
   }
   else
-    _powerOutput.push_back(thermalTransfered);
+    _powerOutput.push_back(thermalTransferred);
 }

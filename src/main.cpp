@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.3.0              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.3.1              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
 /*  2021-04-21                                                                   */
@@ -26,7 +26,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.3.0, 2021-04-21";
+const std::string VERSION = "0.3.1, 2021-06-24";
 
 // validation functions:
 bool check ( bool fast );

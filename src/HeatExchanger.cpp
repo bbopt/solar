@@ -41,7 +41,7 @@ HeatExchanger::HeatExchanger ( MoltenSalt * input  ,
   _inletWaterPressure     = P_ATM;
   _outletSteamTemperature = powerblock->get_temperature();
   _outletSteamPressure    = powerblock->get_pressure();
-  _heatTransfered.reserve(86400); // 24x60x60
+  _heatTransferred.reserve(86400); // 24x60x60
 }
 
 /*-------------------------------------------------------------------------*/
@@ -180,11 +180,11 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
 /*-------------------------------------------------------------------------*/
 double HeatExchanger::fEnergyToPowerBlock ( int timeInSeconds ) {
 /*-------------------------------------------------------------------------*/
-  double Q_transfered =
+  double Q_transferred =
     HEAT_CAPACITY * timeInSeconds * _input->get_massFlow() * (_input->get_temperature() - _output->get_temperature());
   if ( _exchangerModel == 1 )
-    _heatTransfered.push_back ( Q_transfered );
-  return Q_transfered;
+    _heatTransferred.push_back ( Q_transferred );
+  return Q_transferred;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -193,7 +193,7 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
 							   double maximumFlow            ) {
 /*-------------------------------------------------------------------------*/
   if ( energyOutputRequired == 0.0 ) { 
-    _heatTransfered.push_back ( 0.0 );
+    _heatTransferred.push_back ( 0.0 );
     return 0.0;
   }
   
@@ -240,7 +240,7 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
   m_dot_ms1 = Q_to_water / (c_ms*(T_in_ms - T_out_ms));
 
   if ( m_dot_ms1 > maximumFlow ) { 
-    _heatTransfered.push_back(0.0);
+    _heatTransferred.push_back(0.0);
     return 0.0;
   }
 
@@ -275,7 +275,7 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
   if (eps_requis > 0.95) {
     _output->set_massFlow(0);
     _input->set_massFlow(0);
-    _heatTransfered.push_back(0);
+    _heatTransferred.push_back(0);
     return 0.0;
   }
 
@@ -432,7 +432,7 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
   }
 
   if ( m_dot_ms1 > maximumFlow || m_dot_ms1 < 0.0 ) {
-    _heatTransfered.push_back(0.);
+    _heatTransferred.push_back(0.);
     _output->set_massFlow(0);
     _input->set_massFlow(0);
     return 0.0;
@@ -440,7 +440,7 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
   _output->set_temperature(T_out_ms);
   _output->set_massFlow(m_dot_ms1);
   _input->set_massFlow(m_dot_ms1);
-  _heatTransfered.push_back(Q_to_water);
+  _heatTransferred.push_back(Q_to_water);
   
   return m_dot_ms1;
 }

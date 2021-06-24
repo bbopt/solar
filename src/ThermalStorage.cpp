@@ -183,7 +183,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
   //   T_out = q_dot*R_conv + T_a
   //4- With this outter surface temperature, find radations emitted by the surface
   //   q_dot_rad = epsilon*BOLTZMAN*A*(T_out^4 - T_a^4)
-  //5- With this surface temperature, compute the amount of energy transfered from the inner
+  //5- With this surface temperature, compute the amount of energy transferred from the inner
   //   surface to the outer surface by conduction. q_dot_cond = (T_sur - T_out)/R_cond
   //6- Now the only energy left for convection would be q_dot_conv = q_dot_cond - q_dot_rad
   //7- go back to 3- using q_dot = q_dot_conv Do this until convergence of T_out

@@ -417,7 +417,7 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\tc12: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
       << "\tc13: Parasitics do not exceed 20% of energy production (stochastic)\n"
       << "\tc14: Steam generator outer tubes diameter <= tubes spacing\n"
-      << "\tc15: Steam generator inside diameter      <=  steam generator outside diameter\n"
+      << "\tc15: Steam generator inside diameter      <= steam generator outside diameter\n"
       << "\tc16: Pressure in steam generator tubes    <= yield pressure\n"
 
       << "\n-----------------------------------------------------------------\n"
@@ -565,7 +565,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << std::endl;
   
   out << "Objective (first output, stochastic)\n"
-      << "\tMaximize receiver efficiency, i.e the energy transfered to the molten salt\n"
+      << "\tMaximize receiver efficiency, i.e the energy transferred to the molten salt\n"
       << std::endl;
 
   out << "Variables:\n"

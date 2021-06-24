@@ -80,7 +80,7 @@ private:
   double _a, _b, _c, _e;
 
   // Data gathering
-  std::vector<double> _heatTransfered;
+  std::vector<double> _heatTransferred;
   
   //geometric parameters to add
   double fComputeEpsilon(void);
@@ -114,7 +114,7 @@ public:
   ~HeatExchanger ( void ) {}
 
   double fComputeRequiredMoltenSaltMassFlow ( double, double) const;
-  void   fCalculateEnergyTransfered         ( void );
+  void   fCalculateEnergyTransferred        ( void );
   double fComputeRequiredMoltenSaltMassFlow ( double, double, double);
   double fEnergyToPowerBlock                ( int );
 
@@ -125,7 +125,7 @@ public:
   double computePressureInTubes  ( double ) const;
   double computePressureInShells ( void   ) const;
   
-  const std::vector<double> & get_heatTransfered ( void ) const { return _heatTransfered; }
+  const std::vector<double> & get_heatTransferred ( void ) const { return _heatTransferred; }
 
   int    get_exchangerModel     ( void ) const { return _exchangerModel;     }
   double get_tubesSpacing       ( void ) const { return _tubesSpacing;       }
