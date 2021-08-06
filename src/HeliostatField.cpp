@@ -55,8 +55,8 @@ HeliostatField::HeliostatField ( size_t      nbOfHeliostats       ,
   Heliostat::set_length(heliostatLength);
   Sunray::set_minDistance();
 
-  _powerOutput.reserve(24);
-  _fieldEfficiency.reserve(24);
+  _powerOutput.reserve     ( 24 );
+  _fieldEfficiency.reserve ( 24 );
 }
 
 void HeliostatField::delete_heliostats ( void ) {
@@ -309,11 +309,11 @@ void HeliostatField::fComputeCosineAndSpillage ( void ) {
   long double alpha_s, gamma_s, theta;
   long double summation;
   long double slantRange;
-  std::vector<long double> vector_I(3, 0.);
-  std::vector<long double> vector_R(3, 0.);
+  std::vector<long double> vector_I ( 3, 0.0 );
+  std::vector<long double> vector_R ( 3, 0.0 );
   int n = 0;
 
-  Sun tempSun(_sun);
+  Sun tempSun ( _sun );
 
   // Assuming that the sun azimuth is due south at 12:00
   // Using  ESO's FITS convention where azimuth is measured from the south increasing towards the west Thus it is 0 at 12:00

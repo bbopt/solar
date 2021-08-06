@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.3.1              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.4.0              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2021-04-21                                                                   */
+/*  2021-08-06                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -26,7 +26,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.3.1, 2021-06-24";
+const std::string VERSION = "0.4.0, 2021-08-06";
 
 // validation functions:
 bool check ( bool fast );
@@ -52,7 +52,7 @@ bool get_options ( int           argc         ,
 /*                       main function                       */
 /*-----------------------------------------------------------*/
 int main ( int argc , char ** argv ) {
-
+  
   // create problem descriptions:
   std::vector<Problem> problems;
   create_problems ( problems );
@@ -522,7 +522,8 @@ bool check ( bool fast ) {
       std::cout << "\tEval test ( 8/" << nb_eval_tests << ") ..." << std::flush;
       double x[20] = { 13, 9, 150, 7, 8, 249, 46, 0, 6, 900, 10, 8, 0.3, 0.2, 560, 42, 0.3, 0.015, 0.017, 2 };
       expected_output =
-    	"1e+20 -149690.320707 1e+20 -124 -6 1e+20 1e+20 1e+20 1e+20 1e+20 -0.002 -11.8523706144 -97 1e+20";
+    	// "1e+20 -149690.320707 1e+20 -124 -6 1e+20 1e+20 1e+20 1e+20 1e+20 -0.002 -11.8523706144 -97 1e+20";
+        "1e+20 -149690.320707 1e+20 -124 -6 1e+20 1e+20 1e+20 1e+20 1e+20 -0.002 -11.8523706144 1e+20 1e+20";
       if ( check_eval ( "SOLAR3", 0, 1.0, 1, x, expected_output, error ) )
     	std::cout << "... Ok";
       else {
@@ -739,7 +740,8 @@ bool check ( bool fast ) {
       std::cout << "\tEval test (22/" << nb_eval_tests << ") ..." << std::flush;
       double x[29] = { 9, 9, 150, 6, 8, 1000, 45, 0.5, 5, 900, 9, 9, 0.3, 0.2, 560, 50, 0.3, 0.0165, 0.018, 0.017, 10, 0.0155, 0.016, 0.2, 2, 12000, 1, 2, 2 };
       expected_output =
-    	"1e+20 1e+20 1e+20 1e+20 -4562631.39776 -132 -4.5 1e+20 1e+20 1e+20 1e+20 1e+20 -0.0015 -11.6663706144 -97 1e+20 -0.001 -0.0005 1e+20";
+	//	"1e+20 1e+20 1e+20 1e+20 -4562631.39776 -132 -4.5 1e+20 1e+20 1e+20 1e+20 1e+20 -0.0015 -11.6663706144 -97 1e+20 -0.001 -0.0005 1e+20";
+	"1e+20 1e+20 1e+20 1e+20 -4562631.39776 -132 -4.5 1e+20 1e+20 1e+20 1e+20 1e+20 -0.0015 -11.6663706144 1e+20 1e+20 -0.001 -0.0005 1e+20";
       if ( check_eval ( "SOLAR9", 0, 1.0, 1, x, expected_output, error ) )
     	std::cout << "... Ok";
       else {

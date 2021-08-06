@@ -50,13 +50,13 @@ Scenario::Scenario ( const std::string & problem , double precision ) :
   _cFieldSurface                    ( 0.0     ) ,
   _cReflectiveSurface               ( 0.0     ) ,
   _cParasitics                      ( 0.0     ) ,
-  _heliostatHeight                  ( 0.0     ) ,
+  _heliostatLength                  ( 0.0     ) ,
   _heliostatWidth                   ( 0.0     ) ,
   _towerHeight                      ( 0.0     ) ,
   _receiverApertureHeight           ( 0.0     ) , 
   _receiverApertureWidth            ( 0.0     ) , 
-  _maxNumberOfHeliostats            ( 0       ) , 
-  _fieldMaxAngularSpan              ( 0.0     ) ,
+  _numberOfHeliostats               ( 0       ) , 
+  _fieldAngularWidth                ( 0.0     ) ,
   _minimumDistanceToTower           ( 0.0     ) ,
   _maximumDistanceToTower           ( 0.0     ) ,
   _centralReceiverOutletTemperature ( 0.0     ) ,
@@ -198,13 +198,13 @@ bool Scenario::set_x_maxNrg_H1 ( const double * x ) {
 
   // assign variables:
   // -----------------
-  _heliostatHeight        = x[0];
+  _heliostatLength        = x[0];
   _heliostatWidth         = x[1];
   _towerHeight            = x[2];
   _receiverApertureHeight = x[3];
   _receiverApertureWidth  = x[4];
-  _maxNumberOfHeliostats  = myround(x[5]);
-  _fieldMaxAngularSpan    = x[6];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
   _minimumDistanceToTower = x[7];
   _maximumDistanceToTower = x[8];
 
@@ -267,13 +267,13 @@ bool Scenario::set_x_minSurf_H1 ( const double * x ) {
   // -----------------
 
   // Heliostats Field:
-  _heliostatHeight        = x[0];
+  _heliostatLength        = x[0];
   _heliostatWidth         = x[1];
   _towerHeight            = x[2];
   _receiverApertureHeight = x[3];
   _receiverApertureWidth  = x[4];
-  _maxNumberOfHeliostats  = myround(x[5]);
-  _fieldMaxAngularSpan    = x[6];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
   _minimumDistanceToTower = x[7];
   _maximumDistanceToTower = x[8];
 
@@ -340,15 +340,15 @@ bool Scenario::set_x_minCost_C1 ( const double * x ) {
   // -----------------
 
   // Heliostats Field:
-  _heliostatHeight                  = x[ 0];
-  _heliostatWidth                   = x[ 1];
-  _towerHeight                      = x[ 2];
-  _receiverApertureHeight           = x[ 3];
-  _receiverApertureWidth            = x[ 4];
-  _maxNumberOfHeliostats            = myround(x[5]);
-  _fieldMaxAngularSpan              = x[ 6];
-  _minimumDistanceToTower           = x[ 7];
-  _maximumDistanceToTower           = x[ 8];
+  _heliostatLength        = x[ 0];
+  _heliostatWidth         = x[ 1];
+  _towerHeight            = x[ 2];
+  _receiverApertureHeight = x[ 3];
+  _receiverApertureWidth  = x[ 4];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[ 6];
+  _minimumDistanceToTower = x[ 7];
+  _maximumDistanceToTower = x[ 8];
 
   // Htf cycle:
   _centralReceiverOutletTemperature = x[ 9];
@@ -430,13 +430,13 @@ bool Scenario::set_x_minCost_C2 ( const double * x ) {
   // -----------------
 
   // Heliostats Field:
-  _heliostatHeight        = x[0];
+  _heliostatLength        = x[0];
   _heliostatWidth         = x[1];
   _towerHeight            = x[2];
   _receiverApertureHeight = x[3];
   _receiverApertureWidth  = x[4];
-  _maxNumberOfHeliostats  = myround(x[5]);
-  _fieldMaxAngularSpan    = x[6];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
   _minimumDistanceToTower = x[7];
   _maximumDistanceToTower = x[8];
 
@@ -494,13 +494,13 @@ void Scenario::init_maxComp_HTF1 ( void ) {
   _cBudget                 = 100e6;
   _cParasitics             = 0.18;
 
-  _heliostatHeight        = 2.1336;
+  _heliostatLength        = 2.1336;
   _heliostatWidth         = 3.048;
   _towerHeight            = 100.0;
   _receiverApertureHeight = 6.0;
   _receiverApertureWidth  = 6.0;
-  _maxNumberOfHeliostats  = 3800;
-  _fieldMaxAngularSpan    = 89;
+  _numberOfHeliostats     = 3800;
+  _fieldAngularWidth      = 89;
   _minimumDistanceToTower = 0.5;
   _maximumDistanceToTower = 10;
  
@@ -584,13 +584,13 @@ void Scenario::init_minCost_TS ( void ) {
 
   set_typeOfTurbine(7);
 	
-  _heliostatHeight          = 9;
+  _heliostatLength          = 9;
   _heliostatWidth           = 9;
   _towerHeight              = 250.0;
   _receiverApertureHeight   = 15;
   _receiverApertureWidth    = 20;
-  _maxNumberOfHeliostats    = 12232;
-  _fieldMaxAngularSpan      = 65;
+  _numberOfHeliostats       = 12232;
+  _fieldAngularWidth        = 65;
   _minimumDistanceToTower   = 1;
   _maximumDistanceToTower   = 10.5;
   _receiverInsulThickness   = 0.5;
@@ -652,11 +652,11 @@ void Scenario::init_maxEff_RE ( double precision ) {
   _coldStorageInsulThickness    = 5;
   _coldMoltenSaltMinTemperature = 550;
 
-  _heliostatHeight        = 9;
+  _heliostatLength        = 9;
   _heliostatWidth         = 9;
   _towerHeight            = 175.0;
-  _maxNumberOfHeliostats  = 5000;
-  _fieldMaxAngularSpan    = 55;
+  _numberOfHeliostats     = 5000;
+  _fieldAngularWidth      = 55;
   _minimumDistanceToTower = 1;
   _maximumDistanceToTower = 7;
 
@@ -698,7 +698,7 @@ bool Scenario::set_x_maxEff_RE ( const double * x ) {
 /*--------------------------------------------*/
 void Scenario::init_maxHF_minCost ( double precision ) {
   
-  _model_type               = 2; // whole plant
+  _model_type              = 2; // whole plant
   _heliostatsFieldModel    = 1;
   _exchangerModel          = 1;
   _latitude                = 45.0;
@@ -741,13 +741,13 @@ bool Scenario::set_x_maxHF_minCost ( const double * x ) {
   // -----------------
 
   // Heliostats Field:
-  _heliostatHeight        = x[0];
+  _heliostatLength        = x[0];
   _heliostatWidth         = x[1];
   _towerHeight            = x[2];
   _receiverApertureHeight = x[3];
   _receiverApertureWidth  = x[4];
-  _maxNumberOfHeliostats  = myround(x[5]);
-  _fieldMaxAngularSpan    = x[6];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
   _minimumDistanceToTower = x[7];
   _maximumDistanceToTower = x[8];
   	
@@ -820,13 +820,13 @@ bool Scenario::set_x_maxNrg_minPar ( const double * x ) {
   // -----------------
 
   // Heliostats Field:
-  _heliostatHeight        = x[0];
+  _heliostatLength        = x[0];
   _heliostatWidth         = x[1];
   _towerHeight            = x[2];
   _receiverApertureHeight = x[3];
   _receiverApertureWidth  = x[4];
-  _maxNumberOfHeliostats  = myround(x[5]);
-  _fieldMaxAngularSpan    = x[6];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
   _minimumDistanceToTower = x[7];
   _maximumDistanceToTower = x[8];
 
@@ -913,6 +913,16 @@ bool Scenario::simulate ( double * outputs , bool & cnt_eval ) {
 /*---------------------------*/
 bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
 
+  // x1: _heliostatLength
+  // x2: _heliostatWidth
+  // x3: _towerHeight
+  // x4: _receiverApertureHeight
+  // x5: _receiverApertureWidth
+  // x6: _numberOfHeliostats (int)
+  // x7: _fieldAngularWidth
+  // x8: _minimumDistanceToTower
+  // x9: _maximumDistanceToTower
+
   for ( int i = 0 ; i < 6 ; ++i )
     outputs[i] = 1e20;
 
@@ -935,28 +945,37 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
     // Objective function: total energy gathered in kWh:
     outputs[0] = -_powerplant->get_totalEnergyConcentrated();
    
-    // Check if budget is respected:
+    // c1: check if budget is respected:
     outputs[1] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
       + _powerplant->get_costOfReceiver()
       - _cBudget;
 
-    // Check if total land area is below 1M m^2:
+    // c2: check total land area:
+    // PI*x3*x3 ( x9*x9 - x8*x8 ) * x7/180 <= 1.95e6
     outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
-      *(2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
-    
-    // Check basic geometric requirements:
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
-    outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
-    outputs[5] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+      * _fieldAngularWidth / 180.0 - _cFieldSurface;
+   
+    // Check basic geometric requirements (c3, c4):
+    outputs[3] = 2 * _heliostatLength - _towerHeight;               // c3: 2*x1-x3 <= 0
+    outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower; // c4: x8 <= x9
+
+    // c5: check that x6 heliostats can fit in the field:
+    // c5: x6 <= _powerplant->get_heliostatField()->get_nb_heliostats()
+    // _powerplant->get_heliostatField()->get_nb_heliostats() is the number of heliostats generated in the grid
+    outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
   }
   catch (...) {
+
+    // output a priori constraints:
     
+    // c2: check total land area:
+    // PI*x3*x3 ( x9*x9 - x8*x8 ) * x7/180 <= 1.95e6
     outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
-      * (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      * _fieldAngularWidth / 180.0 - _cFieldSurface;
     
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
-    outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
+    outputs[3] = 2 * _heliostatLength - _towerHeight;               // c3: 2*x1-x3 <= 0
+    outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower; // c4: x8 <= x9
     
     throw Simulation_Interruption ( "simulation could not go through" );
   }
@@ -969,6 +988,21 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
 /*----------------------------*/
 bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
 
+  // x1 : _heliostatLength
+  // x2 : _heliostatWidth
+  // x3 : _towerHeight
+  // x4 : _receiverApertureHeight
+  // x5 : _receiverApertureWidth
+  // x6 : _numberOfHeliostats (int)
+  // x7 : _fieldAngularWidth
+  // x8 : _minimumDistanceToTower
+  // x9 : _maximumDistanceToTower
+  // x10: _centralReceiverOutletTemperature
+  // x11: _receiverNbOfTubes (int)
+  // x12: _receiverInsulThickness
+  // x13: _receiverTubesInsideDiam
+  // x14: _receiverTubesOutsideDiam
+  
   for ( int i = 0 ; i < 14 ; ++i )
     outputs[i] = 1e20;
 
@@ -991,13 +1025,13 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // Objective function: field surface (m^2):
     outputs[0] = _powerplant->get_fieldSurface();
 
-    // Check if surface constraint is respected:
+    // c1: check if surface constraint is respected:
     outputs[1] = _powerplant->get_fieldSurface() - _cFieldSurface;
 
-    // Check if demand is met:
+    // c2: check if demand is met:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
-
-    // Check if total cost does not exceed limit:
+  
+    // c3: check if total cost does not exceed limit:
     outputs[3] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
       + _powerplant->get_costOfReceiver()
@@ -1006,38 +1040,49 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
       + _powerplant->get_costOfPowerblock()
       - _cBudget;
 
-    // Check basic geometric requirements:
-    outputs[4] = 2 * _heliostatHeight - _towerHeight;
-    outputs[5] = _minimumDistanceToTower - _maximumDistanceToTower;
-		
-    // Check number of heliostats requested fits in the field:
-    outputs[6] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    // Check basic geometric requirements: c4 and c5:
+    outputs[4] = 2 * _heliostatLength - _towerHeight;               // c4: 2x1 - x3 <= 0
+    outputs[5] = _minimumDistanceToTower - _maximumDistanceToTower; // c5: x8 <= x9
 
-    // Check pressure in tubes:
+    // c6: check that _numberOfHeliostats (x6) heliostats can fit in the field:
+    outputs[6] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+   
+    // c7: check pressure in tubes:
     outputs[7] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
 
-    // Check if molten salt temperature does not drop below the melting point:
-    outputs[ 8]  = MELTING_POINT - _powerplant->get_minHotStorageTemp();
-    outputs[ 9]  = MELTING_POINT - _powerplant->get_minColdStorageTemp();
-    outputs[10] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
+    // Check if molten salt temperature does not drop below the melting point (c8, c9, c10):
+    outputs[ 8] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
+    outputs[ 9] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
+    outputs[10] = MELTING_POINT - _powerplant->get_minSteamGenTemp   ();
 
+    // c11: x13 <= x14:
     outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
-
-    // Check if tubes fit in receiver:
+   
+    // c12: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
     outputs[12] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
-    
-    outputs[13] = (_powerplant->get_steamTurbineInletTemperature()) - _centralReceiverOutletTemperature;        
+
+    // c13:
+    outputs[13] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;        
   }
   catch (...) {
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
 
-    outputs[4] = 2 * _heliostatHeight - _towerHeight;
-    outputs[5] = _minimumDistanceToTower - _maximumDistanceToTower;
+    // Old version (bug): Removed in version 0.4.0:
+    // outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0)
+    // 		 - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+    //              * (2 * _fieldAngularWidth / 360.0) - _cFieldSurface;
+    // outputs[ 4] = 2 * _heliostatLength - _towerHeight;
+    // outputs[ 5] = _minimumDistanceToTower - _maximumDistanceToTower;
+    // outputs[ 6] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
+    // outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
+    // outputs[13] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+   
+    // corrected version:
+    outputs[ 4] = 2 * _heliostatLength - _towerHeight;                  //  c4: 2x1 - x3 <= 0
+    outputs[ 5] = _minimumDistanceToTower - _maximumDistanceToTower;    //  c5:  x8 <= x9
+    outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam; // c11: x13 <= x14
 
-    outputs[ 6] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
-    outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
-    outputs[13] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+    // c12: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
+    outputs[12] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1050,6 +1095,27 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
 /*----------------------------*/
 bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
 
+  //  x1: _heliostatLength
+  //  x2: _heliostatWidth
+  //  x3: _towerHeight
+  //  x4: _receiverApertureHeight
+  //  x5: _receiverApertureWidth
+  //  x6: _numberOfHeliostats (int)
+  //  x7: _fieldAngularWidth
+  //  x8: _minimumDistanceToTower
+  //  x9: _maximumDistanceToTower
+  // x10: _centralReceiverOutletTemperature
+  // x11: _hotStorageHeight
+  // x12: _hotStorageDiameter
+  // x13: _hotStorageInsulThickness
+  // x14: _coldStorageInsulThickness
+  // x15: _coldMoltenSaltMinTemperature
+  // x16: _receiverNbOfTubes (int)
+  // x17: _receiverInsulThickness
+  // x18: _receiverTubesInsideDiam
+  // x19: _receiverTubesOutsideDiam
+  // x20: _typeOfTurbine (int)
+  
   for ( int i = 0 ; i < 14 ; ++i )
     outputs[i] = 1e20;
 
@@ -1077,53 +1143,57 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
       + _powerplant->get_costOfSteamGenerator()
       + _powerplant->get_costOfPowerblock();
 
-    // check total land area is below 700k m^2:
+    // c1: check total land area is below 800000 m^2:
+    // PI * x3 * x3 * ( x9*x9 - x8*x8 ) * x7 / 180 <= 800000 :
     outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
-
-    // check if compliance to demand is 100%:
+      _fieldAngularWidth / 180.0 - _cFieldSurface;
+    
+    // c2: check if compliance to demand is 100%:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
 
-    // check if tower at least twice as high as heliostats:
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
+    // c3: check if tower at least twice as high as heliostats: 2*x1 - x3 <= 0:
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
 
-    // check Rmin < Rmax:
-    outputs[4]= _minimumDistanceToTower - _maximumDistanceToTower;
+    // c4: check Rmin <= Rmax: x8 <= x9:
+    outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
 
-    // check number of heliostats fits in the field:
-    outputs[5] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
-
-    // check maximum pressure in receiver tubes do not exceed yield pressure:
+    // c5: check that _numberOfHeliostats (x6) heliostats can fit in the field:
+    outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    
+    // c6: check maximum pressure in receiver tubes do not exceed yield pressure:
     outputs[6] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
 
-    // check molten Salt temperature does not drop below the melting point:
+    // check molten Salt temperature does not drop below the melting point: c7, c8, and c9:
     outputs[7] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
     outputs[8] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
     outputs[9] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
-
-    // check receiver tubes Din < Dout:
+   
+    // c10: check receiver tubes Din < Dout: x18 <= x19:
     outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
 
-    // check if tubes fit in receiver:
+    // c11: check if tubes fit in receiver: x16 * x19 - x5 * PI / 2 <= 0:
     outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
 		
-    // check central receiver outlet is higher than that required by the turbine:
+    // c12: check central receiver outlet is higher than that required by the turbine:
     outputs[12] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
 
-    // check if storage is back to initial conditions:
-    double storageFinalConditions = 0.0;
-    storageFinalConditions = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() / _hotStorageHeight;
-    outputs[13] = 1.*_storageStartupCondition - storageFinalConditions;
+    // c13: check if storage is back to initial conditions:
+    outputs[13] = 1.0*_storageStartupCondition
+      - (_powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() / _hotStorageHeight);
   }
   catch (...) {
+
+    // output a priori constraints:
+    
     outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
+      _fieldAngularWidth / 180.0 - _cFieldSurface;
+   
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
     
     outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
-    outputs[12] =  _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+    // outputs[12] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;  removed in version 0.4.0
     
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1135,6 +1205,36 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
 /*----------------------------*/
 bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
 
+  //  x1: _heliostatLength
+  //  x2: _heliostatWidth
+  //  x3: _towerHeight
+  //  x4: _receiverApertureHeight
+  //  x5: _receiverApertureWidth
+  //  x6: _numberOfHeliostats (int)
+  //  x7: _fieldAngularWidth
+  //  x8: _minimumDistanceToTower
+  //  x9: _maximumDistanceToTower
+  // x10: _centralReceiverOutletTemperature
+  // x11: _hotStorageHeight
+  // x12: _hotStorageDiameter
+  // x13: _hotStorageInsulThickness
+  // x14: _coldStorageInsulThickness
+  // x15: _coldMoltenSaltMinTemperature
+  // x16: _receiverNbOfTubes (int)
+  // x17: _receiverInsulThickness
+  // x18: _receiverTubesInsideDiam
+  // x19: _receiverTubesOutsideDiam
+  // x20: _exchangerTubesSpacing
+  // x21: _exchangerTubesLength
+  // x22: _exchangerTubesDin
+  // x23: _exchangerTubesDout
+  // x24: _exchangerBaffleCut
+  // x25: _exchangerNbOfBaffles (int)
+  // x26: _exchangerNbOfTubes (int)
+  // x27: _exchangerNbOfShells (int)
+  // x28: _exchangerNbOfPassesPerShell (int)
+  // x29: _typeOfTurbine (int)
+  
   for ( int i = 0 ; i < 17 ; ++i )
     outputs[i] = 1e20;
 
@@ -1151,10 +1251,10 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // Creating required objects:
     construct_minCost_C2();
     
-    // Launching simulation
+    // Launching simulation:
     _powerplant->fSimulatePowerplant();
 
-    // Objective function : total investment cost
+    // Objective function: total investment cost:
     outputs[0] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
       + _powerplant->get_costOfReceiver()
@@ -1162,60 +1262,85 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
       + _powerplant->get_costOfSteamGenerator()
       + _powerplant->get_costOfPowerblock();
 
-    // Verify: total land area is below 700k m^2
+    // c1: total land area is below 200 hectares:
+    // PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000
     outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
-    // Verify: compliance to demand is 100%
+    // c2: compliance to demand is 100%:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
 
-    // Verify: tower at least twice as high as heliostats
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
+    // c3: tower at least twice as high as heliostats: 2x1-x3 <= 0:
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
 
-    // Verify: Rmin < Rmax
+    // c4: Rmin <= Rmax: x8 <= x9:
     outputs[4]= _minimumDistanceToTower - _maximumDistanceToTower;
     
-    // Verify: number of heliostats fits in the field
-    outputs[5] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    // c5: Check that _numberOfHeliostats (x6) heliostats can fit in the field:
+    outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
     
-    // Verify: maximum pressure in receiver tubes do not exceed yield pressure
+    // c6: maximum pressure in receiver tubes do not exceed yield pressure
     outputs[6] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
 
-    // Verify: Molten Salt temperature does not drop below the melting point
+    // Molten Salt temperature does not drop below the melting point: c7, c8, and c9:
     outputs[7] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
     outputs[8] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
     outputs[9] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
     
-    // Verify: Receiver tubes Din < Dout
+    // c10: Receiver tubes Din < Dout: x18 <= x19:
     outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
 
-    // Verify: Tubes fit in receiver
+    // c11: Tubes fit in receiver: x16*x19 <= x5*PI/2:
     outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
 
-    // Verify: central receiver outlet is higher than that required by the turbine
+    // c12: central receiver outlet is higher than that required by the turbine:
     outputs[12] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
-
-    double sum = 1;
-    for ( unsigned int i = 0; i < _powerplant->get_powerplantPowerOutput().size(); ++i )
-      sum += _powerplant->get_powerplantPowerOutput()[i];
-
-    outputs[13] = _powerplant->fComputeParasiticLosses()/sum - _cParasitics;
+ 
+    // c13:
+    {
+      double sum = 1.0;
+      for ( unsigned int i = 0; i < _powerplant->get_powerplantPowerOutput().size(); ++i )
+	sum += _powerplant->get_powerplantPowerOutput()[i];
+      outputs[13] = _powerplant->fComputeParasiticLosses()/sum - _cParasitics;
+    }
+   
+    // c14: x23 <= x20:
     outputs[14] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[15] = _exchangerTubesDin - _exchangerTubesDout;
+
+    // c15: x22 <= x23:
+    outputs[15] = _exchangerTubesDin  - _exchangerTubesDout;
+
+    // c16:
     outputs[16] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
   catch (...) {
+
+    // output a priori constraints:
+
+    // c1: PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000:
     outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+
+    // c3: 2x1-x3 <= 0:
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
+
+    // c4: x8 <= x9:
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
-    
+
+    // c10: x18 <= x19:
     outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
+
+    // c11: x16*x19 <= x5*PI/2:
     outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
-    outputs[12] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
-    
+
+    // c12: Removed in version 0.4.0:
+    // outputs[12] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+
+    // c14: x23 <= x20:
     outputs[14] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[15] = _exchangerTubesDin - _exchangerTubesDout;
+
+    // c15: x22 <= x23:
+    outputs[15] = _exchangerTubesDin  - _exchangerTubesDout;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1228,6 +1353,27 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
 /*------------------------------*/
 bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
 
+  //  x1: _centralReceiverOutletTemperature
+  //  x2: _hotStorageHeight
+  //  x3: _hotStorageDiameter
+  //  x4: _hotStorageInsulThickness
+  //  x5: _coldStorageInsulThickness
+  //  x6: _coldMoltenSaltMinTemperature
+  //  x7: _receiverNbOfTubes (int)
+  //  x8: _receiverInsulThickness
+  //  x9: _receiverTubesInsideDiam
+  // x10: _receiverTubesOutsideDiam
+  // x11: _exchangerTubesSpacing
+  // x12: _exchangerTubesLength
+  // x13: _exchangerTubesDin
+  // x14: _exchangerTubesDout
+  // x15: _exchangerBaffleCut
+  // x16: _exchangerNbOfBaffles (int)
+  // x17: _exchangerNbOfTubes (int)
+  // x18: _exchangerNbOfShells (int)
+  // x19: _exchangerNbOfPassesPerShell (int)
+  // x20: _typeOfTurbine (int)
+  
   for ( int i = 0 ; i < 13 ; ++i )
     outputs[i] = 1e20;
 
@@ -1241,69 +1387,68 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
 
-    //Creating required objects
+    // create required objects:
     construct_maxComp_HTF1();
 
-    //Launching simulation
+    // launch simulation:
     _powerplant->fSimulatePowerplant();
 
-    //Objective function : time for which the demand is met
+    // objective function: time for which the demand is met:
     outputs[0] = - _powerplant->get_overallComplianceToDemand();
 
-    //Verify : cost constraint
-    double totalCost = _powerplant->get_costOfReceiver()
+    // c1: cost constraint:
+    outputs[1] =  _powerplant->get_costOfReceiver()
       + _powerplant->get_costOfStorage()
       + _powerplant->get_costOfSteamGenerator()
-      + _powerplant->get_costOfPowerblock();
+      + _powerplant->get_costOfPowerblock()
+      - _cBudget;
     
-    outputs[1] =  totalCost - _cBudget;
-
-    //Verify : pressure in receiver tubes doesn't exceed yield pressure
+    // c2: pressure in receiver tubes does not exceed yield pressure:
     outputs[2] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
 
-    //Verify : Molten Salt temperature does not drop below the melting point
+    // c3, c4, c5: Molten Salt temperature does not drop below the melting point:
     outputs[3] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
     outputs[4] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
     outputs[5] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
     
-    //Verify : Receiver tubes Din < Dout
+    // c6: Receiver tubes Din <= Dout: x9 <= x10:
     outputs[6] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : Tubes fit in receiver
+    // c7: Tubes fit in receiver: x7*x10 <= 6*PI/2:
     outputs[7] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
+    // c8: central receiver outlet is higher than that required by the turbine:
     outputs[8] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
     
-    //Verify : parasitics do not exceed limit
-    double sum = 1;
-    foncteurSum somme(&sum);
-    std::for_each(_powerplant->get_powerplantPowerOutput().begin(),
-		  _powerplant->get_powerplantPowerOutput().end(),
-		  somme);
-    outputs[9] = _powerplant->fComputeParasiticLosses() / sum - _cParasitics;
+    // c9: parasitics do not exceed limit:
+    {
+      double sum = 1;
+      foncteurSum somme(&sum);
+      std::for_each(_powerplant->get_powerplantPowerOutput().begin(),
+		    _powerplant->get_powerplantPowerOutput().end(),
+		    somme);
+      outputs[9] = _powerplant->fComputeParasiticLosses() / sum - _cParasitics;
+    }
     
-    //Verify : spacing and tubes dimensions in steam gen.
-    outputs[10] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[11] = _exchangerTubesDin - _exchangerTubesDout;
+    // c10 and c11: spacing and tubes dimensions in steam gen.
+    outputs[10] = _exchangerTubesDout - _exchangerTubesSpacing; // x14 <= x11
+    outputs[11] = _exchangerTubesDin  - _exchangerTubesDout;    // x13 <= x14
     
-    //Verify : pressure in steam gen. tubes do not exceed yield
+    // c12: pressure in steam gen. tubes do not exceed yield
     outputs[12] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
   catch (...) {
     
-    //Verify : Receiver tubes Din < Dout
+    // output a priori constraints:
+
     outputs[6] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
-    
-    //Verify : Tubes fit in receiver
     outputs[7] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
-    outputs[8] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+    // c8: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
+    // outputs[8] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
     
-    //Verify : spacing and tubes dimensions in steam gen.
     outputs[10] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[11] = _exchangerTubesDin - _exchangerTubesDout;
+    outputs[11] = _exchangerTubesDin  - _exchangerTubesDout;
    
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1315,6 +1460,12 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
 /*----------------------------*/
 bool Scenario::simulate_minCost_TS ( double * outputs , bool & cnt_eval ) {
 
+  // x1: _centralReceiverOutletTemperature
+  // x2: _hotStorageHeight
+  // x3: _hotStorageDiameter
+  // x4: _hotStorageInsulThickness
+  // x5: _coldStorageInsulThickness
+  
   for ( int i = 0 ; i < 7 ; ++i )
     outputs[i] = 1e20;
 
@@ -1328,39 +1479,37 @@ bool Scenario::simulate_minCost_TS ( double * outputs , bool & cnt_eval ) {
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
     
-    //Creating required objects
+    // create required objects:
     construct_minCost_TS();
     
-    //Launching simulation
+    // launch simulation:
     _powerplant->fSimulatePowerplant();
    
-    //Objective function : cost of storage
+    // objective function: cost of storage:
     outputs[0] = _powerplant->get_costOfStorage();
 
-    //Verify : demand met 100%
+    // c1: demand met:
     outputs[1] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
 
-    //Verify : pressure in receiver tubes doesn't exceed yield pressure
+    // c2: pressure in receiver tubes does not exceed yield pressure:
     outputs[2] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
     
-    //Verify : Molten Salt temperature does not drop below the melting point
-    outputs[3] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
+    // c3 and c4: molten Salt temperature does not drop below the melting point:
+    outputs[3] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
     outputs[4] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
 
-    //Verify : central receiver outlet is higher than that required by the turbine
+    // c5: central receiver outlet is higher than that required by the turbine:
     outputs[5] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
 
-    //Verify: storage is back to initial conditions
-    double storageFinalConditions = 0.0;
-    storageFinalConditions = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored()
-      /_hotStorageHeight;
-    outputs[6] = 1.*_storageStartupCondition - storageFinalConditions*100;
+    // c6: storage is back to initial conditions:
+    outputs[6] = 1.0*_storageStartupCondition
+      - 100*(_powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() /_hotStorageHeight);
 
   }
   catch (...) {
     
-    //Verify : central receiver outlet is higher than that required by the turbine
-    outputs[5] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+    // c5: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
+    // outputs[5] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1373,6 +1522,14 @@ bool Scenario::simulate_minCost_TS ( double * outputs , bool & cnt_eval ) {
 /*-----------------------------*/
 bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
 
+  // x1: _receiverApertureHeight
+  // x2: _receiverApertureWidth
+  // x3: _centralReceiverOutletTemperature
+  // x4: _receiverNbOfTubes (int)
+  // x5: _receiverInsulThickness
+  // x6: _receiverTubesInsideDiam
+  // x7: _receiverTubesOutsideDiam
+  
   for ( int i = 0 ; i < 7 ; ++i )
     outputs[i] = 1e20;
 
@@ -1386,44 +1543,45 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
     
-    //Creating required objects
+    // create required objects:
     construct_maxEff_RE();
 
-    //Launching simulation
+    // launch simulation:
     _powerplant->fSimulatePowerplant();
 
-    //Objective function : absorbed energy
+    // objective function: absorbed energy
     double Q_abs = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_storedMass()
       *(_centralReceiverOutletTemperature - _coldMoltenSaltMinTemperature)
       *HEAT_CAPACITY;
     outputs[0] = -Q_abs*1e-9;
 
-    //Verify : budget is respected
+    // c1: budget is respected:
     outputs[1] = _powerplant->get_costOfReceiver() - _cBudget;
     
-    //Verify : maximum pressure in tubes < yield
+    // c2: maximum pressure in tubes <= yield:
     outputs[2] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
     
-    //Verify : receiver inner tubes diameter < outer diameter
+    // c3: receiver inner tubes diameter <= outer diameter: x6 <= x7:
     outputs[3] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
+    // c4: central receiver outlet is higher than that required by the turbine:
     outputs[4] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
     
-    //Verify : tubes fit in receiver
+    // c5: tubes fit in receiver: x4*x7 <= x2*PI/2:
     outputs[5] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : work to drive receiver pump does not exceed 5% of the absorbed energy
+    // c6: work to drive receiver pump does not exceed 5% of the absorbed energy:
     outputs[6] = ( Q_abs > 0.01 ) ? _powerplant->fComputeParasiticsForPb7() / Q_abs - _cParasitics : 1.0;
   }
   catch (...) {
-    //Verify : tower at least twice as high as heliostats
+
+    // ouput a priori constraints:
+   
     outputs[3] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
-    outputs[4] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
+    // c4: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
+    // outputs[4] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
     
-    //Verify : tubes fit in receiver
     outputs[5] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
@@ -1436,6 +1594,20 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
 /*----------------------------------*/
 bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
 
+  //  x1: _heliostatLength
+  //  x2: _heliostatWidth
+  //  x3: _towerHeight
+  //  x4: _receiverApertureHeight
+  //  x5: _receiverApertureWidth
+  //  x6: _numberOfHeliostats (int)
+  //  x7: _fieldAngularWidth
+  //  x8: _minimumDistanceToTower
+  //  x9: _maximumDistanceToTower
+  // x10: _receiverNbOfTubes (int)
+  // x11: _receiverInsulThickness
+  // x12: _receiverTubesInsideDiam
+  // x13: _receiverTubesOutsideDiam
+  
   for ( int i = 0 ; i < 11 ; ++i )
     outputs[i] = 1e20;
 
@@ -1449,70 +1621,66 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
     
-    //Creating required objects
+    // create required objects:
     construct_maxHF_minCost();
     
-    //Launching simulation
+    // launch simulation:
     _powerplant->fSimulatePowerplant();
 
-    //Objective function : absorbed energy
+    // objective function #1: absorbed energy:
     double Q_abs = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_storedMass()
-      *(_centralReceiverOutletTemperature - _coldMoltenSaltMinTemperature)
-      *HEAT_CAPACITY;
+      * (_centralReceiverOutletTemperature - _coldMoltenSaltMinTemperature)
+      * HEAT_CAPACITY;
     outputs[0] = -Q_abs;
 
-    //Objective function : total investment cost
+    // objective function #2: total investment cost:
     outputs[1] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
       + _powerplant->get_costOfReceiver();
     
-    //Verify : total land area
+    // c1: total land area:
+    // PI*x3*x3*( x9*x9 - x8*x8 ) * x7 / 180 <= 4e6:
     outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
-    //Verify : tower at least twice as high as heliostats
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
+    // c2: tower at least twice as high as heliostats: 2x1-x3 <= 0:
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
     
-    //Verify : Rmin < Rmax
+    // c3: Rmin < Rmax: x8 <= x9:
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
+   
+    // c4: Check that _numberOfHeliostats (x6) heliostats can fit in the field:
+    outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
     
-    //Verify : number of heliostats fits in the field
-    outputs[5] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
-    
-    //Verify : maximum pressure in receiver tubes do not exceed yield pressure
+    // c5: maximum pressure in receiver tubes do not exceed yield pressure:
     outputs[6] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
     
-    //Verify : Receiver tubes Din < Dout
+    // c6: Receiver tubes Din < Dout: x12 <= x13:
     outputs[7] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : Tubes fit in receiver
+    // c7: Tubes fit in receiver: x10*x13 <= x5*PI/2:
     outputs[8] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : minimal energy production satisfied
-    outputs[9] = ((400e6)*3600.0) - Q_abs;
+    // c8: minimal energy production satisfied:
+    outputs[9] = 1.44e+12 - Q_abs; // 1.44e+12 = 400e6 * 3600
     
-    //Verify : work to drive receiver pump does not exceed 8% of the absorbed energy
-    double parasitics = 0;
-    parasitics = _powerplant->fComputeParasiticsForPb9();
+    // c9: work to drive receiver pump does not exceed 8% of the absorbed energy:
     if ( Q_abs > 1.0 )
-      outputs[10] = (parasitics / Q_abs) - _cParasitics;
+      outputs[10] = (_powerplant->fComputeParasiticsForPb9() / Q_abs) - _cParasitics;
   }
   catch (...) {
+
+    // output a priori constraints:
     
-    //Verify : total land area
     outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+
+    outputs[3] = 2 * _heliostatLength - _towerHeight;
     
-    //Verify : tower at least twice as high as heliostats
-    outputs[3] = 2 * _heliostatHeight - _towerHeight;
-    
-    //Verify : Rmin < Rmax
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
     
-    //Verify : Receiver tubes Din < Dout
     outputs[7] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : Tubes fit in receiver
     outputs[8] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
@@ -1525,6 +1693,36 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
 /*----------------------------------*/
 bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
 
+  //  x1: _heliostatLength
+  //  x2: _heliostatWidth
+  //  x3: _towerHeight
+  //  x4: _receiverApertureHeight
+  //  x5: _receiverApertureWidth
+  //  x6: _numberOfHeliostats (int)
+  //  x7: _fieldAngularWidth
+  //  x8: _minimumDistanceToTower
+  //  x9: _maximumDistanceToTower
+  // x10: _centralReceiverOutletTemperature
+  // x11: _hotStorageHeight
+  // x12: _hotStorageDiameter
+  // x13: _hotStorageInsulThickness
+  // x14: _coldStorageInsulThickness
+  // x15: _coldMoltenSaltMinTemperature
+  // x16: _receiverNbOfTubes (int)
+  // x17: _receiverInsulThickness
+  // x18: _receiverTubesInsideDiam
+  // x19: _receiverTubesOutsideDiam
+  // x20: _exchangerTubesSpacing
+  // x21: _exchangerTubesLength
+  // x22: _exchangerTubesDin
+  // x23: _exchangerTubesDout
+  // x24: _exchangerBaffleCut
+  // x25: _exchangerNbOfBaffles (int)
+  // x26: _exchangerNbOfTubes (int)
+  // x27: _exchangerNbOfShells (int)
+  // x28: _exchangerNbOfPassesPerShell (int)
+  // x29: _typeOfTurbine (int)
+  
   for ( int i = 0 ; i < 19 ; ++i )
     outputs[i] = 1e20;
 
@@ -1538,25 +1736,24 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
     
-    //Creating required objects
+    // create required objects:
     construct_maxNrg_minPar();
 
-    //Launching simulation
+    // launch simulation:
     _powerplant->fSimulatePowerplant();
     
-    //Objective : power output (MWe)
+    // objective #1: power output (MWe)
     double sum = 1.0;
     foncteurSum somme(&sum);
     std::for_each(_powerplant->get_powerplantPowerOutput().begin(),
 		  _powerplant->get_powerplantPowerOutput().end(),
 		  somme);
-
     outputs[0] = -sum;
 
-    //Objective : parasitic losses
+    // objective #2: parasitic losses:
     outputs[1] = _powerplant->fComputeParasiticLosses();
     
-    //Verify : total investment cost
+    // c1: total investment cost:
     outputs[2] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
       + _powerplant->get_costOfReceiver()
@@ -1564,68 +1761,78 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
       + _powerplant->get_costOfSteamGenerator()
       + _powerplant->get_costOfPowerblock()
       - _cBudget;
+
+    // c2:
+    outputs[3] = 4.32e+11 - sum; // 4.32e+11 = 3600.0 * 120.0e6
     
-    outputs[3] = 3600.0 * 120.0e6 - sum;
-    
-    //Verify : total land area is below 2000k m^2
+    // c3: total land area: PI*x3*x3*( x9*x9 - x8*x8 ) * x7 / 180 <= 5e6:
     outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2.0 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
     
-    //Verify : tower at least twice as high as heliostats
-    outputs[5] = 2 * _heliostatHeight - _towerHeight;
+    // c4: tower at least twice as high as heliostats: 2x1-x3 <= 0:
+    outputs[5] = 2 * _heliostatLength - _towerHeight;
     
-    //Verify : Rmin < Rmax
+    // c5: Rmin < Rmax: x8 <= x9:
     outputs[6] = _minimumDistanceToTower - _maximumDistanceToTower;
     
-    //Verify : number of heliostats fits in the field
-    outputs[7] = _maxNumberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    // c6: Check that _numberOfHeliostats (x6) heliostats can fit in the field:
+    outputs[7] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
     
-    //Verify : maximum pressure in receiver tubes do not exceed yield pressure
+    // c7: maximum pressure in receiver tubes do not exceed yield pressure:
     outputs[8] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
         
-    //Verify : Molten Salt temperature does not drop below the melting point
-    outputs[ 9] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
+    // Molten Salt temperature does not drop below the melting point: c8, c9, and c10:
+    outputs[ 9] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
     outputs[10] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
-    outputs[11] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
+    outputs[11] = MELTING_POINT - _powerplant->get_minSteamGenTemp   ();
     
-    //Verify : Receiver tubes Din < Dout
+    // c11: Receiver tubes Din < Dout: x18 <= x19:
     outputs[12] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : Tubes fit in receiver
+    // c12: Tubes fit in receiver: x16*x19 <= x5*PI/2:
     outputs[13] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
+    // c13: central receiver outlet is higher than that required by the turbine:
     outputs[14] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
-   
+
+    // c15:
     if ( sum > 1.0 )
       outputs[15] = outputs[1]/sum - 0.20;
 
+    // c16: x23 <= x20:
     outputs[16] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[17] = _exchangerTubesDin - _exchangerTubesDout;
+
+    // c17: x22 <= x23:
+    outputs[17] = _exchangerTubesDin  - _exchangerTubesDout;
+
+    // c18:
     outputs[18] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
   catch (...) {
-    //Verify : total land area is below 2000k m^2
+
+    // output a priori constraints:
+    
+    // total land area is below 2000k m^2:
     outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2.0 * _fieldMaxAngularSpan / 360.0) - _cFieldSurface;
+      (_fieldAngularWidth / 180.0) - _cFieldSurface;
     
-    //Verify : tower at least twice as high as heliostats
-    outputs[5] = 2 * _heliostatHeight - _towerHeight;
+    // tower at least twice as high as heliostats:
+    outputs[5] = 2 * _heliostatLength - _towerHeight;
     
-    //Verify : Rmin < Rmax
+    // Rmin <= Rmax:
     outputs[6] = _minimumDistanceToTower - _maximumDistanceToTower;
     
-    //Verify : Receiver tubes Din < Dout
+    // Receiver tubes Din <= Dout:
     outputs[12] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    //Verify : Tubes fit in receiver
+    // Tubes fit in receiver:
     outputs[13] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    //Verify : central receiver outlet is higher than that required by the turbine
-    outputs[14] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;   
+    // c14: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
+    // outputs[14] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;   
     
     outputs[16] = _exchangerTubesDout - _exchangerTubesSpacing;
-    outputs[17] = _exchangerTubesDin - _exchangerTubesDout;
+    outputs[17] = _exchangerTubesDin  - _exchangerTubesDout;
     
     throw Simulation_Interruption ( "Simulation could not go through" );
   }
@@ -1637,13 +1844,13 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxNrg_H1 ( void ) const {
 
-  if ( _heliostatHeight < 1 || _heliostatHeight > 40 )
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
     return false;
 
   if ( _heliostatWidth < 1 || _heliostatWidth > 40 )
     return false;
 
-  if ( _towerHeight < 20 || _towerHeight > 250. )
+  if ( _towerHeight < 20 || _towerHeight > 250 )
     return false;
 
   if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
@@ -1652,35 +1859,36 @@ bool Scenario::check_bounds_maxNrg_H1 ( void ) const {
   if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
 
-  if ( _maxNumberOfHeliostats < 1 )
+  if ( _numberOfHeliostats < 1 )
     return false;
 
-  if ( _fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89 )
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
   
   if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
     return false;
 
-  if ( _maximumDistanceToTower < 0 || _maximumDistanceToTower > 20 )
+  if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
 
   return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #1   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_maxNrg_H1 ( void ) const {
-/*------------------------------------------------------------------*/
   
-  if ( _towerHeight < 2 * _heliostatHeight )
+  if ( _towerHeight < 2 * _heliostatLength )
     return false;
     
-  if ( _maximumDistanceToTower <= _minimumDistanceToTower )
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
   
   if ( PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-       (2 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface )
+       (_fieldAngularWidth / 180.0) > _cFieldSurface )
     return false;
-
+  
   return true;
 }
 
@@ -1689,7 +1897,7 @@ bool Scenario::check_apriori_constraints_maxNrg_H1 ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minSurf_H1 ( void ) const {
 
-  if ( _heliostatHeight < 1.0 || _heliostatHeight > 40 )
+  if ( _heliostatLength < 1.0 || _heliostatLength > 40 )
     return false;
 
   if ( _heliostatWidth < 1.0 || _heliostatWidth > 40 )
@@ -1704,10 +1912,10 @@ bool Scenario::check_bounds_minSurf_H1 ( void ) const {
   if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
 
-  if ( _maxNumberOfHeliostats < 1)
+  if ( _numberOfHeliostats < 1)
     return false;
 
-  if ( _fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89 )
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
 
   if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
@@ -1734,26 +1942,30 @@ bool Scenario::check_bounds_minSurf_H1 ( void ) const {
   return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #2   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_minSurf_H1 ( void ) const {
-/*------------------------------------------------------------------*/
   
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
   
-  if ( _towerHeight < 2 * _heliostatHeight)
+  if ( _towerHeight < 2 * _heliostatLength)
     return false;
   
-  if ( _maximumDistanceToTower <= _minimumDistanceToTower )
-    return false;
-  
-  if ( PI*(pow(_maximumDistanceToTower * _towerHeight, 2.0) - pow(_minimumDistanceToTower * _towerHeight, 2.0)) *
-       (2.0 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface )
-    return false;
-  
-  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005 )
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
 
+  if ( PI*(pow(_maximumDistanceToTower * _towerHeight, 2.0) - pow(_minimumDistanceToTower * _towerHeight, 2.0)) *
+       (_fieldAngularWidth / 180.0) > _cFieldSurface )
+    return false;  // hidden constraint
+  
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
+    return false;
+
+  if ( _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0 > 0.0 )
+    return false;
+  
   return true;
 }
 
@@ -1762,61 +1974,61 @@ bool Scenario::check_apriori_constraints_minSurf_H1 ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minCost_C1 ( void ) const {
  
-  if (_heliostatHeight < 1 || _heliostatHeight > 40)
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
     return false;
     
-  if (_heliostatWidth < 1 || _heliostatWidth > 40)
+  if ( _heliostatWidth < 1 || _heliostatWidth > 40 )
     return false;
     
-  if (_towerHeight < 20 || _towerHeight > 250)
+  if ( _towerHeight < 20 || _towerHeight > 250 )
     return false;
   
-  if (_receiverApertureHeight < 1 || _receiverApertureHeight > 30)
+  if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
     return false;
 
-  if (_receiverApertureWidth < 1 || _receiverApertureWidth > 30)
+  if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
   
-  if (_maxNumberOfHeliostats < 1)
+  if ( _numberOfHeliostats < 1 )
     return false;
 
-  if (_fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89)
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
 
-  if (_minimumDistanceToTower < 0 || _minimumDistanceToTower > 20)
+  if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
     return false;
 
-  if (_maximumDistanceToTower < 1 || _maximumDistanceToTower > 20)
+  if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
 
-  if (_centralReceiverOutletTemperature > 995)
+  if ( _centralReceiverOutletTemperature > 995 )
     return false;
   
-  if (_hotStorageHeight < 1 || _hotStorageHeight > 50)
+  if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
     return false;
 
-  if (_hotStorageDiameter < 1 || _hotStorageDiameter > 30)
+  if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
       
-  if (_hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5)
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
     return false;
     
-  if (_coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5)
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
     return false;
   
-  if (_coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650)
+  if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
 
-  if (_receiverInsulThickness < 0.01 || _receiverInsulThickness > 5)
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
     return false;
   
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
   
-  if (_receiverTubesOutsideDiam < 0.005 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.005 || _receiverTubesOutsideDiam > 0.1 )
     return false;
 
   if ( _typeOfTurbine < 1 || _typeOfTurbine > 8 )
@@ -1825,29 +2037,30 @@ bool Scenario::check_bounds_minCost_C1 ( void ) const {
   return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #3   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_minCost_C1 ( void ) const {
-/*------------------------------------------------------------------*/
 
-  if (_centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
 
-  if (_receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0)
+  if ( _receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0 )
     return false;
 
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
     return false;
 
-  if (_towerHeight < 2 * _heliostatHeight)
+  if ( _towerHeight < 2 * _heliostatLength )
     return false;
     
-  if (_maximumDistanceToTower <= _minimumDistanceToTower)
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
   
-  if (PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (2 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface)
+  if ( PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
+      (_fieldAngularWidth / 180.0) > _cFieldSurface )
     return false;
-  
+
   return true;
 }
 
@@ -1856,123 +2069,124 @@ bool Scenario::check_apriori_constraints_minCost_C1 ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minCost_C2 ( void ) const {
 
-  if (_heliostatHeight < 1 || _heliostatHeight > 40)
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
     return false;
 
-  if (_heliostatWidth < 1 || _heliostatWidth > 40)
+  if ( _heliostatWidth < 1 || _heliostatWidth > 40 )
     return false;
 
-  if (_towerHeight < 20 || _towerHeight > 250)
+  if ( _towerHeight < 20 || _towerHeight > 250 )
     return false;
    
-  if (_receiverApertureHeight < 1 || _receiverApertureHeight > 30)
+  if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
     return false;
   
-  if (_receiverApertureWidth < 1 || _receiverApertureWidth > 30)
+  if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
   
-  if (_maxNumberOfHeliostats < 1)
+  if ( _numberOfHeliostats < 1 )
     return false;
   
-  if (_fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89)
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
   
-  if (_minimumDistanceToTower < 0 || _minimumDistanceToTower > 20)
+  if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
     return false;
   
-  if (_maximumDistanceToTower < 1 || _maximumDistanceToTower > 20)
+  if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
   
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
  
-  if (_hotStorageHeight < 1 || _hotStorageHeight > 50)
+  if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
     return false;
  
-  if (_hotStorageDiameter < 1 || _hotStorageDiameter > 30)
+  if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
  
-  if (_hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5)
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
     return false;
   
-  if (_coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5)
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
     return false;
   
-  if (_coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650)
+  if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
   
-  if (_receiverInsulThickness < 0.01 || _receiverInsulThickness > 5)
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
     return false;
 
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
 
-  if (_receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1 )
     return false;
 
   if ( _exchangerTubesSpacing > 0.3 )
     return false;
 
-  if (_exchangerTubesLength < 0.5 || _receiverTubesOutsideDiam > 10)
+  if ( _exchangerTubesLength < 0.5 || _receiverTubesOutsideDiam > 10 )
     return false;
   
-  if (_exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1)
+  if ( _exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1 )
     return false;
 
-  if (_exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1)
+  if ( _exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1 )
     return false;
 
-  if (_exchangerNbOfBaffles < 2)
+  if ( _exchangerNbOfBaffles < 2 )
     return false;
 
-  if (_exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4)
+  if ( _exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4 )
     return false;
 
-  if (_exchangerNbOfTubes < 1)
+  if ( _exchangerNbOfTubes < 1 )
     return false;
 
-  if (_exchangerNbOfShells < 1 || _exchangerNbOfShells > 10)
+  if ( _exchangerNbOfShells < 1 || _exchangerNbOfShells > 10 )
     return false;
 
-  if (_exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9)
+  if ( _exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9 )
     return false;
 
-  if (_typeOfTurbine < 1 || _typeOfTurbine >  8)
+  if ( _typeOfTurbine < 1 || _typeOfTurbine >  8 )
     return false;
 
    return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #4   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_minCost_C2 ( void ) const {
-/*------------------------------------------------------------------*/
   
-  if (_towerHeight < 2 * _heliostatHeight)
+  if ( _towerHeight < 2 * _heliostatLength )
     return false;
   
-  if (_maximumDistanceToTower <= _minimumDistanceToTower)
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
   
   if ( PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-       (2 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface )
+       (_fieldAngularWidth / 180.0) > _cFieldSurface )
     return false;
 
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
-
-  if (_receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0)
+ 
+  if ( _receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0 )
     return false;
   
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0001)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
     return false;
 
-  if ( _exchangerTubesSpacing <= _exchangerTubesDout )
+  if ( _exchangerTubesSpacing < _exchangerTubesDout )
     return false;
 
-  if (_exchangerTubesDout < _exchangerTubesDin + 0.0005)
+  if ( _exchangerTubesDout < _exchangerTubesDin )
     return false;
 
    return true;
@@ -1986,82 +2200,86 @@ bool Scenario::check_bounds_maxComp_HTF1 ( void ) const {
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
   
-  if (_hotStorageHeight < 1 || _hotStorageHeight > 30)
+  if ( _hotStorageHeight < 1 || _hotStorageHeight > 30 )
     return false;
   
-  if (_hotStorageDiameter < 1 || _hotStorageDiameter > 30)
+  if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
   
-  if (_hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 2)
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 2 )
     return false;
   
-  if (_coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 2)
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 2 )
     return false;
   
-  if (_coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650)
+  if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
   
-  if (_receiverInsulThickness < 0.1 || _receiverInsulThickness > 2)
+  if ( _receiverInsulThickness < 0.1 || _receiverInsulThickness > 2 )
     return false;
   
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
   
-  if (_receiverTubesOutsideDiam < 0.005 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.005 || _receiverTubesOutsideDiam > 0.1 )
     return false;
 
   if ( _exchangerTubesSpacing > 0.2 )
     return false;
  
-  if (_exchangerTubesLength < 0.5 || _exchangerTubesLength > 10)
+  if ( _exchangerTubesLength < 0.5 || _exchangerTubesLength > 10 )
     return false;
   
-  if (_exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1)
+  if ( _exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1 )
     return false;
   
-  if (_exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1)
+  if ( _exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1 )
     return false;
  
-  if (_exchangerNbOfBaffles < 2)
+  if ( _exchangerNbOfBaffles < 2 )
     return false;
   
-  if (_exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4)
+  if ( _exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4 )
     return false;
   
-  if (_exchangerNbOfTubes < 1)
+  if ( _exchangerNbOfTubes < 1 )
     return false;
   
-  if (_exchangerNbOfShells < 1 || _exchangerNbOfShells > 10)
+  if ( _exchangerNbOfShells < 1 || _exchangerNbOfShells > 10 )
     return false;
   
-  if (_exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9)
+  if ( _exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9 )
     return false;
   
-  if (_typeOfTurbine < 1 || _typeOfTurbine >  8)
+  if ( _typeOfTurbine < 1 || _typeOfTurbine >  8 )
     return false;
 
    return true;
 }
 
-/*--------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #5   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_maxComp_HTF1 ( void ) const {
-/*---------------------------------------------------------------------*/
 
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
   
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
     return false;
   
-  if ( _exchangerTubesSpacing <= _exchangerTubesDout )
+  if ( _exchangerTubesSpacing < _exchangerTubesDout )
     return false;
   
-  if (_exchangerTubesDout < _exchangerTubesDin + 0.0005)
+  if ( _exchangerTubesDout < _exchangerTubesDin )
     return false;
 
+  if ( _receiverNbOfTubes * _receiverTubesOutsideDiam > _receiverApertureWidth * PI / 2.0 )
+    return false;
+  
   return true;
 }
 
@@ -2073,26 +2291,29 @@ bool Scenario::check_bounds_minCost_TS ( void ) const {
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
   
-  if (_hotStorageHeight < 2 || _hotStorageHeight > 50)
+  if ( _hotStorageHeight < 2 || _hotStorageHeight > 50 )
     return false;
   
-  if (_hotStorageDiameter < 2 || _hotStorageDiameter > 30)
+  if ( _hotStorageDiameter < 2 || _hotStorageDiameter > 30 )
     return false;
   
-  if (_hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5)
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
     return false;
   
-  if (_coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5)
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
     return false;
 
   return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #6   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_minCost_TS ( void ) const {
-/*------------------------------------------------------------------*/
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
+
   return true;
 }
 
@@ -2101,41 +2322,42 @@ bool Scenario::check_apriori_constraints_minCost_TS ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxEff_RE ( void ) const {
 
-  if (_receiverApertureHeight < 1 || _receiverApertureHeight > 30)
+  if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
     return false;
 
-  if (_receiverApertureWidth < 1 || _receiverApertureWidth > 30)
+  if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
 
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
  
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
   
-  if (_receiverInsulThickness < 0.01 || _receiverInsulThickness > 5.0)
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5.0 )
     return false;
   
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
   
-  if (_receiverTubesOutsideDiam < 0.0055 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.0055 || _receiverTubesOutsideDiam > 0.1 )
     return false;
 
   return true;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #7   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_maxEff_RE ( void ) const {
-/*------------------------------------------------------------------*/
 
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
     
-  if (_receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0)
+  if ( _receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0 )
     return false;
   
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
     return false;
 
    return true;
@@ -2146,65 +2368,69 @@ bool Scenario::check_apriori_constraints_maxEff_RE ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxHF_minCost ( void ) const {
 
-  if (_heliostatHeight < 1 || _heliostatHeight > 40)
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
     return false;
 
-  if (_heliostatWidth < 1 || _heliostatWidth > 40)
+  if ( _heliostatWidth < 1 || _heliostatWidth > 40 )
     return false;
   
-  if (_towerHeight < 20 || _towerHeight > 250)
+  if ( _towerHeight < 20 || _towerHeight > 250 )
     return false;
    
-  if (_receiverApertureHeight < 1 || _receiverApertureHeight > 30)
+  if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
     return false;
   
-  if (_receiverApertureWidth < 1 || _receiverApertureWidth > 30)
+  if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
     return false;
   
-  if (_maxNumberOfHeliostats < 1)
+  if ( _numberOfHeliostats < 1 )
     return false;
   
-  if (_fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89)
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
   
-  if (_minimumDistanceToTower < 0 || _minimumDistanceToTower > 20)
+  if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
     return false;
   
-  if (_maximumDistanceToTower < 1 || _maximumDistanceToTower > 20)
+  if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
    
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
   
-  if (_receiverInsulThickness < 0.01 || _receiverInsulThickness > 5)
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
     return false;
   
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
   
-  if (_receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1 )
     return false;
 
   return true;
 }
 
-/*----------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #8   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_maxHF_minCost ( void ) const {
-/*----------------------------------------------------------------------*/
 
-  if (_maximumDistanceToTower <= _minimumDistanceToTower)
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
   
   if ( PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-       (2 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface )
+       (_fieldAngularWidth / 180.0) > _cFieldSurface )
     return false;
 
-  if (_towerHeight < 2 * _heliostatHeight)
+  if ( _towerHeight < 2 * _heliostatLength )
     return false;
 
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0005)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam )
     return false;
 
+  if ( _receiverNbOfTubes*_receiverTubesOutsideDiam > _receiverApertureWidth * PI / 2.0 )
+    return false;
+  
   return true;
 }
 
@@ -2213,7 +2439,7 @@ bool Scenario::check_apriori_constraints_maxHF_minCost ( void ) const {
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxNrg_minPar ( void ) const {
 
-  if ( _heliostatHeight < 1 || _heliostatHeight > 40 )
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
     return false;
 
   if ( _heliostatWidth  < 1 || _heliostatWidth > 40 )
@@ -2228,7 +2454,7 @@ bool Scenario::check_bounds_maxNrg_minPar ( void ) const {
   if ( _receiverApertureWidth  < 1 || _receiverApertureWidth  > 30 )
     return false;
   
-  if ( _fieldMaxAngularSpan < 1 || _fieldMaxAngularSpan > 89 )
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
     return false;
 
   if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
@@ -2237,101 +2463,105 @@ bool Scenario::check_bounds_maxNrg_minPar ( void ) const {
   if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
 
-  if ( _maxNumberOfHeliostats < 1 )
+  if ( _numberOfHeliostats < 1 )
     return false;
 
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
  
-  if (_hotStorageHeight < 1 || _hotStorageHeight > 50)
+  if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
     return false;
 
-  if (_hotStorageDiameter < 1 || _hotStorageDiameter > 30)
+  if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
 
-  if (_hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5)
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
     return false;
 
-  if (_coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5)
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
     return false;
 
-  if (_coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650)
+  if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
 
-  if (_receiverNbOfTubes < 1)
+  if ( _receiverNbOfTubes < 1 )
     return false;
 
-  if (_receiverInsulThickness < 0.01 || _receiverInsulThickness > 5)
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
     return false;
 
-  if (_receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1)
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
     return false;
 
-  if (_receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1)
+  if ( _receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1 )
     return false;
   
-  if (_receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0001)
+  if ( _receiverTubesOutsideDiam < _receiverTubesInsideDiam + 0.0001 )
     return false;
 
   if ( _exchangerTubesSpacing < 0.007 || _exchangerTubesSpacing > 0.2 )
     return false;
 
-  if (_exchangerTubesLength < 0.5 || _receiverTubesOutsideDiam > 10)
+  if ( _exchangerTubesLength < 0.5 || _receiverTubesOutsideDiam > 10 )
     return false;
 
-  if (_exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1)
+  if ( _exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1 )
     return false;
   
-  if (_exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1)
+  if ( _exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1 )
     return false;
  
-  if (_exchangerNbOfBaffles < 2)
+  if ( _exchangerNbOfBaffles < 2 )
     return false;
   
-  if (_exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4)
+  if ( _exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4 )
     return false;
 
-  if (_exchangerNbOfTubes < 1)
+  if ( _exchangerNbOfTubes < 1 )
     return false;
 
-  if (_exchangerNbOfShells < 1 || _exchangerNbOfShells > 10)
+  if ( _exchangerNbOfShells < 1 || _exchangerNbOfShells > 10 )
     return false;
   
-  if (_exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9)
+  if ( _exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9 )
     return false;
 
-  if (_typeOfTurbine < 1 || _typeOfTurbine >  8)
+  if ( _typeOfTurbine < 1 || _typeOfTurbine >  8 )
     return false;
 
    return true;
 }
 
-/*----------------------------------------------------------------------*/
+/*-------------------------------------------------*/
+/*    check a priori constraints for instance #9   */
+/*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_maxNrg_minPar ( void ) const {
-/*----------------------------------------------------------------------*/
 
-  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
 
-  if (_receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0)
+  if ( _receiverNbOfTubes * _receiverTubesOutsideDiam > PI*_receiverApertureWidth / 2.0 )
     return false;
   
-  if ( _towerHeight < 2 * _heliostatHeight )
+  if ( _towerHeight < 2 * _heliostatLength )
     return false;
     
-  if ( _maximumDistanceToTower <= _minimumDistanceToTower )
+  if ( _maximumDistanceToTower < _minimumDistanceToTower )
     return false;
   
   if ( PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
-       *(2 * _fieldMaxAngularSpan / 360.0) > _cFieldSurface )
+       *(_fieldAngularWidth / 180.0) > _cFieldSurface )
     return false;
  
-  if (_exchangerTubesDout < _exchangerTubesDin + 0.0005)
+  if ( _exchangerTubesDout < _exchangerTubesDin )
     return false;
   
-  if ( _exchangerTubesSpacing <= _exchangerTubesDout )
+  if ( _exchangerTubesSpacing < _exchangerTubesDout )
     return false;
 
+  if ( _receiverTubesInsideDiam > _receiverTubesOutsideDiam )
+    return false;
+  
   return true;
 }
 
@@ -2353,24 +2583,24 @@ void Scenario::construct_maxNrg_H1 ( void ) {
   
   try {
     
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
 
     economics = new Economics;
-    economics->set_heightOfTower(_towerHeight);
-    economics->set_heightOfReceiverAperture(_receiverApertureHeight);
-    economics->set_widthOfReceiverAperture(_receiverApertureWidth);
-    economics->set_lengthOfHeliostats(_heliostatHeight);
-    economics->set_widthOfHeliostats(_heliostatWidth);
-    economics->set_exchangerModel ( _exchangerModel);
+    economics->set_heightOfTower            ( _towerHeight            );
+    economics->set_heightOfReceiverAperture ( _receiverApertureHeight );
+    economics->set_widthOfReceiverAperture  ( _receiverApertureWidth  );
+    economics->set_lengthOfHeliostats       ( _heliostatLength        );
+    economics->set_widthOfHeliostats        ( _heliostatWidth         );
+    economics->set_exchangerModel           ( _exchangerModel         );
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -2415,15 +2645,15 @@ void Scenario::construct_minSurf_H1 ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
 
     // constructing Htf Cycle with desired steam generator model:
@@ -2440,24 +2670,26 @@ void Scenario::construct_minSurf_H1 ( void ) {
 			      _receiverNbOfTubes                ,
 			      _minutesPerTimeIncrement            );
 
-    htfCycle->setStorage ( _storageStartupCondition, 0.98*_centralReceiverOutletTemperature, _coldMoltenSaltMinTemperature );
+    htfCycle->setStorage ( _storageStartupCondition               ,
+			   0.98*_centralReceiverOutletTemperature ,
+			   _coldMoltenSaltMinTemperature            );
 
     // investment cost model:
     economics = new Economics;
-    economics->set_heightOfTower(_towerHeight);
-    economics->set_heightOfReceiverAperture(_receiverApertureHeight);
-    economics->set_widthOfReceiverAperture(_receiverApertureWidth);
-    economics->set_receiverNumberOfTubes(_receiverNbOfTubes);
-    economics->set_receiverTubesDout(_receiverTubesOutsideDiam);
-    economics->set_lengthOfHeliostats(_heliostatHeight);
-    economics->set_widthOfHeliostats(_heliostatWidth);
-    economics->set_hotStorageHeight(_hotStorageHeight);
-    economics->set_storageDiameter(_hotStorageDiameter);
-    economics->set_hotStorageInsulationThickness(_hotStorageInsulThickness);
-    economics->set_coldStorageInsulationThickness(_coldStorageInsulThickness);
-    economics->set_receiverInsulationThickness(_receiverInsulThickness);
-    economics->set_turbineNominalPowerOutput(powerblock->get_powerOfTurbine());
-    economics->set_exchangerModel ( _exchangerModel);
+    economics->set_heightOfTower                  ( _towerHeight                     );
+    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
+    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
+    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
+    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
+    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_storageDiameter                ( _hotStorageDiameter              );
+    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
+    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
+    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
+    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
+    economics->set_exchangerModel                 ( _exchangerModel                  );
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -2473,8 +2705,8 @@ void Scenario::construct_minSurf_H1 ( void ) {
 				 htfCycle    ,
 				 powerblock  ,
 				 economics     );
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 }
 
 /*-----------------------------------------------*/
@@ -2504,15 +2736,15 @@ void Scenario::construct_minCost_C1 ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
 
     // constructing Htf Cycle with desired steam generator model:
@@ -2532,20 +2764,20 @@ void Scenario::construct_minCost_C1 ( void ) {
   
     // investment cost model:
     economics = new Economics;
-    economics->set_heightOfTower(_towerHeight);
-    economics->set_heightOfReceiverAperture(_receiverApertureHeight);
-    economics->set_widthOfReceiverAperture(_receiverApertureWidth);
-    economics->set_receiverNumberOfTubes(_receiverNbOfTubes);
-    economics->set_receiverTubesDout(_receiverTubesOutsideDiam);
-    economics->set_lengthOfHeliostats(_heliostatHeight);
-    economics->set_widthOfHeliostats(_heliostatWidth);
-    economics->set_hotStorageHeight(_hotStorageHeight);
-    economics->set_storageDiameter(_hotStorageDiameter);
-    economics->set_hotStorageInsulationThickness(_hotStorageInsulThickness);
-    economics->set_coldStorageInsulationThickness(_coldStorageInsulThickness);
-    economics->set_receiverInsulationThickness(_receiverInsulThickness);
-    economics->set_turbineNominalPowerOutput(powerblock->get_powerOfTurbine());
-    economics->set_exchangerModel ( _exchangerModel);
+    economics->set_heightOfTower                  ( _towerHeight                     );
+    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
+    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
+    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
+    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
+    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_storageDiameter                ( _hotStorageDiameter              );
+    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
+    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
+    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
+    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
+    economics->set_exchangerModel                 ( _exchangerModel                  );
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -2593,15 +2825,15 @@ void Scenario::construct_minCost_C2 ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
   
     // constructing Htf Cycle with desired steam generator model:
@@ -2636,7 +2868,7 @@ void Scenario::construct_minCost_C2 ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -2689,18 +2921,18 @@ void Scenario::construct_maxComp_HTF1 ( void ) {
   try {
     
     // powerblock model:
-    powerblock = new Powerblock(_typeOfTurbine);
+    powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
 
     // constructing Htf Cycle with desired steam generator model:
@@ -2735,7 +2967,7 @@ void Scenario::construct_maxComp_HTF1 ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -2760,8 +2992,8 @@ void Scenario::construct_maxComp_HTF1 ( void ) {
 				 powerblock  ,
 				 economics     );
 
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 		
   if  ( !_powerplant->set_heliostatFieldPowerOutput_MAXCOMP_HTF1() ) {
     delete _powerplant;
@@ -2793,7 +3025,7 @@ void Scenario::construct_minCost_TS ( void ) {
   try {
     
     // powerblock model:
-    powerblock = new Powerblock(_typeOfTurbine);
+    powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
@@ -2809,7 +3041,9 @@ void Scenario::construct_minCost_TS ( void ) {
 			      _receiverNbOfTubes                ,
 			      _minutesPerTimeIncrement            );
   
-    htfCycle->setStorage(_storageStartupCondition, 0.98*_centralReceiverOutletTemperature, _coldMoltenSaltMinTemperature );
+    htfCycle->setStorage ( _storageStartupCondition               ,
+			   0.98*_centralReceiverOutletTemperature ,
+			   _coldMoltenSaltMinTemperature            );
 
     // investment cost model:
     economics = new Economics;
@@ -2818,7 +3052,7 @@ void Scenario::construct_minCost_TS ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -2843,8 +3077,8 @@ void Scenario::construct_minCost_TS ( void ) {
 				 economics     );
 
   // setting demand vector:
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 
   if  ( !_powerplant->set_heliostatFieldPowerOutput_MINCOST_TS() ) {
     delete _powerplant;
@@ -2880,15 +3114,15 @@ void Scenario::construct_maxEff_RE ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
 
     // constructing Htf Cycle with desired steam generator model:
@@ -2913,7 +3147,7 @@ void Scenario::construct_maxEff_RE ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -2939,8 +3173,8 @@ void Scenario::construct_maxEff_RE ( void ) {
 				 economics     );
   
   // setting demand vector:
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 }
 
 /*-----------------------------------------------*/
@@ -2970,15 +3204,15 @@ void Scenario::construct_maxHF_minCost ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
     
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats  ,
-				 _heliostatHeight        ,
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
 				 _heliostatWidth         ,
 				 _towerHeight            ,
 				 _receiverApertureHeight ,
 				 _receiverApertureWidth  ,
 				 _minimumDistanceToTower ,
 				 _maximumDistanceToTower ,
-				 _fieldMaxAngularSpan    ,
+				 _fieldAngularWidth      ,
 				 sun                       );
     
     // constructing Htf Cycle with desired steam generator model:
@@ -3003,7 +3237,7 @@ void Scenario::construct_maxHF_minCost ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -3029,8 +3263,8 @@ void Scenario::construct_maxHF_minCost ( void ) {
 				 economics     );
   
   // setting demand vector:
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 }
 
 /*-----------------------------------------------*/
@@ -3060,16 +3294,16 @@ void Scenario::construct_maxNrg_minPar ( void ) {
     powerblock = new Powerblock ( _typeOfTurbine );
 
     // constructing heliostats field:
-    field = new HeliostatField ( _maxNumberOfHeliostats ,
-				 _heliostatHeight,
-				 _heliostatWidth,
-				 _towerHeight,
-				 _receiverApertureHeight,
-				 _receiverApertureWidth,
-				 _minimumDistanceToTower,
-				 _maximumDistanceToTower,
-				 _fieldMaxAngularSpan,
-				 sun);
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
+				 _heliostatWidth         ,
+				 _towerHeight            ,
+				 _receiverApertureHeight ,
+				 _receiverApertureWidth  ,
+				 _minimumDistanceToTower ,
+				 _maximumDistanceToTower ,
+				 _fieldAngularWidth      ,
+				 sun                       );
     
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
@@ -3103,7 +3337,7 @@ void Scenario::construct_maxNrg_minPar ( void ) {
     economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
     economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatHeight                 );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
     economics->set_hotStorageHeight               ( _hotStorageHeight                );
     economics->set_storageDiameter                ( _hotStorageDiameter              );
@@ -3129,8 +3363,8 @@ void Scenario::construct_maxNrg_minPar ( void ) {
 				 economics     );
     
   // setting demand vector:
-  _powerplant->set_demand(_demand);
-  _powerplant->set_heliostatModel(_heliostatsFieldModel);
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 }
 
 /*-------------------------------------------*/
@@ -3157,7 +3391,7 @@ void Scenario::fFillDemandVector ( void ) {
       if ( time < _tStart || time > _tEnd )
 	_demand.push_back(0.0);
       else
-	_demand.push_back(_maximumPowerDemand);
+	_demand.push_back ( _maximumPowerDemand );
     }
   }
 

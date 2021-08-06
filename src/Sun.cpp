@@ -84,7 +84,7 @@ void Sun::fAddNewSunray ( double Rmax, double thetaMax, double Z ) {
 /*------------------------------------------------------------------*/
   
   long double fRandomR     = Rmax*sqrt(RNG::rand(0,1));
-  long double fRandomTheta = (2. * thetaMax*RNG::rand(0,1) - thetaMax)*DEG_TO_RAD;
+  long double fRandomTheta = (2.0 * thetaMax*RNG::rand(0,1) - thetaMax)*DEG_TO_RAD;
   long double fRandomZ     = Z * RNG::rand(0,1);
 
   _listOfSunrays.push_back ( new Sunray ( fRandomR*sin(fRandomTheta), -fRandomR*cos(fRandomTheta), fRandomZ ) );

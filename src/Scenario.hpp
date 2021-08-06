@@ -80,13 +80,13 @@ private:
   double _cParasitics;                // %
 
   //Heliostats Field:
-  double _heliostatHeight;        // m
+  double _heliostatLength;        // m
   double _heliostatWidth;         // m
   double _towerHeight;            // m
   double _receiverApertureHeight; // m
   double _receiverApertureWidth;  // m
-  int    _maxNumberOfHeliostats; 
-  double _fieldMaxAngularSpan;    // degrees
+  int    _numberOfHeliostats; 
+  double _fieldAngularWidth;      // degrees
   double _minimumDistanceToTower; // fraction of tower height
   double _maximumDistanceToTower; // fraction of tower height
   

@@ -43,12 +43,12 @@ private:
   size_t                             _nbOfHeliostats;
   double                             _heliostatLength;
   double                             _heliostatWidth;
-  double                             _towerHeight; // height of aim point
+  double                             _towerHeight;          // height of aim point
   double                             _apertureHeight;
   double                             _apertureWidth;
-  double                             _minDistanceFromTower; //as a multiple of tower height
-  double                             _maxDistanceFromTower; //as a multiple of tower height
-  double                             _maxAngularDeviation;  //degrees
+  double                             _minDistanceFromTower; // as a multiple of tower height
+  double                             _maxDistanceFromTower; // as a multiple of tower height
+  double                             _maxAngularDeviation;  // degrees
   std::vector<Heliostat*>            _listOfHeliostats;
   std::vector< std::vector<double> > _gridLayoutAngularCoordinates;
   std::vector< std::vector<double> > _gridLayoutCartesianCoordinates;
