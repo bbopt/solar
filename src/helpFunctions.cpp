@@ -186,8 +186,8 @@ void print_maxNrg_H1 ( std::ostream & out ) {
       << "\tLatitude: 44.95 deg N\n"
       << "\tDay: April 10th\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 24 hours\n"
-      << "\tMaximum field surface: 195 hectares\n"
-      << "\tBudget: $50 M\n"
+      << "\tMaximum field surface area: 195 hectares\n"
+      << "\tBudget: $50M\n"
       << "\tMust provide 100% of the demand requirement\n"
       << "\tPrecision cannot be changed (must be 100%)\n"
       << std::endl
@@ -207,7 +207,7 @@ void print_maxNrg_H1 ( std::ostream & out ) {
       << "\t\tx9: Maximum distance from tower (% of tower height): Real in [1;20]\n"
       << std::endl
       << "Constraints (outputs 2 to 6 with format ci <= 0):\n"
-      << "\tc1: Cost of field <= budget\n"
+      << "\tc1: Cost of plant <= budget=$50M\n"
       << "\tc2: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 1.95e6\n"
       << "\tc3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\tc4: Min. distance from tower <= Max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
@@ -232,12 +232,13 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\tLatitude: 37.55 deg N\n"
       << "\tDay: June 29th\n" // https://www.epochconverter.com/days/2019
       << "\tDuration: 72 hours\n"
-      << "\tMaximum field surface: 400 hectares\n"
-      << "\tBudget: $300 M\n"
+      << "\tMaximum field surface area: 400 hectares\n"
+      << "\tBudget: $300M\n"
       << "\tMust provide 100% of the demand requirement\n"
       << std::endl
-      << "Objective (first output)\n"
-      << "\tMinimize total heliostats field surface (m^2) with constraints to run a pre-determined powerplant\n"
+      << "Objective (first output, analytic)\n"
+      << "\tMinimize total heliostats field surface to run a pre-determined powerplant\n"
+      << "\tObjective = PI*x3*x3(x9*x9-x8*x8) * x7/180\n"
       << std::endl
       << "Variables:\n"
       << "\tHeliostats Field:\n"
@@ -258,9 +259,9 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\t\tx14: Receiver tubes outer diameter (m): Real in [0.005;0.1]\n"   
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
-      << "\t c1: Difference with max. field surface\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 4e6 or simply: objective <= 4e6\n"
       << "\t c2: Demand compliance (stochastic)\n"
-      << "\t c3: Budget\n"
+      << "\t c3: Cost of plant <= budget=$300M\n"
       << "\t c4: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c5: Min. distance from tower <= Max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
       << "\t c6: Check that x6 heliostats can fit in the field\n"
@@ -292,8 +293,8 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\tLatitude: 35 deg N\n"
       << "\tDay: September 27th\n"
       << "\tDuration: 24 hours\n"
-      << "\tDemand profile: 10 MW, starting at 3PM and ending at 9PM, 3 consecutive days\n"
-      << "\tMaximum field surface: 800 000 m^2\n"
+      << "\tDemand profile: 10MW, starting at 3PM and ending at 9PM, 3 consecutive days\n"
+      << "\tMaximum field surface area: 80 hectares\n"
       << "\tMust provide 100% of the demand requirement\n"
       << std::endl
       << "Objective (first output)\n"
@@ -325,7 +326,7 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\t\tx20: Type of turbine: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
-      << "\tc1: Surface area: A priori constraint: PI*x3*x3*(x9*x9-x8*x8) * x7/180 <= 800000\n"
+      << "\tc1: Field surface area: A priori constraint: PI*x3*x3*(x9*x9-x8*x8) * x7/180 <= 800000\n"
       << "\tc2: Compliance to demand (stochastic)\n"
       << "\tc3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\tc4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
@@ -357,8 +358,8 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\tLatitude: 35 deg N\n"
       << "\tDay: January 1st\n"
       << "\tDuration: 24 hours\n"
-      << "\tDemand profile: 25 MW, starting at 3PM and ending at 9PM, 3 consecutive days\n"
-      << "\tMaximum field surface: 2 000 000 m^2 (200 hectares)\n"
+      << "\tDemand profile: 25MW, starting at 3PM and ending at 9PM, 3 consecutive days\n"
+      << "\tMaximum field surface area: 200 hectares\n"
       << "\tMust provide 100% of the demand requirement\n"
       << std::endl
 
@@ -402,7 +403,7 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\t\tx29: Type of turbine: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 17 with format ci <= 0):\n"
-      << "\t c1: Maximum heliostats field surface: A priori constraint: PI*x3*x3(x9*x9- x8*x8) * x7 / 180 <= 2e6\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9- x8*x8) * x7 / 180 <= 2e6\n"
       << "\t c2: Compliance to the demand (stochastic)\n"
       << "\t c3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
@@ -439,8 +440,8 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\tLatitude: 37.5581 deg N\n"
       << "\tDay: January 30th\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 30 days\n"
-      << "\tDemand: 12 MW\n"
-      << "\tBudget: $300 M\n"
+      << "\tDemand: 12MW\n"
+      << "\tBudget: $100M\n"
       << "\tPre-determined sunlight input for a period of 1 month\n"
       << "\tNumber of heliostats to fit in the field: 3,800\n"
       << "\tDeterministic instance\n"
@@ -475,7 +476,7 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\t\tx20: Type of turbine: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 13 with format ci <= 0):\n"
-      << "\t c1: Budget\n"
+      << "\t c1: Cost of plant <= budget=$100M\n"
       << "\t c2: Pressure in receiver tubes <= yield pressure\n"
       << "\t c3: Molten salt melting point  <= hot storage lowest temperature\n"
       << "\t c4: Molten salt melting point  <= cold storage lowest temperature\n"
@@ -509,12 +510,12 @@ void print_minCost_TS ( std::ostream & out ) {
       << "\tLatitude: 30.05 deg N\n"
       << "\tDay: January 1st\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 24 hours\n"
-      << "\tDemand: 120 MW\n"
+      << "\tDemand: 120MW\n"
       << "\tMust provide 100% of the demand requirement\n"
       << "\tNumber of heliostats to fit in the field: 12,232\n"  
       << "\tThis instance runs a predetermined power plant using the molten salt cycle and power block models.\n"
       << "\tThe objective is to minimize the cost of the thermal storage units so that the power plant is able\n"
-      << "\tto sustain a 120 MW electrical power output during 24 hours. Since the heliostat field is not being\n"
+      << "\tto sustain a 120MW electrical power output during 24 hours. Since the heliostat field is not being\n"
       << "\toptimized, its hourly power output is taken from prerecorded data instead of being simulated.\n"  
       << "\tDeterministic instance\n"
       << "\tPrecision cannot be changed (must be 100%)\n"
@@ -561,6 +562,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << "\tLatitude: 30.05 deg N\n"
       << "\tDay: January 1st\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 24 hours\n"
+      << "\tBudget: $45M\n"
       << "\tNumber of heliostats to fit in the field: 5,000\n"  
       << std::endl;
   
@@ -580,7 +582,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << "\t\tx7: Receiver tubes outer diameter (m): Real in [0.0055;0.1]\n"
       << std::endl
       << "Constraints (outputs 2 to 7 with format ci <= 0):\n"
-      << "\tc1: Budget\n"
+      << "\tc1: Cost of plant <= budget=$45M\n"
       << "\tc2: Pressure in tubes does not exceed yield pressure (stochastic)\n"
       << "\tc3: Tubes inside diameter <= tubes outside diameter: A priori, linear constraint: x6 <= x7\n"
       << "\tc4: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
@@ -607,8 +609,8 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\tLatitude: 45 deg N\n"
       << "\tDay: January 1st\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 24 hours\n"
-      << "\tMaximum field surface: 4x10^6 m^2\n"
-      << "\tMinimum energy production: 400 MWh\n"
+      << "\tMaximum field surface area: 400 hectares\n"
+      << "\tMinimum energy production: 400MWh\n"
       << std::endl;
     
   out << "Objectives (first and second outputs)\n"
@@ -633,7 +635,7 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\t\tx13: Receiver tubes outer diameter (m): Real in [0.006;0.1]\n"
       << std::endl
       << "Constraints (outputs 3 to 11 with format ci <= 0):\n"
-      << "\tc1: Maximum heliostats field surface: A priori constraint:    PI*x3*x3*(x9*x9-x8*x8)*x7/180 <= 4e6\n"
+      << "\tc1: Field surface area: A priori constraint: PI*x3*x3*(x9*x9-x8*x8)*x7/180 <= 4e6\n"
       << "\tc2: Tower is at least twice as high as heliostats        : A priori, linear constraint: 2x1 <= x3\n"
       << "\tc3: Min. distance from tower <= max. distance from tower : A priori, linear constraint:  x8 <= x9\n"   
       << "\tc4: Check that x6 heliostats can fit in the field\n"
@@ -664,9 +666,9 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tLatitude: 25 deg N\n"
       << "\tDay: June 29th\n"  // https://www.epochconverter.com/days/2019
       << "\tDuration: 24 hours\n"
-      << "\tMaximum field surface:  5M m^2\n"
-      << "\tBudget: $1.2 B\n"
-      << "\tMinimum energy production: 250 MWh\n"
+      << "\tMaximum field surface area: 500 hectares\n"
+      << "\tBudget: $1.2B\n"
+      << "\tMinimum energy production: 250MWh\n"
       << std::endl;
   
   out << "Objectives (first and second outputs; second objective is stochastic)\n"
@@ -709,9 +711,9 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\t\tx29: Type of turbine: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 3 to 19 with format ci <= 0):\n"
-      << "\t c1: Cost\n"
+      << "\t c1: Cost of plant <= budget=$1.2B\n"
       << "\t c2: Minimum energy production is reached\n"
-      << "\t c3: Maximum heliostats field surface: A priori constraint: PI*x3*x3*( x9*x9 - x8*x8 ) * x7/180 <= 5e6\n"
+      << "\t c3: Field surface area: A priori constraint: PI*x3*x3*( x9*x9 - x8*x8 ) * x7/180 <= 5e6\n"
       << "\t c4: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c5: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"  
       << "\t c6: Check that x6 heliostats can fit in the field\n"

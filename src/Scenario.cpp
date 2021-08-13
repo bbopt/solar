@@ -302,7 +302,7 @@ void Scenario::init_minCost_C1 ( double precision ) {
   // Latitude      : 35 deg
   // Day           : 1
   // Duration      : 48 hours
-  // maximum field surface of 800 000 m^2
+  // maximum field surface of 800,000 m^2 (80 hectares)
 
   // Scenario parameters:
   _model_type           = 2; // whole plant
@@ -310,15 +310,15 @@ void Scenario::init_minCost_C1 ( double precision ) {
   _exchangerModel       = 1;
   
   _latitude                = 35.0;
-  _day                     = 270;   // https://www.epochconverter.com/days/2019: Sept. 27th
+  _day                     = 270;  // https://www.epochconverter.com/days/2019: Sept. 27th
   _demandProfile           = 1;
-  _tStart                  =  900; // 15*60
+  _tStart                  = 900;  // 15*60
   _tEnd                    = 1260; // 21*60;
   _maximumPowerDemand      = 1e7;
   _storageStartupCondition = 0;
   _minutesPerTimeIncrement = 60;
   _fixedPointsPrecision    = 0.001;
-  _cFieldSurface           = 800000;
+  _cFieldSurface           = 800000; // 80 hectares
   _cDemandComplianceRatio  = 100;
   
   // variable precision surrogate:
@@ -394,14 +394,14 @@ void Scenario::init_minCost_C2 ( double precision ) {
   _latitude                = 35.0;
   _day                     = 1;
   _demandProfile           = 1;
-  _tStart                  = 900; // 15x60
+  _tStart                  = 900;  // 15x60
   _tEnd                    = 1260; // 21x60
   _maximumPowerDemand      = 25e6;
   _storageStartupCondition = 50;
   _minutesPerTimeIncrement = 60;
 
   _fixedPointsPrecision   = 0.001;
-  _cFieldSurface          = 2000000.0; // 200 hectares
+  _cFieldSurface          = 2000000; // 200 hectares
   _cDemandComplianceRatio = 100;
   _cParasitics            = 0.18;
   
@@ -704,7 +704,7 @@ void Scenario::init_maxHF_minCost ( double precision ) {
   _latitude                = 45.0;
   _day                     = 1;
   _demandProfile           = 1;
-  _tStart                  =    0; //  0x60;
+  _tStart                  = 0;    //  0x60;
   _tEnd                    = 1380; // 23x60;
   _maximumPowerDemand      = 0;
   _minutesPerTimeIncrement = 60;
@@ -775,7 +775,7 @@ void Scenario::init_maxNrg_minPar ( double precision ) {
   // Latitude : 25 deg
   // Day : 180
   // Duration : 24 hours
-  // maximum field surface of 5M m^2
+  // maximum field surface of 5M m^2 (500 hectares)
   
   // Scenario parameters:
  _model_type           = 2; // whole plant
@@ -785,13 +785,13 @@ void Scenario::init_maxNrg_minPar ( double precision ) {
  _latitude      = 25.0;
  _day           = 180;
  _demandProfile = 1;
- _tStart        =    0; //  0x60;
+ _tStart        = 0;    //  0x60;
  _tEnd          = 1380; // 23x60;
 
  _maximumPowerDemand      = 250e6;
  _minutesPerTimeIncrement = 60;
  _fixedPointsPrecision    = 0.001;
- _cFieldSurface           = 5.0e6;
+ _cFieldSurface           = 5e6;
  _cParasitics             = 0.2;
  _cBudget                 = 1.2e9;
 
@@ -946,16 +946,17 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
     outputs[0] = -_powerplant->get_totalEnergyConcentrated();
    
     // c1: check if budget is respected:
-    outputs[1] = _powerplant->get_costOfHeliostatField()
-      + _powerplant->get_costOfTower()
-      + _powerplant->get_costOfReceiver()
-      - _cBudget;
+    outputs[1] =
+      _powerplant->get_costOfHeliostatField() +
+      _powerplant->get_costOfTower()          +
+      _powerplant->get_costOfReceiver()       -
+      _cBudget;
 
     // c2: check total land area:
     // PI*x3*x3 ( x9*x9 - x8*x8 ) * x7/180 <= 1.95e6
     outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
       * _fieldAngularWidth / 180.0 - _cFieldSurface;
-   
+    
     // Check basic geometric requirements (c3, c4):
     outputs[3] = 2 * _heliostatLength - _towerHeight;               // c3: 2*x1-x3 <= 0
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower; // c4: x8 <= x9
@@ -1023,10 +1024,13 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     _powerplant->fSimulatePowerplant();
 
     // Objective function: field surface (m^2):
-    outputs[0] = _powerplant->get_fieldSurface();
-
-    // c1: check if surface constraint is respected:
-    outputs[1] = _powerplant->get_fieldSurface() - _cFieldSurface;
+    outputs[0] = _fieldAngularWidth * (PI / 180.0) *
+      (pow(_towerHeight*_maximumDistanceToTower, 2.0) - pow(_towerHeight*_minimumDistanceToTower, 2.0));
+    
+    // c1: check if surface constraint is respected: f <= max. surface:
+    outputs[1] = _fieldAngularWidth * (PI / 180.0) *
+      (pow(_towerHeight*_maximumDistanceToTower, 2.0) - pow(_towerHeight*_minimumDistanceToTower, 2.0))
+      - _cFieldSurface;
 
     // c2: check if demand is met:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
@@ -1077,6 +1081,12 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // outputs[13] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
    
     // corrected version:
+
+    // c1: x7 * (PI / 180.0) * (pow(x3*x9, 2.0) - pow(x3*x8, 2.0)) <=  _cFieldSurface:
+    outputs[1] = _fieldAngularWidth * (PI / 180.0) *
+      (pow(_towerHeight*_maximumDistanceToTower, 2.0) - pow(_towerHeight*_minimumDistanceToTower, 2.0))
+      - _cFieldSurface;
+    
     outputs[ 4] = 2 * _heliostatLength - _towerHeight;                  //  c4: 2x1 - x3 <= 0
     outputs[ 5] = _minimumDistanceToTower - _maximumDistanceToTower;    //  c5:  x8 <= x9
     outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam; // c11: x13 <= x14

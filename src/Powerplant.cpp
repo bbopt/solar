@@ -40,7 +40,6 @@ Powerplant::Powerplant ( const Time_Manager & time       ,
   _powerblock                 ( powerblock ) ,
   _investmentCost             ( economics  ) ,
   _reflectiveSurface          ( 0.0        ) ,
-  _fieldSurface               ( 0.0        ) ,
   _costOfHeliostatsField      ( 0.0        ) ,
   _totalEnergyConcentrated    ( 0.0        ) ,
   _maximumPressureInReceiver  ( 0.0        ) ,
@@ -217,15 +216,15 @@ void Powerplant::fSimulateHeliostatField ( void ) {
   
   if (_heliostatsFieldModel == 1) {
     
-    //Generating heliostats field
+    // generating heliostats field
     _heliostatsField->fGenerateField();
     _heliostatFieldPowerOutput.reserve(_time.get_numberOfIncrements());
 
-    //Economics
+    // economics
     _investmentCost->set_nbOfHeliostats ( static_cast<int>(_heliostatsField->get_nb_heliostats()) );
     _totalEnergyConcentrated = 0.;
  
-    //Simulating heliostats field
+    // simulating heliostats field
     _heliostatsField->fGenerateSunrays();
     for (int i = 0; i < _time.get_numberOfIncrements(); ++i) {
       _heliostatFieldPowerOutput.push_back ( _heliostatsField->fCalculateTotalEnergyOutput() );
@@ -236,12 +235,8 @@ void Powerplant::fSimulateHeliostatField ( void ) {
     _reflectiveSurface = _heliostatsField->get_nb_heliostats() *
       _heliostatsField->get_heliostatLength() * _heliostatsField->get_heliostatWidth();
     _investmentCost->set_reflectiveArea(_reflectiveSurface);
-    
-    _fieldSurface = _heliostatsField->get_maxAngularDeviation() * 2 * (PI / 180.0)*
-      (pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_maxDistanceFromTower(), 2.0) -
-       pow(_heliostatsField->get_towerHeight()*_heliostatsField->get_minDistanceFromTower(), 2.0));
 
-    //converting to kWh
+    // converting to kWh
     _totalEnergyConcentrated /= 3600000.0;
   }  
 }

@@ -71,7 +71,6 @@ private:
   std::vector<double> _demand;
 
   double _reflectiveSurface;
-  double _fieldSurface;
   double _costOfHeliostatsField;
   double _totalEnergyConcentrated;
   double _maximumPressureInReceiver;
@@ -112,7 +111,6 @@ public:
   }
   
   double get_reflectiveSurface            ( void ) const { return _reflectiveSurface; }
-  double get_fieldSurface                 ( void ) const { return _fieldSurface; }
   double get_costOfHeliostatsField        ( void ) const { return _costOfHeliostatsField; }
   double get_totalEnergyConcentrated      ( void ) const { return _totalEnergyConcentrated; }
   double get_costOfHeliostatField         ( void ) const { return _investmentCost->evaluateCostOfField();          }
