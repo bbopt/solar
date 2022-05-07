@@ -948,8 +948,8 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
     // c1: check if budget is respected:
     outputs[1] =
       _powerplant->get_costOfHeliostatField() +
-      _powerplant->get_costOfTower()          +
-      _powerplant->get_costOfReceiver()       -
+      _powerplant->get_costOfTower         () +
+      _powerplant->get_costOfReceiver      () -
       _cBudget;
 
     // c2: check total land area:

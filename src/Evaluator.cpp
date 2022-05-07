@@ -388,7 +388,7 @@ bool Evaluator::eval_x ( int           x_index              ,
     // problem with simulation (e.g. bad input): Simulation cannot be used by solver;
     // error message must be printed since outputs are not displayed.     
     err_msg = e.what();
-    status = false;
+    status  = false;
   }
   // (controlled) problem with the simulation (e.g. a priori constraint violated):
   // Simulation should be usable by solver;
@@ -397,7 +397,7 @@ bool Evaluator::eval_x ( int           x_index              ,
   // the simulation can still be used by a solver: 'return 0' is then appropriate.
   catch ( const Simulation_Interruption & e ) {
     err_msg = e.what();
-    status = true;
+    status  = true;
   }
   catch (...) {
     err_msg = "Error: simulation was interrupted for an unknown reason";
@@ -426,8 +426,8 @@ void Evaluator::display_outputs ( void ) const {
   // solar 1:
   if ( pb_id == "MAXNRG_H1" )
     _out << std::setprecision(12) << _outputs[0] << " "
-	 << _outputs[1] << " "
-	 << _outputs[2] << " "
+	 << std::setprecision(10) << _outputs[1] << " " // New in Version 0.4.2
+	 << std::setprecision(12) << _outputs[2] << " "
 	 << _outputs[3] << " "
 	 << _outputs[4] << " "
 	 << _outputs[5] << std::setprecision(12);
@@ -442,9 +442,9 @@ void Evaluator::display_outputs ( void ) const {
 	 << _outputs[5] << " "
 	 << _outputs[6] << " "
 	 << _outputs[7] << " "
-	 << std::setprecision(8)  << _outputs[ 8] << " "
-	 << std::setprecision(8)  << _outputs[ 9] << " "
-	 << std::setprecision(8)  << _outputs[10] << " "
+	 << std::setprecision( 8) << _outputs[ 8] << " "
+	 << std::setprecision( 8) << _outputs[ 9] << " "
+	 << std::setprecision( 8) << _outputs[10] << " "
 	 << std::setprecision(12) << _outputs[11] << " "
 	 << _outputs[12] << " "
 	 << _outputs[13] << std::setprecision(12);
@@ -458,9 +458,9 @@ void Evaluator::display_outputs ( void ) const {
 	 << _outputs[4] << " "
 	 << _outputs[5] << " "
 	 << _outputs[6] << " "
-	 << std::setprecision(8) << _outputs[7] << " "
-	 << std::setprecision(8) << _outputs[8] << " "
-	 << std::setprecision(8) << _outputs[9] << " "
+	 << std::setprecision( 8) << _outputs[7] << " "
+	 << std::setprecision( 8) << _outputs[8] << " "
+	 << std::setprecision( 8) << _outputs[9] << " "
 	 << std::setprecision(12) << _outputs[10] << " "
 	 << _outputs[11] << " "
 	 << _outputs[12] << " "
@@ -490,8 +490,8 @@ void Evaluator::display_outputs ( void ) const {
   // solar 5:
   else if ( pb_id == "MAXCOMP_HTF1" )
     _out << std::setprecision(12) << _outputs[0] << " "
-	 << _outputs[1] << " "
-	 << _outputs[2] << " "
+	 << std::setprecision(11) << _outputs[1] << " " // New in Version 0.4.2
+	 << std::setprecision(12) << _outputs[2] << " "
 	 << std::setprecision( 8) << _outputs[3] << " "
 	 << std::setprecision( 8) << _outputs[4] << " "
 	 << std::setprecision( 8) << _outputs[5] << " "
@@ -543,22 +543,22 @@ void Evaluator::display_outputs ( void ) const {
   // solar 9:
   else if ( pb_id == "MAXNRG_MINPAR" )
     _out << std::setprecision(12) << _outputs[ 0] << " "
-	 << _outputs[ 1] << " "
-	 << _outputs[ 2] << " "
+	 << std::setprecision(10) << _outputs[ 1] << " " // New in Version 0.4.2
+	 << std::setprecision(12) << _outputs[ 2] << " "
 	 << _outputs[ 3] << " "
 	 << _outputs[ 4] << " "
 	 << _outputs[ 5] << " "
 	 << _outputs[ 6] << " "
 	 << _outputs[ 7] << " "
 	 << _outputs[ 8] << " "
-	 << std::setprecision(10) << _outputs[ 9] << " "
-	 << std::setprecision(12) << _outputs[10] << " "
-	 << _outputs[11] << " "
+	 << std::setprecision( 9) << _outputs[ 9] << " " // New in Version 0.4.2
+	 << std::setprecision(10) << _outputs[10] << " " // New in Version 0.4.2
+	 << std::setprecision(12) << _outputs[11] << " "
 	 << _outputs[12] << " "
 	 << _outputs[13] << " "
 	 << _outputs[14] << " "
-	 << _outputs[15] << " "
-	 << _outputs[16] << " "
+	 << std::setprecision(11) << _outputs[15] << " " // New in Version 0.4.2
+	 << std::setprecision(12) << _outputs[16] << " "
 	 << _outputs[17] << " "
-	 << _outputs[18] << std::setprecision(12);
+	 << _outputs[18] << std::setprecision(12); 
 }
