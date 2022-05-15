@@ -2,7 +2,7 @@
 /*  SOLAR - The solar thermal power plant simulator - version 0.4.2              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2022-05-07                                                                   */
+/*  2022-05-14                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
