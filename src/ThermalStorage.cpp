@@ -536,7 +536,7 @@ double ThermalStorage::fInitialStorageTemperature(int timeInterval) const {
 }
 
 /*-----------------------------------------------------------------------------------------*/
-/*  This function solves the typical k1*T^4 + k2*T - q = 0 equation using Newton<s method  */
+/*  This function solves the typical k1*T^4 + k2*T - q = 0 equation using Newton's method  */
 /*-----------------------------------------------------------------------------------------*/
 double ThermalStorage::fSolveForT ( double coef_T4,
 				    double coef_T ,

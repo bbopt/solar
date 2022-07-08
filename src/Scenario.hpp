@@ -122,24 +122,24 @@ private:
   
 private:
 
-  // for the variable precisions surrogates:
-  static int compute_numberOfTimeIncrements ( int min, int max, double precision ) {
-    return min + static_cast<int>(floor(precision*(max-min)));
+  // for the variable fidelity surrogates:
+  static int compute_numberOfTimeIncrements ( int min, int max, double fidelity ) {
+    return min + static_cast<int>(floor(fidelity*(max-min)));
   }
 
-  static double compute_raysPerSquareMeters ( double min, double max, double precison ) {
-    return min + precison*(max-min);
+  static double compute_raysPerSquareMeters ( double min, double max, double fidelity ) {
+    return min + fidelity*(max-min);
   }
   
-  void init_maxNrg_H1     ( void );             // #1
-  void init_minSurf_H1    ( double precision ); // #2
-  void init_minCost_C1    ( double precision ); // #3
-  void init_minCost_C2    ( double precision ); // #4
-  void init_maxComp_HTF1  ( void );             // #5
-  void init_minCost_TS    ( void );             // #6
-  void init_maxEff_RE     ( double precision ); // #7
-  void init_maxHF_minCost ( double precision ); // #8
-  void init_maxNrg_minPar ( double precision ); // #9
+  void init_maxNrg_H1     ( void );            // #1
+  void init_minSurf_H1    ( double fidelity ); // #2
+  void init_minCost_C1    ( double fidelity ); // #3
+  void init_minCost_C2    ( double fidelity ); // #4
+  void init_maxComp_HTF1  ( void );            // #5
+  void init_minCost_TS    ( void );            // #6
+  void init_maxEff_RE     ( double fidelity ); // #7
+  void init_maxHF_minCost ( double fidelity ); // #8
+  void init_maxNrg_minPar ( double fidelity ); // #9
 
   bool set_typeOfTurbine ( int tot );
   
@@ -199,7 +199,7 @@ private:
   
 public:
 
-  Scenario  ( const std::string & problem, double precision );
+  Scenario  ( const std::string & problem, double fidelity );
   ~Scenario ( void );
   
   bool set_x    ( const double * x );

@@ -1,4 +1,4 @@
-# SOLAR v0.4.2
+# SOLAR v0.5.1
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -19,9 +19,9 @@ Type `./bin/solar` and you will be guided with the following help:
 
 ```
 Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)
-Run SOLAR (advanced): solar pb_id x.txt -seed=S -prec=P -rep=R -v
-     S: Random seed : integer >=0 or "diff"; Default=0
-     P: Precision   : real in ]0;1]; Default=1.0 (truth)
+Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v
+     S: Random seed: integer >=0 or "diff"; Default=0
+     F: Fidelity: real in ]0;1]; Default=1.0 (truth)
      R: Replications: integer >= 1 ; Default=1
 
 Validation: solar -check (can take several minutes)
@@ -29,7 +29,7 @@ Help(1)   : solar -h
 Help(2)   : solar -h pb_id
 Info      : solar -i
 ```
-To run a simulation, type `$SOLAR_HOME/bin/solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)`.
+To run a simulation, type `$SOLAR_HOME/bin/solar pb_id x.txt -seed=S -fid=F -rep=R -v (optional)`.
 
 The different options are:
 
@@ -50,11 +50,11 @@ The different options are:
           Use -seed=diff to let SOLAR use a different random seed each time
           The random number generator can be validated by running 'solar -check'
 
-     P: Precision of the simulator
+     F: Fidelity of the simulator
           Real value in ]0;1]
           Default: 1.0, which corresponds to the "true blackbox", or the "truth"
           Any value in ]0;1[ corresponds to a "static surrogate" of the truth
-          The execution time increases with the precision
+          The execution time increases with the fidelity
           A good default static surrogate is -prec=0.5
 
      R: Number of replications

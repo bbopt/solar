@@ -26,7 +26,7 @@
 /*-------------------------------------*/
 /*              constructor            */
 /*-------------------------------------*/
-Scenario::Scenario ( const std::string & problem , double precision ) :
+Scenario::Scenario ( const std::string & problem , double fidelity ) :
   _problem                          ( problem ) ,
   _model_type                       ( 0       ) ,
   _heliostatsFieldModel             ( 0       ) ,
@@ -82,19 +82,19 @@ Scenario::Scenario ( const std::string & problem , double precision ) :
   _minReceiverOutletTemp            ( 0.0     ) ,
   _powerplant                       ( NULL    )   {
 
-  // Check precision:
-  // ----------------
-  if ( precision <= 0.0 || precision > 1.0 )
-    throw std::invalid_argument ( "precision is not valid" );
+  // Check fidelity:
+  // ---------------
+  if ( fidelity <= 0.0 || fidelity > 1.0 )
+    throw std::invalid_argument ( "fidelity is not valid" );
 
-  if ( precision < 1.0 && _problem == "MAXNRG_H1" )
-    throw std::invalid_argument ( "precision must be 1.0 for Problem MAXNRG_H1 (#1)" );
+  if ( fidelity < 1.0 && _problem == "MAXNRG_H1" )
+    throw std::invalid_argument ( "fidelity must be 1.0 for Problem MAXNRG_H1 (#1)" );
 
-  if ( precision < 1.0 && _problem == "MAXCOMP_HTF1" )
-    throw std::invalid_argument ( "precision must be 1.0 for Problem MAXCOMP_HTF1 (#5)" );
+  if ( fidelity < 1.0 && _problem == "MAXCOMP_HTF1" )
+    throw std::invalid_argument ( "fidelity must be 1.0 for Problem MAXCOMP_HTF1 (#5)" );
 
-  if ( precision < 1.0 && _problem == "MINCOST_TS" )
-    throw std::invalid_argument ( "precision must be 1.0 for Problem MINCOST_TS (#6)" );
+  if ( fidelity < 1.0 && _problem == "MINCOST_TS" )
+    throw std::invalid_argument ( "fidelity must be 1.0 for Problem MINCOST_TS (#6)" );
   
   // Problem #1:
   if ( _problem == "MAXNRG_H1" )
@@ -102,15 +102,15 @@ Scenario::Scenario ( const std::string & problem , double precision ) :
 
   // Problem #2:
   if ( _problem == "MINSURF_H1" )
-    init_minSurf_H1 ( precision );
+    init_minSurf_H1 ( fidelity );
   
   // Problem #3:
   if ( _problem == "MINCOST_C1" )
-    init_minCost_C1 ( precision );
+    init_minCost_C1 ( fidelity );
 
   // Problem #4:
   if ( _problem == "MINCOST_C2" )
-    init_minCost_C2 ( precision );
+    init_minCost_C2 ( fidelity );
   
   // Problem #5:
   if ( _problem == "MAXCOMP_HTF1" )
@@ -122,15 +122,15 @@ Scenario::Scenario ( const std::string & problem , double precision ) :
 
   // Problem #7:
   if ( _problem == "MAXEFF_RE" )
-    init_maxEff_RE ( precision );
+    init_maxEff_RE ( fidelity );
   
   // Problem #8:
   if ( _problem == "MAXHF_MINCOST" )
-    init_maxHF_minCost ( precision );
+    init_maxHF_minCost ( fidelity );
 
   // Problem #9:
   if ( _problem == "MAXNRG_MINPAR" )
-    init_maxNrg_minPar ( precision );
+    init_maxNrg_minPar ( fidelity );
      
   // Check problem id:
   // -----------------
@@ -219,7 +219,7 @@ bool Scenario::set_x_maxNrg_H1 ( const double * x ) {
 /*-----------------------------------------*/
 /*    initialize problem minSurf_H1 (#2)   */
 /*-----------------------------------------*/
-void Scenario::init_minSurf_H1 ( double precision ) {
+void Scenario::init_minSurf_H1 ( double fidelity ) {
   
   // scenario parameters:
   _model_type           = 2; // whole plant
@@ -233,9 +233,9 @@ void Scenario::init_minSurf_H1 ( double precision ) {
   _maximumPowerDemand      = 20e6;
   _minutesPerTimeIncrement = 60;
 
-  // variable precision surrogate:
-  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   72, precision );
-  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, precision );
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   72, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, fidelity );
    
   _cFieldSurface           = 4e6;   // 400 hectares
   _cDemandComplianceRatio  = 100;
@@ -295,7 +295,7 @@ bool Scenario::set_x_minSurf_H1 ( const double * x ) {
 /*-----------------------------------------*/
 /*    initialize problem minCost_C1 (#3)   */
 /*-----------------------------------------*/
-void Scenario::init_minCost_C1 ( double precision ) {
+void Scenario::init_minCost_C1 ( double fidelity ) {
 
   // Demand profile: 1, from 3 pm to 9 pm
   // Maximum demand: 10 MW
@@ -321,9 +321,9 @@ void Scenario::init_minCost_C1 ( double precision ) {
   _cFieldSurface           = 800000; // 80 hectares
   _cDemandComplianceRatio  = 100;
   
-  // variable precision surrogate:
-  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   24, precision );
-  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-6, 0.01, precision ); 
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   24, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-6, 0.01, fidelity ); 
 }
   
 /*-----------------------------------------*/
@@ -377,7 +377,7 @@ bool Scenario::set_x_minCost_C1 ( const double * x ) {
 /*------------------------------------------*/
 /*    initialize problem minCost_C2 (#4)    */
 /*------------------------------------------*/
-void Scenario::init_minCost_C2 ( double precision ) {
+void Scenario::init_minCost_C2 ( double fidelity ) {
  
   // Demand profile : 1, from 3 pm to 9 pm
   // Maximum demand : 25 MW
@@ -405,9 +405,9 @@ void Scenario::init_minCost_C2 ( double precision ) {
   _cDemandComplianceRatio = 100;
   _cParasitics            = 0.18;
   
-  // variable precision surrogate:
-  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   24, precision );
-  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-8, 0.01, precision );
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   24, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-8, 0.01, fidelity );
 }
 
 /*------------------------------------------*/
@@ -487,7 +487,7 @@ void Scenario::init_maxComp_HTF1 ( void ) {
   _demandProfile      = 1;
   _tStart             = 0;
   _tEnd               = 1380; // 23x60
-  _maximumPowerDemand = 12e6;  // 12 MW
+  _maximumPowerDemand = 12e6; // 12 MW
  
   _minutesPerTimeIncrement = 60;
   _fixedPointsPrecision    = 0.001;
@@ -504,7 +504,7 @@ void Scenario::init_maxComp_HTF1 ( void ) {
   _minimumDistanceToTower = 0.5;
   _maximumDistanceToTower = 10;
  
-  // variable precision surrogate: disabled
+  // variable fidelity surrogate: disabled
 
   _numberOfTimeIncrements = 720;
   _raysPerSquareMeters    = 0.01;
@@ -598,7 +598,7 @@ void Scenario::init_minCost_TS ( void ) {
   _receiverTubesInsideDiam  = 0.033;
   _receiverTubesOutsideDiam = 0.050;
 
-  // variable precision surrogate: disabled
+  // variable fidelity surrogate: disabled
 
   _numberOfTimeIncrements = 24;
   _raysPerSquareMeters    = 0.01;
@@ -628,7 +628,7 @@ bool Scenario::set_x_minCost_TS ( const double * x ) {
 /*-----------------------------------------*/
 /*    initialize problem maxEff_RE (#7)    */
 /*-----------------------------------------*/
-void Scenario::init_maxEff_RE ( double precision ) {
+void Scenario::init_maxEff_RE ( double fidelity ) {
 
   _model_type              = 2; // whole plant
   _heliostatsFieldModel    = 1;
@@ -660,9 +660,9 @@ void Scenario::init_maxEff_RE ( double precision ) {
   _minimumDistanceToTower = 1;
   _maximumDistanceToTower = 7;
 
-  // variable precision surrogate:
-  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    8,   24, precision );
-  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, precision );
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    8,   24, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, fidelity );
 }
 
 /*------------------------------------------*/
@@ -696,7 +696,7 @@ bool Scenario::set_x_maxEff_RE ( const double * x ) {
 /*--------------------------------------------*/
 /*    initialize problem maxHF_minCost (#8)   */
 /*--------------------------------------------*/
-void Scenario::init_maxHF_minCost ( double precision ) {
+void Scenario::init_maxHF_minCost ( double fidelity ) {
   
   _model_type              = 2; // whole plant
   _heliostatsFieldModel    = 1;
@@ -722,9 +722,9 @@ void Scenario::init_maxHF_minCost ( double precision ) {
   _coldStorageInsulThickness        = 5;
   _coldMoltenSaltMinTemperature     = 550;
 
-  // variable precision surrogate:
-  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (   12,   24, precision );
-  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-8, 0.01, precision );
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (   12,   24, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-8, 0.01, fidelity );
 }
 
 /*---------------------------------------------*/
@@ -768,7 +768,7 @@ bool Scenario::set_x_maxHF_minCost ( const double * x ) {
 /*--------------------------------------------*/
 /*    initialize problem maxNrg_minPar (#9)   */
 /*--------------------------------------------*/
-void Scenario::init_maxNrg_minPar ( double precision ) {
+void Scenario::init_maxNrg_minPar ( double fidelity ) {
 
   // Demand profile : 1, from 3 pm to 9 pm
   // Maximum demand : 250MW
@@ -795,9 +795,9 @@ void Scenario::init_maxNrg_minPar ( double precision ) {
  _cParasitics             = 0.2;
  _cBudget                 = 1.2e9;
 
- // variable precision surrogate:
- _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    6,   24, precision );
- _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, precision );
+ // variable fidelity surrogate:
+ _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    6,   24, fidelity );
+ _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-7, 0.01, fidelity );
 }
 
 /*---------------------------------------------*/
@@ -1057,7 +1057,7 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // Check if molten salt temperature does not drop below the melting point (c8, c9, c10):
     outputs[ 8] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
     outputs[ 9] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
-    outputs[10] = MELTING_POINT - _powerplant->get_minSteamGenTemp   ();
+    outputs[10] = MELTING_POINT - _powerplant->get_minSteamGenTemp   ();  
 
     // c11: x13 <= x14:
     outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
@@ -1559,11 +1559,11 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
     // launch simulation:
     _powerplant->fSimulatePowerplant();
 
-    // objective function: absorbed energy
+    // objective function: absorbed energy:
     double Q_abs = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_storedMass()
-      *(_centralReceiverOutletTemperature - _coldMoltenSaltMinTemperature)
-      *HEAT_CAPACITY;
-    outputs[0] = -Q_abs*1e-9;
+      * (_centralReceiverOutletTemperature - _coldMoltenSaltMinTemperature)
+      * HEAT_CAPACITY;
+    outputs[0] = -Q_abs*1e-9;  
 
     // c1: budget is respected:
     outputs[1] = _powerplant->get_costOfReceiver() - _cBudget;
@@ -1755,9 +1755,9 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // objective #1: power output (MWe)
     double sum = 1.0;
     foncteurSum somme(&sum);
-    std::for_each(_powerplant->get_powerplantPowerOutput().begin(),
-		  _powerplant->get_powerplantPowerOutput().end(),
-		  somme);
+    std::for_each ( _powerplant->get_powerplantPowerOutput().begin(),
+		    _powerplant->get_powerplantPowerOutput().end(),
+		    somme );
     outputs[0] = -sum;
 
     // objective #2: parasitic losses:

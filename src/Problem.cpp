@@ -37,7 +37,7 @@ bool Problem::is_stochastic ( int output_index ) const {
 
   // SOLAR2:
   if ( _pb_id == "MINSURF_H1" &&
-       ( output_index == -1 || output_index == 2 || output_index == 7 || output_index == 9 ) )
+       ( output_index == -1 || output_index == 2 || output_index == 7 || output_index == 8 || output_index == 9 ) )
     return true;
 
   // SOLAR3:  
@@ -70,7 +70,9 @@ bool Problem::is_stochastic ( int output_index ) const {
  
   // SOLAR9:
   if ( _pb_id == "MAXNRG_MINPAR"  &&
-       ( output_index == -1 || output_index == 1 || output_index == 8 || output_index == 9 || output_index == 10 || output_index == 11 || output_index == 15 ) )
+       ( output_index == -1 || output_index ==  0 || output_index ==  1 || output_index ==  3 ||
+	 output_index ==  8 || output_index ==  9 || output_index == 10 || output_index == 11 ||
+	 output_index == 15 ) )
     return true;
   
   return false;

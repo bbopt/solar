@@ -177,10 +177,9 @@ double Economics::evaluateCostOfReceiver ( void ) {
 double Economics::evaluateCostOfStorage ( void ) {
 /*--------------------------------------------------------*/
   
-  double moltenSaltPerKg = COST_NANO3_KNO3; //$/kg
+  double moltenSaltPerKg = COST_NANO3_KNO3; // $/kg
   
-  //total molten salt inventory is assumed to be that of
-  // the volume of the full cold tank
+  // Total molten salt inventory is assumed to be that of the volume of the full cold tank
 
   double moltenSaltVolume     = _hotStorageHeight*1.1*PI*pow(_storageDiameter / 2.0, 2.0);
   double _totalMoltenSaltMass = moltenSaltVolume*MS_DENSITY;
@@ -193,12 +192,12 @@ double Economics::evaluateCostOfStorage ( void ) {
 			      pow(_storageDiameter / 2.0 + 0.04, 2.0)) +
     PI*pow(_storageDiameter / 2.0 + 0.04, 2.0)*(_coldStorageInsulationThickness + _hotStorageInsulationThickness);
 
-  //the 4cm thick stainless steel tank is considered when evaluating the total volume of insulation needed.
-  //The design tank diameter is the inner diameter
+  // The 4cm thick stainless steel tank is considered when evaluating the total volume of insulation needed.
+  // The design tank diameter is the inner diameter
 
-  double ceramicFiberCost = CERAMIC_FIBER_INSULATION_COST*insulationVolume;
+  double ceramicFiberCost = CERAMIC_FIBER_INSULATION_COST * insulationVolume;
 	
-  double foundationCost = _totalMoltenSaltMass * STORAGE_TANK_FOUNDATION_COST_COEF + 1.*STORAGE_TANK_FOUNDATION_COST_CONST;
+  double foundationCost   = _totalMoltenSaltMass * STORAGE_TANK_FOUNDATION_COST_COEF + 1.*STORAGE_TANK_FOUNDATION_COST_CONST;
   
   _costOfStorage = ceramicFiberCost + moltenSaltCost + foundationCost;
 

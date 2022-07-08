@@ -53,7 +53,7 @@ private:
   // one evaluation:
   bool eval_x ( int           x_index              ,
 		int           seed                 ,
-		double        precison             ,
+		double        fidelity             ,
 		bool        & simulation_completed ,
 		bool        & cnt_eval             ,
 		std::string & err_msg              ,
@@ -79,7 +79,7 @@ public:
   // multiple evaluations:
   bool eval_x ( int           x_index              ,
 		int           seed                 ,
-		double        precison             ,
+		double        fidelity             ,
 		int           replications         ,
 		bool        & simulation_completed ,
 		bool        & cnt_eval             ,

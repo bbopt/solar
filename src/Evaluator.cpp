@@ -178,7 +178,7 @@ bool Evaluator::compute_mean_var ( std::vector<double> & output       ,
 /*------------------------------------------------------------*/
 bool Evaluator::eval_x ( int           x_index              ,
 			 int           seed                 ,
-			 double        precision            ,
+			 double        fidelity             ,
 			 int           replications         ,
 			 bool        & simulation_completed ,
 			 bool        & cnt_eval             ,
@@ -197,7 +197,7 @@ bool Evaluator::eval_x ( int           x_index              ,
   }
   
   if ( replications == 1 )
-    return eval_x ( x_index, seed, precision, simulation_completed, cnt_eval, err_msg, verbose );
+    return eval_x ( x_index, seed, fidelity, simulation_completed, cnt_eval, err_msg, verbose );
   
   reset_outputs(1e20);
   cnt_eval = simulation_completed = false;
@@ -233,9 +233,7 @@ bool Evaluator::eval_x ( int           x_index              ,
  
   for ( int o = 0; o < nbo; ++o )
     means[o] = vars[o] = 1e20;
-
-  // Clock clock; // DEBUG
-  
+ 
   for ( int r = 0 ; r < replications ; ++r ) {
 
     if ( verbose )
@@ -244,7 +242,7 @@ bool Evaluator::eval_x ( int           x_index              ,
     reset_outputs(1e20);
 
     // evaluation is here:
-    if ( !eval_x ( x_index, seed, precision, simc, cnt, err_msg, false ) ) {
+    if ( !eval_x ( x_index, seed, fidelity, simc, cnt, err_msg, false ) ) {
       reset_outputs(1e20);
       delete [] output_matrix;
       delete [] means;
@@ -272,13 +270,17 @@ bool Evaluator::eval_x ( int           x_index              ,
       
       if ( verbose ) {
 	
-	if  (!compute_mean_var ( output_matrix[o], o, means[o], vars[o] ) ) {
+	if  ( !compute_mean_var ( output_matrix[o], o, means[o], vars[o] ) ) {
 	  reset_outputs(1e20);
 	  delete [] output_matrix;
 	  delete [] means;
 	  delete [] vars;
 	  _out << " Fail\n";
-	  err_msg = "problem with the computation of mean and coeff. of variation";
+
+	  std::ostringstream err;
+	  err << "problem with the computation of mean and coeff. of variation for output #" << o;
+	  err_msg = err.str();
+	  
 	  return false;
 	}
 	
@@ -286,14 +288,6 @@ bool Evaluator::eval_x ( int           x_index              ,
 	  _out << "\t m" << o << "=" << means[o]; //  << " v" << o << "=" << vars[o];
       }
     }
-
-
-    // DEBUG:
-    // {
-    //  compute_mean_var ( output_matrix[0], 0, means[0], vars[0] );
-    //  std::cout << r << " " << seed << " " << clock.get_real_time()
-    //            << " " << std::setprecision(12) << _outputs[0] << " " << means[0] << " " << vars[0] << std::endl;
-    // }
     
     if ( verbose )
       _out << std::endl;
@@ -321,7 +315,9 @@ bool Evaluator::eval_x ( int           x_index              ,
     for ( int o = 0; o < nbo; ++o ) {
       if  ( !compute_mean_var ( output_matrix[o], o, means[o], vars[o] ) ) {
 	error = true;
-	err_msg = "problem with the computation of mean and coeff. of variation";
+	std::ostringstream err;
+	err << "problem with the computation of mean and coeff. of variation for output #" << o;
+	err_msg = err.str();
       }
     }
   }
@@ -341,7 +337,7 @@ bool Evaluator::eval_x ( int           x_index              ,
 /*---------------------------------------------*/
 bool Evaluator::eval_x ( int           x_index              ,
 			 int           seed                 ,
-			 double        precision            ,
+			 double        fidelity             ,
 			 bool        & simulation_completed ,
 			 bool        & cnt_eval             ,
 			 std::string & err_msg              ,
@@ -363,7 +359,7 @@ bool Evaluator::eval_x ( int           x_index              ,
   
   try { 
      
-    Scenario scenario ( _problem.get_pb_id(), precision );
+    Scenario scenario ( _problem.get_pb_id(), fidelity );
    
     cnt_eval = scenario.set_x ( _x[x_index] );
 

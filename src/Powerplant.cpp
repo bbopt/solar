@@ -124,7 +124,7 @@ void Powerplant::fSimulatePowerplant ( void ) {
     _receiverOutletFlow.reserve(kk);
     _heliostatsFieldPar.reserve(kk);
 
-    // Determining yield pressure for the receiver
+    // determining yield pressure for the receiver
     if (_moltenSaltLoop->get_exchangerModel() == 2) {
       _pressureTubesSide.reserve(kk);
       _maximumPressureInExchanger = 0.0;
@@ -159,10 +159,10 @@ void Powerplant::fSimulatePowerplant ( void ) {
 	    
 	if ( _moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow() > 0.0 ) {
 
-	  //Filling powerplant power output vector
+	  // filling powerplant power output vector
 	  _powerplantPowerOutput.push_back(_powerblock->get_Pout());
 		
-	  //Filling demand compliance vector
+	  // filling demand compliance vector
 	  if ( _powerplantPowerOutput.back() >= _demand[j] && _demand[j] > 0.0 ) {   
 	    tmp_sum += 1.0;
 	    ++tmp_size;

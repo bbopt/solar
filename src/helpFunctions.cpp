@@ -50,14 +50,15 @@ void display_problems ( std::ostream & out , const std::vector<Problem> & proble
 void display_usage ( std::ostream & out ) {
   out << std::endl
       << "Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)" << std::endl
-      << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -prec=P -rep=R -v" << std::endl
-      << "     S: Random seed : integer >=0 or \"diff\"; Default=0"           << std::endl
-      << "     P: Precision   : real in ]0;1]; Default=1.0 (truth)" << std::endl
-      << "     R: Replications: integer >= 1 ; Default=1"           << std::endl << std::endl
-      << "Validation: solar -check (can take several minutes)"      << std::endl
-      << "Help(1)   : solar -h"               << std::endl
-      << "Help(2)   : solar -h pb_id"         << std::endl
-      << "Info      : solar -i"               << std::endl << std::endl;
+      << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v"  << std::endl
+      << " pb_id: Problem instance: integer in {1, 2, ..., 10}"              << std::endl
+      << "     S: Random seed     : integer >=0 or \"diff\"; Default=0"      << std::endl
+      << "     F: Fidelity        : real in ]0;1]; Default=1.0 (truth)"      << std::endl
+      << "     R: Replications    : integer >= 1 ; Default=1\n"              << std::endl
+      << "Validation: solar -check (can take several minutes)"               << std::endl
+      << "Help(1)   : solar -h"                                              << std::endl
+      << "Help(2)   : solar -h pb_id"                                        << std::endl
+      << "Info      : solar -i\n"                                            << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -78,8 +79,8 @@ void display_info ( std::ostream & out , const std::string & version ) {
 /*-----------------------------------------------------------*/
 void display_help ( std::ostream & out , const std::vector<Problem> & problems ) {
   out << std::endl
-      << "Run simulation: solar pb_id x.txt -seed=S -prec=P -rep=R -v (optional)\n\n"
-      << " pb_id: Problem ID (see list of problems below)\n\n"
+      << "Run simulation: solar pb_id x.txt -seed=S -fid=F -rep=R -v (optional)\n\n"
+      << " pb_id: Problem instance (see list of problems below)\n\n"
       << " x.txt: Input vector: Point at which the simulator is evaluated\n"
       << "        Values separated with spaces\n"
       << "        It is possible to specify several vectors: Use one line for each\n\n"
@@ -91,12 +92,12 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
       << "          The default value is 0\n"
       << "          Use -seed=diff to let SOLAR use a different random seed each time\n"
       << "          The random number generator can be validated by running 'solar -check'\n\n"
-      << "     P: Precision of the simulator\n"
+      << "     F: Fidelity of the simulator\n"
       << "          Real value in ]0;1]\n"
       << "          Default: 1.0, which corresponds to the \"true blackbox\", or the \"truth\"\n"
       << "          Any value in ]0;1[ corresponds to a \"static surrogate\" of the truth\n"
-      << "          The execution time increases with the precision\n"
-      << "          A good default static surrogate is -prec=0.5\n\n"
+      << "          The execution time increases with the fidelity\n"
+      << "          A good default static surrogate is -fid=0.5\n\n"
       << "     R: Number of replications\n"
       << "          Integer >= 1, default=1\n"
       << "          Number of times that the simulator is run at the same point\n"
@@ -110,22 +111,22 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
 }
 
 /*-----------------------------------------------------------*/
-/*           display (complete) help for one problem         */
+/*           display (complete) help for one instance        */
 /*-----------------------------------------------------------*/
 void display_help ( std::ostream               & out      ,
 		    const std::vector<Problem> & problems ,
 		    const std::string          & pb_id      ) {
  
-  out << "Display help for Problem \"" << pb_id << "\":" << std::endl << std::endl;
+  out << "Display help for Instance \"" << pb_id << "\":" << std::endl << std::endl;
   
   const Problem * pb = find_problem ( problems, pb_id );
 
   if ( pb ) {
    
-    out << "Problem: " << pb->get_pb_id() << " (solar" << pb->get_index() << ")"
-	<< "\t"        << pb->get_f_description()
-	<< "\tn="      << pb->get_n()
-	<< "\tm="      << pb->get_m()
+    out << "Instance: " << pb->get_pb_id() << " (solar" << pb->get_index() << ")"
+	<< "\t"         << pb->get_f_description()
+	<< "\tn="       << pb->get_n()
+	<< "\tm="       << pb->get_m()
 	<< std::endl;
 
     // #1:
@@ -165,12 +166,12 @@ void display_help ( std::ostream               & out      ,
       print_maxNrg_minPar ( out );
 
     else {
-      out << "Cannot find detailed help for this problem" << std::endl;
+      out << "Cannot find detailed help for this instance" << std::endl;
       return;
     }
   }
   else {
-    out << "This problem id is invalid" << std::endl;
+    out << "This problem instance does not exist" << std::endl;
     return;
   }
   out << "\n-----------------------------------------------------------------\n" << std::endl;
@@ -189,7 +190,7 @@ void print_maxNrg_H1 ( std::ostream & out ) {
       << "\tMaximum field surface area: 195 hectares\n"
       << "\tBudget: $50M\n"
       << "\tMust provide 100% of the demand requirement\n"
-      << "\tPrecision cannot be changed (must be 100%)\n"
+      << "\tFidelity cannot be changed (must be 100%)\n"
       << std::endl
       << "Objective (first output, stochastic)\n"
       << "\tMaximize the total solar energy concentrated on the receiver aperture through one day (kWh)\n"
@@ -237,7 +238,7 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\tMust provide 100% of the demand requirement\n"
       << std::endl
       << "Objective (first output, analytic)\n"
-      << "\tMinimize total heliostats field surface to run a pre-determined powerplant\n"
+      << "\tMinimize total heliostats field surface to run a pre-determined powerplant (square meters)\n"
       << "\tObjective = PI*x3*x3(x9*x9-x8*x8) * x7/180\n"
       << std::endl
       << "Variables:\n"
@@ -259,14 +260,14 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\t\tx14: Receiver tubes outer diameter (m): Real in [0.005;0.1]\n"   
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
-      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 4e6 or simply: objective <= 4e6\n"
-      << "\t c2: Demand compliance (stochastic)\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 4e6 or: objective <= 4e6\n"
+      << "\t c2: Compliance to demand (stochastic)\n"
       << "\t c3: Cost of plant <= budget=$300M\n"
       << "\t c4: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c5: Min. distance from tower <= Max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
       << "\t c6: Check that x6 heliostats can fit in the field\n"
-      << "\t c7: Pressure in receiver tubes <= yield pressure (stochastic)\n"
-      << "\t c8: Molten salt melting point  <= hot storage lowest temperature\n"
+      << "\t c7: Pressure in receiver tubes <= yield pressure                  (stochastic)\n"
+      << "\t c8: Molten salt melting point  <= hot storage lowest temperature  (stochastic)\n"
       << "\t c9: Molten salt melting point  <= cold storage lowest temperature (stochastic)\n"
       << "\tc10: Molten salt melting point  <= steam generator outlet temperature\n"
       << "\tc11: Receiver inside diameter   <= outside diameter: A priori, linear constraint: x13 <= x14\n"
@@ -298,7 +299,7 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\tMust provide 100% of the demand requirement\n"
       << std::endl
       << "Objective (first output)\n"
-      << "\tMinimize Total investment cost ($)\n"
+      << "\tMinimize total investment cost ($)\n"
       << std::endl
       << "Variables:\n"
       << "\tHeliostats Field:\n"
@@ -323,10 +324,10 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\t\tx18: Receiver tubes inner diameter (m)    : Real in [0.005;0.1]\n"
       << "\t\tx19: Receiver tubes outer diameter (m)    : Real in [0.005;0.1]\n"
       << "\tPowerblock:\n"
-      << "\t\tx20: Type of turbine: Integer in {1, 2, ..., 8}\n"
+      << "\t\tx20: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
-      << "\tc1: Field surface area: A priori constraint: PI*x3*x3*(x9*x9-x8*x8) * x7/180 <= 800000\n"
+      << "\tc1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 800000\n"
       << "\tc2: Compliance to demand (stochastic)\n"
       << "\tc3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\tc4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
@@ -400,11 +401,11 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\t\tx27: Number of shell passes  : Integer in {1, 2, ..., 10}\n"
       << "\t\tx28: Number of tubes passes  : Integer in {1, 2, ..., 9}\n"   
       << "\tPowerblock:\n"
-      << "\t\tx29: Type of turbine: Integer in {1, 2, ..., 8}\n"
+      << "\t\tx29: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 17 with format ci <= 0):\n"
-      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9- x8*x8) * x7 / 180 <= 2e6\n"
-      << "\t c2: Compliance to the demand (stochastic)\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 2e6\n"
+      << "\t c2: Compliance to demand (stochastic)\n"
       << "\t c3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
       << "\t c5: Check that x6 heliostats can fit in the field\n"
@@ -445,7 +446,7 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\tPre-determined sunlight input for a period of 1 month\n"
       << "\tNumber of heliostats to fit in the field: 3,800\n"
       << "\tDeterministic instance\n"
-      << "\tPrecision cannot be changed (must be 100%)\n"
+      << "\tFidelity cannot be changed (must be 100%)\n"
       << std::endl
       << "Objective (first output)\n"
       << "\tMaximize compliance to a demand profile\n"
@@ -473,7 +474,7 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\t\tx18: Number of shell passes  : Integer in {1, 2, ...,10}\n"
       << "\t\tx19: Number of tube passes   : Integer in {1, 2, ..., 9}\n"
       << "\tPowerblock:\n"
-      << "\t\tx20: Type of turbine: Integer in {1, 2, ..., 8}\n"
+      << "\t\tx20: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 13 with format ci <= 0):\n"
       << "\t c1: Cost of plant <= budget=$100M\n"
@@ -518,11 +519,11 @@ void print_minCost_TS ( std::ostream & out ) {
       << "\tto sustain a 120MW electrical power output during 24 hours. Since the heliostat field is not being\n"
       << "\toptimized, its hourly power output is taken from prerecorded data instead of being simulated.\n"  
       << "\tDeterministic instance\n"
-      << "\tPrecision cannot be changed (must be 100%)\n"
+      << "\tFidelity cannot be changed (must be 100%)\n"
       << std::endl;
 
   out << "Objective (first output)\n"
-      << "\tMinimize the cost of storage\n"
+      << "\tMinimize the cost of storage ($)\n"
       << std::endl;
 
   out << "Variables:\n"
@@ -534,13 +535,12 @@ void print_minCost_TS ( std::ostream & out ) {
       << "\t\tx5: Cold storage insulation thickness (m): Real in [0.01;5]\n"
       << std::endl
       << "Constraints (outputs 2 to 7 with format ci <= 0):\n"
-      << "\tc1: Compliance to the demand\n"
+      << "\tc1: Compliance to demand\n"
       << "\tc2: Pressure in receiver tubes does not exceed yield pressure\n"
       << "\tc3: Molten salt melting point   <= hot storage lowest temperature\n"
       << "\tc4: Molten salt melting point   <= cold storage lowest temperature\n"
       << "\tc5: Receiver outlet temperature >= steam turbine inlet temperature\n"
       << "\tc6: At midnight, storage must be at least at its original conditions\n"
-    
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 5 << std::endl
@@ -567,7 +567,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << std::endl;
   
   out << "Objective (first output, stochastic)\n"
-      << "\tMaximize receiver efficiency, i.e the energy transferred to the molten salt\n"
+      << "\tMaximize receiver efficiency, i.e the energy transferred to the molten salt (J)\n"
       << std::endl;
 
   out << "Variables:\n"
@@ -614,7 +614,7 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << std::endl;
     
   out << "Objectives (first and second outputs)\n"
-      << "\tMaximize heliostat field performance (absorbed energy) and minimize cost of field, tower and receiver\n"
+      << "\tMaximize heliostat field performance (absorbed energy in Joules) and minimize cost of field, tower and receiver ($)\n"
       << std::endl;
 
   out << "Variables:\n"
@@ -635,9 +635,9 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\t\tx13: Receiver tubes outer diameter (m): Real in [0.006;0.1]\n"
       << std::endl
       << "Constraints (outputs 3 to 11 with format ci <= 0):\n"
-      << "\tc1: Field surface area: A priori constraint: PI*x3*x3*(x9*x9-x8*x8)*x7/180 <= 4e6\n"
-      << "\tc2: Tower is at least twice as high as heliostats        : A priori, linear constraint: 2x1 <= x3\n"
-      << "\tc3: Min. distance from tower <= max. distance from tower : A priori, linear constraint:  x8 <= x9\n"   
+      << "\tc1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 4e6\n"
+      << "\tc2: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
+      << "\tc3: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
       << "\tc4: Check that x6 heliostats can fit in the field\n"
       << "\tc5: Pressure in receiver tubes <= yield pressure (stochastic)\n"
       << "\tc6: Tubes inside diameter   <= tubes outside diameter: A priori, linear constraint: x12 <= x13\n"
@@ -671,8 +671,8 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tMinimum energy production: 250MWh\n"
       << std::endl;
   
-  out << "Objectives (first and second outputs; second objective is stochastic)\n"
-      << "\tMaximize power and minimize losses\n"
+  out << "Objectives (first and second outputs; the two objectives are stochastic)\n"
+      << "\tMaximize power (Wh) and minimize losses (Wh)\n"
       << std::endl;
   
   out << "Variables:\n"
@@ -708,12 +708,12 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\t\tx27: Number of shell passes  : Integer in {1, 2, ..., 10}\n"
       << "\t\tx28: Number of tube passes   : Integer in {1, 2, ..., 9}\n"   
       << "\tPowerblock:\n"
-      << "\t\tx29: Type of turbine: Integer in {1, 2, ..., 8}\n"
+      << "\t\tx29: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 3 to 19 with format ci <= 0):\n"
       << "\t c1: Cost of plant <= budget=$1.2B\n"
-      << "\t c2: Minimum energy production is reached\n"
-      << "\t c3: Field surface area: A priori constraint: PI*x3*x3*( x9*x9 - x8*x8 ) * x7/180 <= 5e6\n"
+      << "\t c2: Minimum energy production is reached (stochastic)\n"
+      << "\t c3: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 5e6\n"
       << "\t c4: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c5: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"  
       << "\t c6: Check that x6 heliostats can fit in the field\n"

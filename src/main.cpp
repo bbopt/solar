@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.4.2              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.5.1              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2022-05-14                                                                   */
+/*  2022-07-08                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -26,14 +26,14 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.4.2, 2022-05-07";
+const std::string VERSION = "0.5.1, 2022-07-08";
 
 // validation functions:
 bool check ( bool fast );
 
 bool check_eval ( const std::string & pb_id        ,
 		  int                 seed         ,
-		  double              precision    ,
+		  double              fidelity     ,
 		  int                 replications ,
 		  const double      * x            ,
 		  const std::string & expected     ,
@@ -45,7 +45,7 @@ bool get_options ( int           argc         ,
 		   std::string & x_file       ,
  		   bool        & verbose      ,
 		   int         & seed         ,
-		   double      & precision    ,
+		   double      & fidelity     ,
 		   int         & replications   );
 
 /*-----------------------------------------------------------*/
@@ -118,10 +118,10 @@ int main ( int argc , char ** argv ) {
   std::string x_file;
   bool        verbose      = false;
   int         seed         = 0;
-  double      precision    = 1.0;
+  double      fidelity     = 1.0;
   int         replications = 1;
 
-  if ( !get_options ( argc, argv, x_file, verbose, seed, precision, replications ) ) {
+  if ( !get_options ( argc, argv, x_file, verbose, seed, fidelity, replications ) ) {
     display_usage ( std::cout );
     return 1;
   }
@@ -139,7 +139,7 @@ int main ( int argc , char ** argv ) {
     if ( change_seed )
       std::cout << " (diff)";
     std::cout << std::endl
-	      << "Precision   : " << precision    << std::endl
+	      << "Fidelity    : " << fidelity     << std::endl
 	      << "Replications: " << replications << std::endl
 	      << std::endl;
   }
@@ -164,7 +164,7 @@ int main ( int argc , char ** argv ) {
   Clock clock1;
   
   // creation of the evaluator:
-  Evaluator evaluator ( *pb , std::cout );
+  Evaluator evaluator ( *pb, std::cout );
  
   // read inputs:
   if ( !evaluator.read_x ( x_file ) ) {
@@ -188,7 +188,7 @@ int main ( int argc , char ** argv ) {
     }
     
     // evaluation(s):
-    if ( !evaluator.eval_x ( i, seed, precision, replications , simulation_completed, cnt_eval, err_msg, verbose ) ) {
+    if ( !evaluator.eval_x ( i, seed, fidelity, replications , simulation_completed, cnt_eval, err_msg, verbose ) ) {
       std::cerr << err_msg << std::endl;
       error = true;
       continue;
@@ -220,25 +220,25 @@ int main ( int argc , char ** argv ) {
 /*----------------------------------------------------------*/
 /*                parse and get the options                 */
 /*                                                          */
-/*  Example: solar ID  X.txt -v  -prec=0.5 -seed=0 -rep=10  */
+/*  Example: solar ID  X.txt -v  -fid=0.5 -seed=0 -rep=10  */
 /*----------------------------------------------------------*/
 bool get_options ( int           argc      ,
 		   char       ** argv      ,
 		   std::string & x_file    ,
  		   bool        & verbose   ,
 		   int         & seed      ,
-		   double      & precision ,
+		   double      & fidelity  ,
 		   int         & replications ) {
   
   verbose      = false;
   seed         = 0;
-  precision    = 1.0;
+  fidelity     = 1.0;
   replications = 1;
 
   x_file.clear();
   
   bool bseed = false;
-  bool bprec = false;
+  bool bfid  = false;
   bool brep  = false;
   bool chk   = false;
   
@@ -259,12 +259,11 @@ bool get_options ( int           argc      ,
     }
         
     else {
-
-      sarg = arg.substr(0,6);
-
+    
       // random seed:
       // ------------
-      if ( sarg == "-SEED=" || sarg == "--SEED=" ) {
+      sarg = arg.substr(0,6);
+      if ( sarg == "-SEED=" ) {
 	if ( bseed )
 	  return false;
 	bseed = true;
@@ -276,31 +275,29 @@ bool get_options ( int           argc      ,
 	chk = true;
       }
 
-      // precision:
-      // ----------
-      else if ( sarg == "-PREC=" || sarg == "--PREC=" ) {
-	if ( bprec )
+      // fidelity:
+      // ---------
+      sarg = arg.substr(0,5);
+      if ( sarg == "-FID=" ) {
+	if ( bfid )
 	  return false;
-	bprec = true;
-	sarg2 = arg.substr(6,arg.size()-6);
-	if ( !string_to_double(sarg2,precision) || precision <= 0.0 || precision > 1.0 )
+	bfid  = true;
+	sarg2 = arg.substr(5,arg.size()-5);
+	if ( !string_to_double(sarg2,fidelity) || fidelity <= 0.0 || fidelity > 1.0 )
 	  return false;
 	chk = true;
       }
       
       // number of replications:
       // -----------------------
-      else {
-	sarg = arg.substr(0,5);
-	if ( sarg == "-REP=" || sarg == "--REP=" ) {
-	  if ( brep )
-	    return false;
-	  brep = true;
-	  sarg2 = arg.substr(5,arg.size()-5);
-	  if ( !string_to_int ( sarg2 , replications ) || replications <= 0 )
-	    return false; 
-	  chk = true;
-	}
+      if ( sarg == "-REP=" ) {
+	if ( brep )
+	  return false;
+	brep = true;
+	sarg2 = arg.substr(5,arg.size()-5);
+	if ( !string_to_int ( sarg2 , replications ) || replications <= 0 )
+	  return false; 
+	chk = true;
       }
     }
    
@@ -319,7 +316,7 @@ bool get_options ( int           argc      ,
 /*----------------------------------------------------------------*/
 bool check_eval ( const std::string & pb_id        ,
 		  int                 seed         ,
-		  double              precision    ,
+		  double              fidelity     ,
 		  int                 replications ,
 		  const double      * x            ,
 		  const std::string & expected     ,
@@ -338,7 +335,7 @@ bool check_eval ( const std::string & pb_id        ,
 
   bool chk = false;
  
-  if ( evaluator.eval_x ( 0, seed, precision, replications, simulation_completed, cnt_eval, err_msg, false ) ) {
+  if ( evaluator.eval_x ( 0, seed, fidelity, replications, simulation_completed, cnt_eval, err_msg, false ) ) {
 
     evaluator.display_outputs();
     if ( oss.str() == expected ) {
