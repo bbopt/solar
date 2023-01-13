@@ -1,4 +1,4 @@
-# SOLAR v0.5.1
+# SOLAR v0.5.2
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -67,7 +67,7 @@ The different options are:
 Help for a problem: solar pb_id or solar -h pb_id
 ```
 
-And the list of instances is:
+The list of instances is:
 
 ```
 	#	          pb_id	                              obj.(f)	# of objectives(p)	   # of var.(n)	# of constr.(m)
@@ -81,16 +81,27 @@ And the list of instances is:
 	8	  MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
 	9	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
 ```
+List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
+```
+	SOLAR1 	-902,503.692418
+	SOLAR2 	987,823.606284
+	SOLAR3 	77,486,732.8425
+	SOLAR4 	108,197,236.146
+	SOLAR5 	-28.8817193932
+	SOLAR6 	44,298,455.5682
+	SOLAR7 	-4,939.4070342
+	SOLAR10	42.905683
+```
 
 ### Example
 
 The command `$SOLAR_HOME/bin/solar 1 ./tests/1_MAXNRG_H1/x0.txt` should display
 
-`-122505.5978 -10881140.5675 -1512631.39776 -134 -4.5 0`
+`-122505.5978 -10881140.57 -1512631.39776 -134 -4.5 0`
 
 which corresponds to the feasible point
 *(8, 8, 150, 7, 7, 250, 45, 0.5, 5)*
-of value *-122505.5978*.
+of value *-122,505.5978*.
 
 Other points and NOMAD parameters files can be found in the
 [./tests](tests) directory.
