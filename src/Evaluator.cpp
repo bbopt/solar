@@ -29,6 +29,8 @@
 Evaluator::~Evaluator ( void ) {
   delete_x();
   delete [] _outputs;
+  if ( _intermediate_outputs )
+    delete [] _intermediate_outputs;
 }
 
 /*-----------------------------------------*/
@@ -184,7 +186,7 @@ bool Evaluator::eval_x ( int           x_index              ,
 			 bool        & cnt_eval             ,
 			 std::string & err_msg              ,
 			 bool          verbose                ) {
-
+  
   if ( !_problem.is_stochastic() ) {
     if ( replications > 1 ) {
       err_msg = "Number or replications > 1 for a deterministic instance";
@@ -211,7 +213,7 @@ bool Evaluator::eval_x ( int           x_index              ,
     err_msg = "Evaluator::eval_x(): Bad input index";
     return false;
   }
- 
+  
   if ( verbose ) {
     _out << std::endl
 	 << "Begin simulation of " << _problem.get_pb_id() << " for ";
@@ -225,8 +227,8 @@ bool Evaluator::eval_x ( int           x_index              ,
 
   simulation_completed = true;
   bool simc, cnt;
-
   int nbo = _problem.get_nb_outputs();
+  
   std::vector<double> * output_matrix = new std::vector<double>[nbo];
   double              * means         = new double[nbo];
   double              * vars          = new double[nbo];
@@ -241,7 +243,7 @@ bool Evaluator::eval_x ( int           x_index              ,
 
     reset_outputs(1e20);
 
-    // evaluation is here:
+    // blackbox evaluation is here:
     if ( !eval_x ( x_index, seed, fidelity, simc, cnt, err_msg, false ) ) {
       reset_outputs(1e20);
       delete [] output_matrix;
@@ -374,8 +376,8 @@ bool Evaluator::eval_x ( int           x_index              ,
       _out <<  ") ..." << std::endl;
     }
 
-    simulation_completed = scenario.simulate ( _outputs , cnt_eval );
-      
+    simulation_completed = scenario.simulate ( _outputs , _intermediate_outputs, fidelity, cnt_eval );
+
     if ( verbose )
       _out << "... done" << std::endl;
   }
@@ -383,7 +385,7 @@ bool Evaluator::eval_x ( int           x_index              ,
   catch ( const std::invalid_argument & e ) {
     // problem with simulation (e.g. bad input): Simulation cannot be used by solver;
     // error message must be printed since outputs are not displayed.     
-    err_msg = e.what();
+    err_msg = e.what();   
     status  = false;
   }
   // (controlled) problem with the simulation (e.g. a priori constraint violated):
@@ -397,7 +399,7 @@ bool Evaluator::eval_x ( int           x_index              ,
   }
   catch (...) {
     err_msg = "Error: simulation was interrupted for an unknown reason";
-    status = false;
+    status  = false;
   }
 
   return status;
@@ -407,18 +409,28 @@ bool Evaluator::eval_x ( int           x_index              ,
 /*           reset all outputs to a specific value       */
 /*-------------------------------------------------------*/
 void Evaluator::reset_outputs ( double v ) {
-  for ( int i = 0; i < _problem.get_nb_outputs(); ++i )
+  int i;
+  for ( i = 0; i < _problem.get_nb_outputs(); ++i )
     _outputs[i] = v;
+  if ( _intermediate_outputs ) {
+    delete [] _intermediate_outputs;
+    _intermediate_outputs = NULL;
+  }
+  if ( _problem.get_pb_id() == "MINCOST_UNCONSTRAINED" ) {
+    _intermediate_outputs = new double[7];
+    for ( i = 0; i < 7; ++i )
+      _intermediate_outputs[i] = v;
+  }
 }
   
-/*-------------------------------------------------------*/
-/*                     display outputs                   */
-/* (each output is displayed with a specific precision)  */
-/*-------------------------------------------------------*/
+/*--------------------------------------------------------*/
+/*                      display outputs                   */
+/*  (each output is displayed with a specific precision)  */
+/*--------------------------------------------------------*/
 void Evaluator::display_outputs ( void ) const {
-
+ 
   const std::string pb_id = _problem.get_pb_id();
-  
+ 
   // solar 1:
   if ( pb_id == "MAXNRG_H1" )
     _out << std::setprecision(12) << _outputs[0] << " "
@@ -556,5 +568,24 @@ void Evaluator::display_outputs ( void ) const {
 	 << std::setprecision(11) << _outputs[15] << " " // New in Version 0.4.2
 	 << std::setprecision(12) << _outputs[16] << " "
 	 << _outputs[17] << " "
-	 << _outputs[18] << std::setprecision(12); 
+	 << _outputs[18] << std::setprecision(12);
+
+  // solar 10:
+  else if ( pb_id == "MINCOST_UNCONSTRAINED" )
+    _out << std::setprecision(8) << _outputs[0];
+}
+
+void Evaluator::display_intermediate_outputs ( void ) const {
+ 
+  // solar 10:
+  if ( _problem.get_pb_id() == "MINCOST_UNCONSTRAINED" ) {
+    _out << std::setprecision(12) << _intermediate_outputs[0] << " "
+	 << _intermediate_outputs[1] << " "
+	 << _intermediate_outputs[2] << " "
+	 << std::setprecision( 8) << _intermediate_outputs[3] << " "
+	 << std::setprecision( 8) << _intermediate_outputs[4] << " "
+	 << std::setprecision(12) << _intermediate_outputs[5] << " "
+	 << std::setprecision(10) << _intermediate_outputs[6]
+	 << std::setprecision(12);
+  }
 }

@@ -92,7 +92,7 @@ public:
 /*--------------------------------------------*/
 /*  This function simply runs the simulation  */
 /*--------------------------------------------*/
-void Powerplant::fSimulatePowerplant ( void ) {
+void Powerplant::fSimulatePowerplant ( bool low_fid ) {
 
   // Options:
   // 1- Simulate the heliostats field or replace it with an input file
@@ -109,10 +109,10 @@ void Powerplant::fSimulatePowerplant ( void ) {
 
   // whole plant:
   else if ( _model_type == 2 ) {
-       
+   
     fSimulateHeliostatField();
     
-    //Pre-setting the reserves
+    // pre-setting the reserves
 
     int kk = _time.get_numberOfIncrements() * _time.get_sizeOfIncrements() * 60;
 
@@ -130,37 +130,36 @@ void Powerplant::fSimulatePowerplant ( void ) {
       _maximumPressureInExchanger = 0.0;
     }
     _maximumPressureInReceiver = 0.0;
-    _yieldPressureReceiver  = _moltenSaltLoop->compute_CR_YieldPressure();
-    _yieldPressureExchanger = _moltenSaltLoop->compute_SG_YieldPressure();
-
+    _yieldPressureReceiver     = _moltenSaltLoop->compute_CR_YieldPressure();
+    _yieldPressureExchanger    = _moltenSaltLoop->compute_SG_YieldPressure();
+    
     double tmp_sum  = 0.0;
     int    tmp_size = 0;
     
     double thermalPowerNeeded, turbineThermalPower, steamRate;
     int    imax = _time.get_sizeOfIncrements() * 60;
-    
+   
     for ( int j = 0; j < _time.get_numberOfIncrements(); ++j ) {
-
+      
       for ( int i = 0; i < imax; ++i ) {
-
-	turbineThermalPower = _powerblock->fComputeRequiredThermalEnergy(_demand[j]);	
-	steamRate = fComputeSteamRate(turbineThermalPower);
-
-	thermalPowerNeeded = fComputeThermalEnergy(steamRate);
 	
-	_powerblock->add_requiredThermalPower(thermalPowerNeeded);
-
-	_moltenSaltLoop->fOperateCycle (1, _heliostatFieldPowerOutput[j], thermalPowerNeeded );
-    
+	turbineThermalPower = _powerblock->fComputeRequiredThermalEnergy(_demand[j]);
+	steamRate           = fComputeSteamRate(turbineThermalPower);
+	thermalPowerNeeded  = fComputeThermalEnergy(steamRate);
+	
+	_powerblock->add_requiredThermalPower ( thermalPowerNeeded );
+	  
+	_moltenSaltLoop->fOperateCycle ( 1, _heliostatFieldPowerOutput[j], thermalPowerNeeded, low_fid );
+	
 	if (_heliostatFieldPowerOutput[j] > 0 && _heliostatsFieldModel == 1)
-	  _heliostatsFieldPar.push_back(55.0 * _heliostatsField->get_nb_heliostats());
+	  _heliostatsFieldPar.push_back ( 55.0 * _heliostatsField->get_nb_heliostats() );
 	else
-	  _heliostatsFieldPar.push_back(0.0);
-	    
+	  _heliostatsFieldPar.push_back ( 0.0 );
+
 	if ( _moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow() > 0.0 ) {
 
 	  // filling powerplant power output vector
-	  _powerplantPowerOutput.push_back(_powerblock->get_Pout());
+	  _powerplantPowerOutput.push_back ( _powerblock->get_Pout() );
 		
 	  // filling demand compliance vector
 	  if ( _powerplantPowerOutput.back() >= _demand[j] && _demand[j] > 0.0 ) {   
@@ -173,34 +172,34 @@ void Powerplant::fSimulatePowerplant ( void ) {
 	  }
 	}
 	else {
-	  _powerplantPowerOutput.push_back(0.0);
+	  _powerplantPowerOutput.push_back ( 0.0 );
 	  if ( _demand[j] > 0.0 )
 	    ++tmp_size;
 	}
-	    
+
 	// recording pressure in receiver tubes
-	_receiverPumpHead.push_back(_moltenSaltLoop->compute_CR_PressureInTubes());
+	_receiverPumpHead.push_back ( _moltenSaltLoop->compute_CR_PressureInTubes() );
 	_receiverPumpHead.back() > _maximumPressureInReceiver ? _maximumPressureInReceiver = _receiverPumpHead.back() : 1;
 	
 	if ( _moltenSaltLoop->get_exchangerModel() == 2 ) {
 
-	  //recording pressure in steam generator tubes
+	  // recording pressure in steam generator tubes
 	  _pressureTubesSide.push_back(_moltenSaltLoop->compute_SG_PressureInTubes(steamRate));
 	  
-	  //recording pressure in steam generator shell
+	  // recording pressure in steam generator shell
 	  _pressureShellSide.push_back(_moltenSaltLoop->computePressureInShells());
 	  
 	  _pressureTubesSide.back() + _powerblock->get_pressure() > _maximumPressureInExchanger ?
 	    _maximumPressureInExchanger = _pressureTubesSide.back() : 1;
 	}
 	
-	//recording molten salt flows to receiver and exchanger
-	_receiverOutletFlow.push_back(_moltenSaltLoop->get_centralReceiverOutlet().get_massFlow());
-	_msRateSteamGen.push_back(_moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow());
+	// recording molten salt flows to receiver and exchanger
+	_receiverOutletFlow.push_back ( _moltenSaltLoop->get_centralReceiverOutlet().get_massFlow() );
+	_msRateSteamGen.push_back     ( _moltenSaltLoop->get_steamGeneratorOutlet().get_massFlow()  );
 	
-	//recording steam rate
-	_steamRate.push_back(steamRate);
-      }
+	// recording steam rate
+	_steamRate.push_back ( steamRate );
+      }     
     }
     
     if ( tmp_size == 0 )
@@ -270,7 +269,7 @@ double Powerplant::fComputeParasiticLosses ( void ) const {
 
   double W_rec = std::inner_product(_receiverPumpHead.begin(), _receiverPumpHead.end(),
 				    _receiverOutletFlow.begin(), 0.0) / MS_DENSITY;
-
+ 
   double W_shell = std::inner_product(_pressureShellSide.begin(), _pressureShellSide.end(),
 				      _msRateSteamGen.begin(), 0.0) / MS_DENSITY;
 
@@ -285,7 +284,7 @@ double Powerplant::fComputeParasiticLosses ( void ) const {
   foncteurSum9 sumQ_helios(&Q_helios);
   std::for_each(_heliostatsFieldPar.begin(), _heliostatsFieldPar.end(),
 		sumQ_helios);
-
+  
   return W_rec + W_shell + W_steam + Q_heat + Q_helios;
 }
 
@@ -327,7 +326,7 @@ double Powerplant::fComputeParasiticsForPb9 ( void ) const {
 }
 
 /*--------------------------------------------------------------*/
-/*                          For solar6                          */
+/*                    For solar6 and solar10                    */
 /*--------------------------------------------------------------*/
 bool Powerplant::set_heliostatFieldPowerOutput_MINCOST_TS ( void ) {
   

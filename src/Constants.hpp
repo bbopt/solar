@@ -220,5 +220,4 @@ const double PI = 3.14159265358979323846264338327950;
 #define SST900_CONDENSE false
 #define SST900_REHEAT true
 
-
 #endif

@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.5.1              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.5.2              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2022-07-08                                                                   */
+/*  2023-01-13                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -23,10 +23,24 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
+/*                                                                               */
+/* Best known values for single-objective instances                              */
+/* (one replication, full fidelity, default seed of zero):                       */
+/*                                                                               */
+/* SOLAR1    -902,503.692418                                                     */
+/* SOLAR2     987,823.606284                                                     */
+/* SOLAR3  77,486,732.8425                                                       */
+/* SOLAR4 108,197,236.146                                                        */
+/* SOLAR5         -28.8817193932                                                 */
+/* SOLAR6  44,298,455.5682                                                       */
+/* SOLAR7      -4,939.4070342                                                    */
+/* SOLAR10         42.905683                                                     */
+/*                                                                               */
+/*-------------------------------------------------------------------------------*/
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.5.1, 2022-07-08";
+const std::string VERSION = "0.5.2, 2023-01-13";
 
 // validation functions:
 bool check ( bool fast );
@@ -126,7 +140,7 @@ int main ( int argc , char ** argv ) {
     return 1;
   }
  
-  // Random seed:
+  // random seed:
   bool change_seed = false;
   if ( seed < 0 ) {
     change_seed = true;
@@ -189,22 +203,49 @@ int main ( int argc , char ** argv ) {
     
     // evaluation(s):
     if ( !evaluator.eval_x ( i, seed, fidelity, replications , simulation_completed, cnt_eval, err_msg, verbose ) ) {
-      std::cerr << err_msg << std::endl;
+
       error = true;
+      
+      // displays:
+      if ( verbose && !err_msg.empty()) {
+	std::cout << err_msg << std::endl;
+	std::cout << std::endl
+		  << "Simulation completed: " << simulation_completed   << std::endl
+		  << "Count evaluation    : " << cnt_eval               << std::endl
+		  << "CPU time            : " << clock2.get_CPU_time()  << std::endl
+		  << "real time           : " << clock2.get_real_time() << std::endl;
+	if ( evaluator.has_intermediate_outputs() ) {
+	  std::cout << "intermediate outputs: ";
+	  evaluator.display_intermediate_outputs();
+	  std::cout << std::endl;
+	}
+	std::cout << "Outputs             : ";
+      }
+
+      // should display only infinite values:
+      evaluator.display_outputs();
+      std::cout << std::endl;
+      
       continue;
     }
-
+  
     // displays:
-    if ( verbose && !err_msg.empty())
-      std::cout << err_msg << std::endl;
+    if ( verbose && !err_msg.empty() )
+      std::cout << "\n" << err_msg << std::endl;
     
-    if ( verbose )
+    if ( verbose ) {
       std::cout << std::endl
 		<< "Simulation completed: " << simulation_completed   << std::endl
 		<< "Count evaluation    : " << cnt_eval               << std::endl
 		<< "CPU time            : " << clock2.get_CPU_time()  << std::endl
-		<< "real time           : " << clock2.get_real_time() << std::endl
-		<< "Outputs             : ";
+		<< "real time           : " << clock2.get_real_time() << std::endl;
+      if ( evaluator.has_intermediate_outputs() ) {
+	std::cout << "intermediate outputs: ";
+	evaluator.display_intermediate_outputs();
+	std::cout << std::endl;
+      }
+      std::cout << "Outputs             : ";
+    }
     evaluator.display_outputs();
     std::cout << std::endl;
   }
@@ -342,13 +383,13 @@ bool check_eval ( const std::string & pb_id        ,
       chk = true;
     }
     else {
-      chk = false;
+      chk    = false;
       error += "Error with " + pb_id + ":\n" +
 	"\tOutput  : " + oss.str() + "\n\tExpected: " + expected + "\n";
     }
   }
   else {
-    chk = false;
+    chk    = false;
     error += "Error with " + pb_id + ":\n\t" + err_msg + "\n";
   }
   
@@ -404,7 +445,7 @@ bool check ( bool fast ) {
   // ------------------
   {
 
-    int nb_eval_tests = 23;
+    int nb_eval_tests = 26;
     std::string expected_output;
       
     // tests for SOLAR1:
@@ -426,7 +467,7 @@ bool check ( bool fast ) {
       std::cout << "\tEval test ( 2/" << nb_eval_tests << ") ..." << std::flush;
       double x[9] = { 14.972466423, 13.2463292833, 109.7450505, 15.35568477,
     		      12.167043, 328, 81.23243276, 1.1838879569, 7.11915913 };
-      expected_output = "-536680.901352 -425.8820987 -1108498.72275 -79.800117654 -5.9352711731 0";
+      expected_output = "-536680.901352 -425.8820987 -1108498.72275 -79.800117654 -5.9352711731 0";     
       if ( check_eval ( "SOLAR1", 0, 1.0, 1, x, expected_output, error ) )
     	std::cout << "... Ok";
       else {
@@ -561,12 +602,29 @@ bool check ( bool fast ) {
     	chk = false;
       }
       std::cout << " \tTime: CPU=" << clock2.get_CPU_time() << " \treal=" << clock2.get_real_time() << std::endl;
+    }
+
+    {
+      clock2.reset();
+      std::cout << "\tEval test (11/" << nb_eval_tests << ") ..." << std::flush;
+      double x[20] = { 14, 13, 150, 15, 14, 260, 64, 1.5, 4, 910, 29, 9, 0.01, 0.01, 650, 56, 3.97, 0.0143, 0.1, 2 };
+
+      expected_output =
+    	"93179363.113 -454424.808105 100 -122 -2.5 0 -451010886.47 -415 -146.77014 -155 -0.0857 -16.3911485751 -107 0";
+      
+      if ( check_eval ( "SOLAR3", 33, 0.27, 1, x, expected_output, error ) )
+    	std::cout << "... Ok";
+      else {
+    	std::cout << "... Fail";
+    	chk = false;
+      }
+      std::cout << " \tTime: CPU=" << clock2.get_CPU_time() << " \treal=" << clock2.get_real_time() << std::endl;
     }  
     
     // tests for SOLAR4:
     {
       clock2.reset();
-      std::cout << "\tEval test (11/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (12/" << nb_eval_tests << ") ..." << std::flush;
       double x[29] = { 9, 9, 150, 6, 8, 1000, 45, 0.5, 5, 900, 9, 9, 0.3, 0.2, 560, 500, 0.3, 0.0165, 0.018, 0.017, 10, 0.0155, 0.016, 0.2, 3, 12000, 1, 2, 2 };
       expected_output =
     	"78622308.4162 -1562631.39776 84.4142857143 -132 -4.5 3 -203757427.579 -386.09689 -63.656929 -65 -0.0015 -3.56637061436 -97 -0.1486950791 -0.001 -0.0005 -9206349.20635";
@@ -580,7 +638,7 @@ bool check ( bool fast ) {
     }
     {
       clock2.reset();
-      std::cout << "\tEval test (12/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (13/" << nb_eval_tests << ") ..." << std::flush;
       double x[29] = { 4.796025798, 7.853658908, 125.7281067, 5.447879269, 7.141820154, 978, 44.821162, 1.497980897,
     		       7.039382352, 984.4806143, 8.587450041, 10.59030397, 0.1330657894, 0.0192747504, 649.9999406,
     		       295, 0.4625754212, 0.006425283473, 0.01258886031, 0.01946272908, 4.107100165, 0.00512445631,
@@ -599,7 +657,7 @@ bool check ( bool fast ) {
     // tests for SOLAR5:
     if ( !fast) {
       clock2.reset();
-      std::cout << "\tEval test (13/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (14/" << nb_eval_tests << ") ..." << std::flush;
       double x[20] = { 847.015, 27.2039, 29.9981, 1.231, 0.0101, 650, 23, 0.2211, 0.026504, 0.037583, 0.045, 9.38, 0.010004, 0.0209, 0.204, 2, 54700, 3, 1, 2 };      
       expected_output =
      	"-28.8817193932 -26173.114929 -192920008.529 -344.9493 -28.349607 -0.08269015 -0.011079 -8.56036896077 -44.015 -0.0430727657 -0.0241 -0.010896 -204459343.324";
@@ -614,7 +672,7 @@ bool check ( bool fast ) {
     
     if ( !fast ) {
       clock2.reset();
-      std::cout << "\tEval test (14/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (15/" << nb_eval_tests << ") ..." << std::flush;
       double x[20] = { 900, 10, 12, 0.15, 0.1, 560, 24, 0.35, 0.02, 0.023, 0.05, 8, 0.02, 0.023, 0.2, 2, 5000, 5, 5, 1 };
       expected_output =
     	"-30.0614936989 -68427260.159 3469782.67137 -343.36191 0 136.36512 -0.003 -8.87277796077 -97 1.383897976 -0.027 -0.003 -40342363.2245";
@@ -630,7 +688,7 @@ bool check ( bool fast ) {
     // tests for SOLAR6:
     {
       clock2.reset();
-      std::cout << "\tEval test (15/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (16/" << nb_eval_tests << ") ..." << std::flush;
       double x[5] = { 900, 10, 12, 0.2, 0.2 };
       expected_output =
     	"4136232.10319 41.5648148148 -90697638.1288 -368.75421 -34.73144 -87 44.99652957";
@@ -644,7 +702,7 @@ bool check ( bool fast ) {
     }
     if ( !fast ) {
       clock2.reset();
-      std::cout << "\tEval test (16/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (17/" << nb_eval_tests << ") ..." << std::flush;
       double x[5] = { 994.947, 46.1, 21.8312, 0.01, 0.01 };
       expected_output =
     	"44298455.5682 0 -81139035.9655 -451.54499 -31.908255 -181.947 -13.8870143";
@@ -658,7 +716,7 @@ bool check ( bool fast ) {
     }
     if ( !fast ) {
       clock2.reset();
-      std::cout << "\tEval test (17/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (18/" << nb_eval_tests << ") ..." << std::flush;
       double x[5] = { 994.84699999999998, 46.090000000000003, 21.841200000000004, 0.01, 0.11 };
       expected_output =
     	"46257817.4945 0 -81103180.0025 -451.4926 -31.908287 -181.847 -13.90461209";
@@ -672,7 +730,7 @@ bool check ( bool fast ) {
     }
     if ( !fast ) {
       clock2.reset();
-      std::cout << "\tEval test (18/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (19/" << nb_eval_tests << ") ..." << std::flush;
       double x[5] = { 994.847, 46.09, 21.8412, 0.01, 0.11 };
       expected_output =
     	"46257817.4945 0 -81103180.0025 -451.4926 -31.908287 -181.847 -13.90461209";
@@ -687,7 +745,7 @@ bool check ( bool fast ) {
     // tests for SOLAR7:
     {
       clock2.reset();
-      std::cout << "\tEval test (19/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (20/" << nb_eval_tests << ") ..." << std::flush;
       double x[7] = { 7, 7, 850, 40, 0.2, 0.01, 0.011 };
       expected_output =
     	"-2768.29493993 -30016849.1891 5656779685 -0.001 -47 -10.5555742876 6.491331149";
@@ -702,7 +760,7 @@ bool check ( bool fast ) {
 
     {
       clock2.reset();
-      std::cout << "\tEval test (20/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (21/" << nb_eval_tests << ") ..." << std::flush;
       double x[7] = { 11.118612, 14.0293, 922.245, 403, 2.704774, 0.02526764, 0.02948456 };
       expected_output =
     	"-4939.4070342 -22502463.2016 -212401980.756 -0.00421692 -119.245 -10.1548952275 -0.02886186514";
@@ -718,7 +776,7 @@ bool check ( bool fast ) {
     // tests for SOLAR8:
     {
       clock2.reset();
-      std::cout << "\tEval test (21/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (22/" << nb_eval_tests << ") ..." << std::flush;
       double x[13] = { 11, 11, 200, 10, 10, 2650, 89, 0.5, 8, 36, 0.3, 0.02, 0.0216 };
       expected_output =
     	"-4.63128915645e+12 124663605.86 -38975.2625989 -178 -7.5 0 460968232.465 -0.0016 -14.9303632679 -3.19128915645e+12 0.5478427658";
@@ -734,7 +792,7 @@ bool check ( bool fast ) {
     // tests for SOLAR9:
     {
       clock2.reset();
-      std::cout << "\tEval test (22/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (23/" << nb_eval_tests << ") ..." << std::flush;
       double x[29] = { 9, 9, 150, 6, 8, 1000, 45, 0.5, 5, 900, 9, 9, 0.3, 0.2, 560, 50, 0.3, 0.0165, 0.018, 0.017, 10, 0.0155, 0.016, 0.2, 2, 12000, 1, 2, 2 };
       expected_output =
     	"1e+20 1e+20 1e+20 1e+20 -4562631.39776 -132 -4.5 1e+20 1e+20 1e+20 1e+20 1e+20 -0.0015 -11.6663706144 1e+20 1e+20 -0.001 -0.0005 1e+20";
@@ -748,7 +806,7 @@ bool check ( bool fast ) {
     }
     {
       clock2.reset();
-      std::cout << "\tEval test (23/" << nb_eval_tests << ") ..." << std::flush;
+      std::cout << "\tEval test (24/" << nb_eval_tests << ") ..." << std::flush;
       double x[29] = { 10.41264945, 9.891229103, 118.7647519, 10.66521456, 11.24343755, 788, 68.3347142, 0.5023836989, 9.091052143, 934.0300707,
     		       22.53631097, 10.24318735, 0.06012616095, 0.01003464624, 649.9997812, 332, 3.670187562, 0.01526149657, 0.02659821692,
     		       0.01829685361, 7.568243894, 0.006819263246, 0.01705667356, 0.399353877, 11, 3390, 2, 5, 3 };
@@ -762,7 +820,36 @@ bool check ( bool fast ) {
     	chk = false;
       }
       std::cout << " \tTime: CPU=" << clock2.get_CPU_time() << " \treal=" << clock2.get_real_time() << std::endl;
-    }  
+    }
+
+    // tests for SOLAR10:
+    {     
+      clock2.reset();
+      std::cout << "\tEval test (25/" << nb_eval_tests << ") ..." << std::flush;
+      double x[5] = { 883.41, 23.63, 29.26, 1.81, 0.01 };
+      expected_output = "93.557882";
+      if ( check_eval ( "SOLAR10", 0, 1.0, 1, x, expected_output, error ) )
+    	std::cout << "... Ok";
+      else {
+    	std::cout << "... Fail";
+    	chk = false;
+      }
+      std::cout << " \tTime: CPU=" << clock2.get_CPU_time() << " \treal=" << clock2.get_real_time() << std::endl;
+    }
+
+    {     
+      clock2.reset();
+      std::cout << "\tEval test (26/" << nb_eval_tests << ") ..." << std::flush;
+      double x[5] = { 995, 50, 20.48, 0.02, 0.01 };
+      expected_output = "42.488721";
+      if ( check_eval ( "SOLAR10", 0, 0.65, 1, x, expected_output, error ) )
+    	std::cout << "... Ok";
+      else {
+    	std::cout << "... Fail";
+    	chk = false;
+      }
+      std::cout << " \tTime: CPU=" << clock2.get_CPU_time() << " \treal=" << clock2.get_real_time() << std::endl;
+    }   
   
   } // end of validation tests
 

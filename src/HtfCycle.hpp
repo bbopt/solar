@@ -120,7 +120,10 @@ public:
   
   void initiateColdStorage ( void );
   void setStorage          ( double, double, double );
-  void fOperateCycle       ( int, double, double );
+  void fOperateCycle       ( int    timeInSeconds       ,
+			     double energyFromField     ,
+			     double requiredPowerOutput ,
+			     bool   low_fid               );
 
 };
 

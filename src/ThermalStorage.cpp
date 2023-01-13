@@ -142,8 +142,8 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 
   try {
 
-    while (fabs(q_wet_2 - q_wet_1) / q_wet_2 > 0.001 && count < 150) {
-
+    while ( fabs(q_wet_2 - q_wet_1) / q_wet_2 > 0.001 && count < 150 ) {
+      
       q_wet_1 = q_wet_2;
       
       T_surf_wet = fSolveForT(k_rad_wet, k_conv_wet, T, T_ATM, q_wet_1, 0.01);
@@ -243,13 +243,13 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
   bool   enabler = false;
   
   if ( H_dry > 0.01 ) {
-
+    
     T_i_t_1 = T - 5.0;
     T_i_w_1 = T - 5.0;
     T_i_t_2 = 0.0;
     T_i_w_2 = 0.0;
     
-    //calculating convection coefficient for top surface
+    // calculating convection coefficient for top surface
     Re_top = WIND_VELOCITY * (_diameterOfStorage + t_ss + t_insul) / AIR_VISCOSITY;
     if (Re_top <= 5.0 * pow(10.0, 5.0))
       Nu_top = 0.664*pow(Re_top, 1.0 / 2.0)*pow(Pr, 1.0 / 3.0);
@@ -324,11 +324,14 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
     inv21 = adj21 / det_A; inv22 = adj22 / det_A; inv23 = adj23 / det_A;
     inv31 = adj31 / det_A; inv32 = adj32 / det_A; inv33 = adj33 / det_A;
     
-    try{
+    try {
       count = 0;
+
+      
       while ( fabs(T_i_t_2 - T_i_t_1) / T_i_t_1 >= 0.001 ||
 	      fabs(T_i_w_2 - T_i_w_1) / T_i_w_1 >= 0.001 ||
 	      enabler != true ) {
+
 	enabler = true;
 	T_i_t_2 = T_i_t_1;
 	T_i_w_2 = T_i_w_1;
@@ -336,7 +339,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 	// loop for top values
 	count2 = 0;
 	try {
-	  while (fabs(q_t_cond_2 - q_t_cond_1) / q_t_cond_2 > 0.001) {
+	  while ( fabs(q_t_cond_2 - q_t_cond_1) / q_t_cond_2 > 0.001 ) {
 	    q_t_cond_1 = q_t_cond_2;
 	    T_o_t = fSolveForT(k_rad_t, k_conv_t, T_i_t_1, T_ATM, q_t_cond_1, 0.01);
 	    k_insul = k_0 + k_1*(((T_i_t_1 + T_o_t) / 2.) - 273); // W/mK
@@ -360,7 +363,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
 	
 	try {
 	  count2 = 0;
-	  while (fabs(q_w_cond_2 - q_w_cond_1) / q_w_cond_2 > 0.001) {
+	  while ( fabs(q_w_cond_2 - q_w_cond_1) / q_w_cond_2 > 0.001 ) {
 	    q_w_cond_1 = q_w_cond_2;
 	    T_o_w = fSolveForT(k_rad_w, k_conv_w, T_i_w_1, T_ATM, q_w_cond_1, 0.01);
 	    k_insul = k_0 + k_1*(((T_i_w_1 + T_o_w) / 2.) - 273); // W/mK
@@ -467,7 +470,7 @@ double ThermalStorage::fComputeEnergyLosses ( double T, double H ) {
     
     try {
       count2 = 0;
-      while (fabs(q_t_cond_2 - q_t_cond_1) / q_t_cond_2 > 0.001) {
+      while ( fabs(q_t_cond_2 - q_t_cond_1) / q_t_cond_2 > 0.001 ) {
 	q_t_cond_1 = q_t_cond_2;
 	T_o_t = fSolveForT(k_rad_t, k_conv_t, T, T_ATM, q_t_cond_1, 0.01);
 	k_insul = k_0 + k_1*(((T_o_t + T) / 2.) - 273); // W/mK
@@ -538,12 +541,12 @@ double ThermalStorage::fInitialStorageTemperature(int timeInterval) const {
 /*-----------------------------------------------------------------------------------------*/
 /*  This function solves the typical k1*T^4 + k2*T - q = 0 equation using Newton's method  */
 /*-----------------------------------------------------------------------------------------*/
-double ThermalStorage::fSolveForT ( double coef_T4,
-				    double coef_T ,
-				    double T_max  ,
-				    double T_min  ,
-				    double q      ,
-				    double eps      ) const {
+double ThermalStorage::fSolveForT ( double coef_T4 ,
+				    double coef_T  ,
+				    double T_max   ,
+				    double T_min   ,
+				    double q       ,
+				    double eps       ) const {
   double T_1, T_2;
   double g_k, Dg_k;
   int count = 0;
@@ -551,6 +554,7 @@ double ThermalStorage::fSolveForT ( double coef_T4,
   T_1 = 0.0;
   T_2 = T_max;
   try {
+    
     while ( fabs(T_2 - T_1) > eps && count < 150 ) {
       T_1  = T_2;
       g_k  = coef_T4*pow(T_1, 4.0) + coef_T*T_1 - (q + coef_T4*pow(T_min, 4.0) + coef_T*T_min);
@@ -591,7 +595,7 @@ double ThermalStorage::fSolveForT_i ( double coef_T4 ,
   T_1 = 0.;
   T_2 = T_max;
   
-  if ( q <0.0 )
+  if ( q < 0.0 )
     g1 = 0.0;
 
   while (fabs(T_2 - T_1) > eps) {

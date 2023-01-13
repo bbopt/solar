@@ -86,10 +86,10 @@ public:
 #ifdef _MSC_VER
   virtual ~Simulation_Interruption ( void ) noexcept {}
 #else
-  virtual ~Simulation_Interruption(void) throw() {}
+  virtual ~Simulation_Interruption ( void ) throw() {}
 #endif
 
-  const char * what(void) const throw() { return _what.c_str(); }
+  const char * what ( void ) const throw() { return _what.c_str(); }
 };
 
 #endif

@@ -65,17 +65,17 @@ void HeliostatField::delete_heliostats ( void ) {
   _listOfHeliostats.clear();
 }
 
-/*----------------------------------------------------------------*/
-/*  Determine the coordinates of all potential heliostats within  */
-/*  the boundaries of the field                                   */
-/*----------------------------------------------------------------*/
+/*---------------------------------------------------------*/
+/*  Determine the coordinates of all potential heliostats  */
+/*  within the boundaries of the field                     */
+/*---------------------------------------------------------*/
 void HeliostatField::fComputeStaggeredGridLayout ( void ) {
 
   // initial check: R_min cannot be equal to zero:
-  double R_min = _minDistanceFromTower * _towerHeight;
+  double R_min = _minDistanceFromTower * _towerHeight;  // Hidden constraint: SOLAR1: x3*x8 != 0.0
 
   if ( R_min == 0.0 )
-    throw Simulation_Interruption ( "Simulation could not go through: R_min equal to zero" );
+    throw Simulation_Interruption ( "R_min equal to zero" );
   
   double z_0     = _heliostatLength / 2.0; // heigth of heliostat center from the ground
   double l_m     = _heliostatLength;

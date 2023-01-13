@@ -79,8 +79,8 @@ Scenario::Scenario ( const std::string & problem , double fidelity ) :
   _exchangerNbOfShells              ( 0       ) ,
   _exchangerNbOfPassesPerShell      ( 0       ) ,
   _typeOfTurbine                    ( 0       ) ,
-  _minReceiverOutletTemp            ( 0.0     ) ,
-  _powerplant                       ( NULL    )   {
+  _powerplant                       ( NULL    ) ,
+  _minReceiverOutletTemp            ( 0.0     )   {
 
   // Check fidelity:
   // ---------------
@@ -131,18 +131,23 @@ Scenario::Scenario ( const std::string & problem , double fidelity ) :
   // Problem #9:
   if ( _problem == "MAXNRG_MINPAR" )
     init_maxNrg_minPar ( fidelity );
-     
+
+  // Problem #10:
+  if ( _problem == "MINCOST_UNCONSTRAINED" )
+    init_minCost_unconstrained ( fidelity );
+  
   // Check problem id:
   // -----------------
-  if ( problem != "MAXNRG_H1"     &&    // #1
-       problem != "MINSURF_H1"    &&    // #2
-       problem != "MINCOST_C1"    &&    // #3
-       problem != "MINCOST_C2"    &&    // #4
-       problem != "MAXCOMP_HTF1"  &&    // #5
-       problem != "MINCOST_TS"    &&    // #6
-       problem != "MAXEFF_RE"     &&    // #7
-       problem != "MAXHF_MINCOST" &&    // #8
-       problem != "MAXNRG_MINPAR"    )  // #9
+  if ( problem != "MAXNRG_H1"             &&    // # 1
+       problem != "MINSURF_H1"            &&    // # 2
+       problem != "MINCOST_C1"            &&    // # 3
+       problem != "MINCOST_C2"            &&    // # 4
+       problem != "MAXCOMP_HTF1"          &&    // # 5
+       problem != "MINCOST_TS"            &&    // # 6
+       problem != "MAXEFF_RE"             &&    // # 7
+       problem != "MAXHF_MINCOST"         &&    // # 8
+       problem != "MAXNRG_MINPAR"         &&    // # 9
+       problem != "MINCOST_UNCONSTRAINED"    )  // # 10
     throw std::invalid_argument ( problem + " is not a valid problem ID" );
 }
 
@@ -158,15 +163,16 @@ Scenario::~Scenario ( void ) {
 /*           general set_x function        */
 /*-----------------------------------------*/
 bool Scenario::set_x ( const double * x ) {
-  if ( _problem == "MAXNRG_H1"     ) { return set_x_maxNrg_H1     ( x ); } // #1
-  if ( _problem == "MINSURF_H1"    ) { return set_x_minSurf_H1    ( x ); } // #2
-  if ( _problem == "MINCOST_C1"    ) { return set_x_minCost_C1    ( x ); } // #3
-  if ( _problem == "MINCOST_C2"    ) { return set_x_minCost_C2    ( x ); } // #4
-  if ( _problem == "MAXCOMP_HTF1"  ) { return set_x_maxComp_HTF1  ( x ); } // #5
-  if ( _problem == "MINCOST_TS"    ) { return set_x_minCost_TS    ( x ); } // #6
-  if ( _problem == "MAXEFF_RE"     ) { return set_x_maxEff_RE     ( x ); } // #7
-  if ( _problem == "MAXHF_MINCOST" ) { return set_x_maxHF_minCost ( x ); } // #8
-  if ( _problem == "MAXNRG_MINPAR" ) { return set_x_maxNrg_minPar ( x ); } // #9
+  if ( _problem == "MAXNRG_H1"             ) { return set_x_maxNrg_H1             ( x ); } // # 1
+  if ( _problem == "MINSURF_H1"            ) { return set_x_minSurf_H1            ( x ); } // # 2
+  if ( _problem == "MINCOST_C1"            ) { return set_x_minCost_C1            ( x ); } // # 3
+  if ( _problem == "MINCOST_C2"            ) { return set_x_minCost_C2            ( x ); } // # 4
+  if ( _problem == "MAXCOMP_HTF1"          ) { return set_x_maxComp_HTF1          ( x ); } // # 5
+  if ( _problem == "MINCOST_TS"            ) { return set_x_minCost_TS            ( x ); } // # 6
+  if ( _problem == "MAXEFF_RE"             ) { return set_x_maxEff_RE             ( x ); } // # 7
+  if ( _problem == "MAXHF_MINCOST"         ) { return set_x_maxHF_minCost         ( x ); } // # 8
+  if ( _problem == "MAXNRG_MINPAR"         ) { return set_x_maxNrg_minPar         ( x ); } // # 9
+  if ( _problem == "MINCOST_UNCONSTRAINED" ) { return set_x_minCost_unconstrained ( x ); } // #10
   return false;
 }
 
@@ -211,7 +217,7 @@ bool Scenario::set_x_maxNrg_H1 ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_maxNrg_H1() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
   
   return true;
 }
@@ -287,7 +293,7 @@ bool Scenario::set_x_minSurf_H1 ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_minSurf_H1() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
   return true;
 }
@@ -364,12 +370,12 @@ bool Scenario::set_x_minCost_C1 ( const double * x ) {
 
   // Powerblock:
   if ( !set_typeOfTurbine ( myround(x[19]) ) )
-    throw std::invalid_argument ( "Problem with input file: Type of turbine is not in {1, 2, ..., 8}" );
+    throw std::invalid_argument ( "Problem with input: Type of turbine is not in {1, 2, ..., 8}" );
 
   // check bounds:
   // -------------
   if ( !check_bounds_minCost_C1() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
   
   return true;
 }
@@ -424,7 +430,7 @@ bool Scenario::set_x_minCost_C2 ( const double * x ) {
        !is_int(x[26]) ||
        !is_int(x[27]) ||
        !is_int(x[28])    )
-    throw std::invalid_argument ( "Problem with: One of the discrete variables has a non-integer value" );
+    throw std::invalid_argument ( "Problem with input: One of the discrete variables has a non-integer value" );
  
   // assign variables:
   // -----------------
@@ -468,7 +474,7 @@ bool Scenario::set_x_minCost_C2 ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_minCost_C2() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
   return true;
 }
@@ -556,7 +562,7 @@ bool Scenario::set_x_maxComp_HTF1 ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_maxComp_HTF1() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
   
   return true;
 }
@@ -620,7 +626,7 @@ bool Scenario::set_x_minCost_TS ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_minCost_TS() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
   return true;
 }
@@ -673,7 +679,7 @@ bool Scenario::set_x_maxEff_RE ( const double * x ) {
   // check discrete variables:
   // -------------------------
   if ( !is_int(x[3]) )
-    throw std::invalid_argument ( "Problem with input file: One of the discrete variables has a non-integer value" );
+    throw std::invalid_argument ( "Problem with input: One of the discrete variables has a non-integer value" );
 
   // assign variables:
   // -----------------
@@ -688,7 +694,7 @@ bool Scenario::set_x_maxEff_RE ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_maxEff_RE() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
   return true;
 }
@@ -760,7 +766,7 @@ bool Scenario::set_x_maxHF_minCost ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_maxHF_minCost() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
   return true;
 }
@@ -858,8 +864,77 @@ bool Scenario::set_x_maxNrg_minPar ( const double * x ) {
   // check bounds:
   // -------------
   if ( !check_bounds_maxNrg_H1() )
-    throw std::invalid_argument ( "one of the inputs is outside its bounds" );
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
 
+  return true;
+}
+
+/*-----------------------------------------------------*/
+/*    initialize problem mincost_unconstrained (#10)   */
+/*-----------------------------------------------------*/
+void Scenario::init_minCost_unconstrained ( double fidelity ) {
+  
+  _model_type           = 2; // whole plant
+  _heliostatsFieldModel = 2;
+  _exchangerModel       = 1;
+
+  _latitude                     = 30.05;
+  _day                          = 1;
+  _demandProfile                = 1;
+  _tStart                       =    0;  // 0 * 60
+  _tEnd                         = 1380; // 23 * 60
+  _maximumPowerDemand           = 120e6;
+  _storageStartupCondition      = 50;
+  _fixedPointsPrecision         = 0.001;
+  _cDemandComplianceRatio       = 100.0;
+  _coldMoltenSaltMinTemperature = 530;
+
+  set_typeOfTurbine(7);
+	
+  _heliostatLength          = 9;
+  _heliostatWidth           = 9;
+  _towerHeight              = 250.0;
+  _receiverApertureHeight   = 15;
+  _receiverApertureWidth    = 20;
+  _numberOfHeliostats       = 12232;
+  _fieldAngularWidth        = 65;
+  _minimumDistanceToTower   = 1;
+  _maximumDistanceToTower   = 10.5;
+  _receiverInsulThickness   = 0.5;
+  _receiverNbOfTubes        = 85;
+  _receiverTubesInsideDiam  = 0.033;
+  _receiverTubesOutsideDiam = 0.050;
+
+  // variable fidelity surrogate:
+  // real in ]0;1] --> integer in {1,2,...,60}:
+  _minutesPerTimeIncrement = myround(fidelity*60);
+  if ( _minutesPerTimeIncrement <= 0 )
+    _minutesPerTimeIncrement = 1;
+  if ( fidelity < 1.0 && _minutesPerTimeIncrement==60 )
+    _minutesPerTimeIncrement = 59;
+
+  _numberOfTimeIncrements = 24;
+  _raysPerSquareMeters    = 0.01;  
+}
+
+/*------------------------------------------------------*/
+/*  set inputs for problem mincost_unconstrained (#10)  */
+/*------------------------------------------------------*/
+bool Scenario::set_x_minCost_unconstrained ( const double * x ) {
+
+  // assign variables:
+  // -----------------
+  _centralReceiverOutletTemperature = x[0];
+  _hotStorageHeight                 = x[1];
+  _hotStorageDiameter               = x[2];
+  _hotStorageInsulThickness         = x[3];
+  _coldStorageInsulThickness        = x[4];
+
+  // check bounds:
+  // -------------
+  if ( !check_bounds_minCost_TS() )
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
+  
   return true;
 }
 
@@ -867,43 +942,47 @@ bool Scenario::set_x_maxNrg_minPar ( const double * x ) {
 /*  functions to launch simulation and output   */
 /*  the values according to the problem chosen  */
 /*----------------------------------------------*/
-bool Scenario::simulate ( double * outputs , bool & cnt_eval ) {
+bool Scenario::simulate ( double * outputs, double * intermediate_outputs, double fidelity, bool & cnt_eval ) {
  
   // #1:
   if ( _problem == "MAXNRG_H1" )
-    return simulate_maxNrg_H1 ( outputs , cnt_eval );
+    return simulate_maxNrg_H1 ( outputs, cnt_eval );
   
   // #2:
   if ( _problem == "MINSURF_H1" )
-    return simulate_minSurf_H1 ( outputs , cnt_eval );
+    return simulate_minSurf_H1 ( outputs, cnt_eval );
 
   // #3:
   if ( _problem == "MINCOST_C1" )
-    return simulate_minCost_C1 ( outputs , cnt_eval );
+    return simulate_minCost_C1 ( outputs, cnt_eval );
 
   // #4:
   if ( _problem == "MINCOST_C2" )
-    return simulate_minCost_C2 ( outputs , cnt_eval );
+    return simulate_minCost_C2 ( outputs, cnt_eval );
 
   // #5:
   if ( _problem == "MAXCOMP_HTF1" )
-    return simulate_maxComp_HTF1 ( outputs , cnt_eval );
+    return simulate_maxComp_HTF1 ( outputs, cnt_eval );
 
   // #6:
   if ( _problem == "MINCOST_TS" )
-    return simulate_minCost_TS ( outputs , cnt_eval );
+    return simulate_minCost_TS ( outputs, cnt_eval );
 
   // #7:
   if ( _problem == "MAXEFF_RE" )
-    return simulate_maxEff_RE ( outputs , cnt_eval );
+    return simulate_maxEff_RE ( outputs, cnt_eval );
 
   // #8:
   if ( _problem == "MAXHF_MINCOST" )
-    return simulate_maxHF_minCost ( outputs , cnt_eval );
+    return simulate_maxHF_minCost ( outputs, cnt_eval );
 
   // #9:
   if ( _problem == "MAXNRG_MINPAR" )
-    return simulate_maxNrg_minPar ( outputs , cnt_eval );
+    return simulate_maxNrg_minPar ( outputs, cnt_eval );
+
+  // #10:
+  if ( _problem == "MINCOST_UNCONSTRAINED" )    
+    return simulate_minCost_unconstrained ( outputs, intermediate_outputs, fidelity <  1.0, cnt_eval );
 
   return false;
 }
@@ -932,16 +1011,16 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
 
     // check a priori constraints:
     if ( !check_apriori_constraints_maxNrg_H1() ) {
-      cnt_eval = false;
+      cnt_eval = false;     
       throw std::invalid_argument ( "one of the a priori constraints is violated" );
     }
-      
-    // Creating required objects:
-    construct_maxNrg_H1();
-  
+   
+    // creating required objects:    
+    construct_maxNrg_H1 ( cnt_eval );
+
     // Launching simulation:
-    _powerplant->fSimulatePowerplant();
-  
+    _powerplant->fSimulatePowerplant ( false );
+    
     // Objective function: total energy gathered in kWh:
     outputs[0] = -_powerplant->get_totalEnergyConcentrated();
    
@@ -954,9 +1033,8 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
 
     // c2: check total land area:
     // PI*x3*x3 ( x9*x9 - x8*x8 ) * x7/180 <= 1.95e6
-    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
-      * _fieldAngularWidth / 180.0 - _cFieldSurface;
-    
+    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
+   
     // Check basic geometric requirements (c3, c4):
     outputs[3] = 2 * _heliostatLength - _towerHeight;               // c3: 2*x1-x3 <= 0
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower; // c4: x8 <= x9
@@ -965,20 +1043,20 @@ bool Scenario::simulate_maxNrg_H1 ( double * outputs, bool & cnt_eval ) {
     // c5: x6 <= _powerplant->get_heliostatField()->get_nb_heliostats()
     // _powerplant->get_heliostatField()->get_nb_heliostats() is the number of heliostats generated in the grid
     outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    
   }
-  catch (...) {
+
+  catch ( const std::exception & e ) {
 
     // output a priori constraints:
     
     // c2: check total land area:
     // PI*x3*x3 ( x9*x9 - x8*x8 ) * x7/180 <= 1.95e6
-    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
-      * _fieldAngularWidth / 180.0 - _cFieldSurface;
-    
+    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
     outputs[3] = 2 * _heliostatLength - _towerHeight;               // c3: 2*x1-x3 <= 0
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower; // c4: x8 <= x9
     
-    throw Simulation_Interruption ( "simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   
   return true;
@@ -1014,14 +1092,14 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_minSurf_H1() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
     
     // Creating required objects:
-    construct_minSurf_H1();
+    construct_minSurf_H1 ( cnt_eval );
 
     // Launching simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
 
     // Objective function: field surface (m^2):
     outputs[0] = _fieldAngularWidth * (PI / 180.0) *
@@ -1068,7 +1146,7 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // c13:
     outputs[13] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;        
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
 
     // Old version (bug): Removed in version 0.4.0:
     // outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0)
@@ -1094,7 +1172,7 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // c12: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
     outputs[12] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   
   return true;
@@ -1136,15 +1214,15 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_minCost_C1() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
     
     // creating required objects:
-    construct_minCost_C1();
-
+    construct_minCost_C1 ( cnt_eval );
+  
     // launching simulation:
-    _powerplant->fSimulatePowerplant();
-
+    _powerplant->fSimulatePowerplant ( false );
+    
     // objective function: total investment cost:
     outputs[0] = _powerplant->get_costOfHeliostatField()
       + _powerplant->get_costOfTower()
@@ -1152,11 +1230,10 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
       + _powerplant->get_costOfStorage()
       + _powerplant->get_costOfSteamGenerator()
       + _powerplant->get_costOfPowerblock();
-
+    
     // c1: check total land area is below 800000 m^2:
     // PI * x3 * x3 * ( x9*x9 - x8*x8 ) * x7 / 180 <= 800000 :
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      _fieldAngularWidth / 180.0 - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
     
     // c2: check if compliance to demand is 100%:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
@@ -1191,12 +1268,11 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
     outputs[13] = 1.0*_storageStartupCondition
       - (_powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() / _hotStorageHeight);
   }
-  catch (...) {
-
+  catch ( const std::exception & e ) {
+    
     // output a priori constraints:
     
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      _fieldAngularWidth / 180.0 - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
    
     outputs[3] = 2 * _heliostatLength - _towerHeight;
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
@@ -1204,8 +1280,8 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
     outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     // outputs[12] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;  removed in version 0.4.0
-    
-    throw Simulation_Interruption ( "Simulation could not go through" );
+
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   return true;
 }
@@ -1255,14 +1331,14 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_minCost_C2() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
     
     // Creating required objects:
-    construct_minCost_C2();
+    construct_minCost_C2 ( cnt_eval );
     
     // Launching simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
 
     // Objective function: total investment cost:
     outputs[0] = _powerplant->get_costOfHeliostatField()
@@ -1323,13 +1399,12 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // c16:
     outputs[16] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
 
     // output a priori constraints:
 
     // c1: PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000:
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
     // c3: 2x1-x3 <= 0:
     outputs[3] = 2 * _heliostatLength - _towerHeight;
@@ -1352,7 +1427,7 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // c15: x22 <= x23:
     outputs[15] = _exchangerTubesDin  - _exchangerTubesDout;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   
   return true;
@@ -1394,14 +1469,14 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_maxComp_HTF1() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
 
     // create required objects:
-    construct_maxComp_HTF1();
+    construct_maxComp_HTF1 ( cnt_eval );
 
     // launch simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
 
     // objective function: time for which the demand is met:
     outputs[0] = - _powerplant->get_overallComplianceToDemand();
@@ -1447,7 +1522,7 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
     // c12: pressure in steam gen. tubes do not exceed yield
     outputs[12] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
     
     // output a priori constraints:
 
@@ -1460,7 +1535,7 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
     outputs[10] = _exchangerTubesDout - _exchangerTubesSpacing;
     outputs[11] = _exchangerTubesDin  - _exchangerTubesDout;
    
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   return true;
 }
@@ -1486,14 +1561,14 @@ bool Scenario::simulate_minCost_TS ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_minCost_TS() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the hidden constraints is violated (detected a priori)" );
     }
     
     // create required objects:
-    construct_minCost_TS();
+    construct_minCost_TS ( cnt_eval );
     
     // launch simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
    
     // objective function: cost of storage:
     outputs[0] = _powerplant->get_costOfStorage();
@@ -1516,12 +1591,12 @@ bool Scenario::simulate_minCost_TS ( double * outputs , bool & cnt_eval ) {
       - 100*(_powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() /_hotStorageHeight);
 
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
     
     // c5: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
     // outputs[5] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   
   return true;
@@ -1550,14 +1625,14 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_maxEff_RE() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
     
     // create required objects:
-    construct_maxEff_RE();
+    construct_maxEff_RE ( cnt_eval );
 
     // launch simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
 
     // objective function: absorbed energy:
     double Q_abs = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_storedMass()
@@ -1583,7 +1658,7 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
     // c6: work to drive receiver pump does not exceed 5% of the absorbed energy:
     outputs[6] = ( Q_abs > 0.01 ) ? _powerplant->fComputeParasiticsForPb7() / Q_abs - _cParasitics : 1.0;
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
 
     // ouput a priori constraints:
    
@@ -1594,7 +1669,7 @@ bool Scenario::simulate_maxEff_RE ( double * outputs , bool & cnt_eval ) {
     
     outputs[5] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   return true;
 }
@@ -1632,10 +1707,10 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
     }
     
     // create required objects:
-    construct_maxHF_minCost();
+    construct_maxHF_minCost ( cnt_eval );
     
     // launch simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
 
     // objective function #1: absorbed energy:
     double Q_abs = _powerplant->get_moltenSaltLoop()->get_hotStorage().get_storedMass()
@@ -1678,12 +1753,11 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
     if ( Q_abs > 1.0 )
       outputs[10] = (_powerplant->fComputeParasiticsForPb9() / Q_abs) - _cParasitics;
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
 
     // output a priori constraints:
     
-    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
     outputs[3] = 2 * _heliostatLength - _towerHeight;
     
@@ -1693,7 +1767,7 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
     
     outputs[8] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   return true;
 }
@@ -1743,14 +1817,14 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // check a priori constraints:
     if ( !check_apriori_constraints_maxNrg_H1() ) {
       cnt_eval = false;
-      throw std::invalid_argument ( "one of the a priori constraints is violated" );
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
     }
     
     // create required objects:
-    construct_maxNrg_minPar();
+    construct_maxNrg_minPar ( cnt_eval );
 
     // launch simulation:
-    _powerplant->fSimulatePowerplant();
+    _powerplant->fSimulatePowerplant ( false );
     
     // objective #1: power output (MWe)
     double sum = 1.0;
@@ -1818,7 +1892,7 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // c18:
     outputs[18] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
-  catch (...) {
+  catch ( const std::exception & e ) {
 
     // output a priori constraints:
     
@@ -1844,8 +1918,97 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     outputs[16] = _exchangerTubesDout - _exchangerTubesSpacing;
     outputs[17] = _exchangerTubesDin  - _exchangerTubesDout;
     
-    throw Simulation_Interruption ( "Simulation could not go through" );
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
+  return true;
+}
+
+/*----------------------------------------*/
+/*  simulate_minCost_unconstrained (#10)  */
+/*----------------------------------------*/
+bool Scenario::simulate_minCost_unconstrained ( double * outputs              ,
+						double * intermediate_outputs ,
+						bool     low_fid              ,
+						bool   & cnt_eval               ) {
+ 
+  // x1: _centralReceiverOutletTemperature
+  // x2: _hotStorageHeight
+  // x3: _hotStorageDiameter
+  // x4: _hotStorageInsulThickness
+  // x5: _coldStorageInsulThickness
+
+  if ( !intermediate_outputs ) {
+    cnt_eval = false;
+    return false;
+  }
+  
+  // reset output:
+  outputs[0] = 1e20;
+  for ( int i = 0 ; i < 7 ; ++i )
+    intermediate_outputs[i] = 1e20;
+
+  cnt_eval = true;
+  
+  try {
+
+    // check a priori constraints:
+    if ( !check_apriori_constraints_minCost_unconstrained() ) {
+      cnt_eval = false;
+      throw std::invalid_argument ( "one of the hidden constraints is violated (detected a priori)" );
+    }
+
+    // create required objects:
+    construct_minCost_unconstrained ( cnt_eval );
+   
+    // launch simulation:
+    _powerplant->fSimulatePowerplant ( low_fid );
+    
+    // objective function: cost of storage:
+    intermediate_outputs[0] = _powerplant->get_costOfStorage();
+			    
+    // c1: demand met:
+    double c1 = intermediate_outputs[1] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
+    if ( c1 < 0.0 )
+      c1 = 0.0;
+
+    // c2: pressure in receiver tubes does not exceed yield pressure:
+    double c2 = intermediate_outputs[2] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
+    if ( c2 < 0.0 )
+      c2 = 0.0;
+    
+    // c3 and c4: molten Salt temperature does not drop below the melting point:
+    double c3 = intermediate_outputs[3] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
+    if ( c3 < 0.0 )
+      c3 = 0.0;
+    
+    double c4 = intermediate_outputs[4] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
+    if ( c4 < 0.0 )
+      c4 = 0.0;
+    
+    // c5: central receiver outlet is higher than that required by the turbine:
+    double c5 = intermediate_outputs[5] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
+    if ( c5 < 0.0 )
+      c5 = 0.0;
+    
+    // c6: storage is back to initial conditions:
+    double c6 = intermediate_outputs[6] = 1.0*_storageStartupCondition
+      - 100*(_powerplant->get_moltenSaltLoop()->get_hotStorage().get_heightOfVolumeStored() /_hotStorageHeight);
+    if ( c6 < 0.0 )
+      c6 = 0.0;
+      
+    // Aggregate the original objective (cost) and penalties on the constraints violations (+scaling):
+    outputs[0] =    intermediate_outputs[0]*1e-6 +
+      0.5 * ( pow ( c1     , 2.0 ) +
+	      pow ( c2*2e-6, 2.0 ) +
+	      pow ( c3     , 2.0 ) +
+	      pow ( c4     , 2.0 ) +
+	      pow ( c5     , 2.0 ) +
+	      pow ( c6     , 2.0 )   );
+  }
+  catch ( const std::exception & e ) {
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
+  }
+  
   return true;
 }
 
@@ -2320,10 +2483,8 @@ bool Scenario::check_bounds_minCost_TS ( void ) const {
 /*    check a priori constraints for instance #6   */
 /*-------------------------------------------------*/
 bool Scenario::check_apriori_constraints_minCost_TS ( void ) const {
-
   if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
     return false;
-
   return true;
 }
 
@@ -2575,10 +2736,44 @@ bool Scenario::check_apriori_constraints_maxNrg_minPar ( void ) const {
   return true;
 }
 
+/*-------------------------------------------------------------*/
+/*         validate problem mincost_unconstrained (#10)        */
+/*-------------------------------------------------------------*/
+bool Scenario::check_bounds_minCost_unconstrained ( void ) const {
+ 
+  if ( _centralReceiverOutletTemperature > 995 )
+    return false;
+  
+  if ( _hotStorageHeight < 2 || _hotStorageHeight > 50 )
+    return false;
+  
+  if ( _hotStorageDiameter < 2 || _hotStorageDiameter > 30 )
+    return false;
+  
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
+    return false;
+  
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
+    return false;
+
+  return true;
+}
+
+/*--------------------------------------------------*/
+/*    check a priori constraints for instance #10   */
+/*--------------------------------------------------*/
+bool Scenario::check_apriori_constraints_minCost_unconstrained ( void ) const {
+
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp ) // hidden constraint
+    return false;
+
+  return true;
+}
+
 /*-----------------------------------------------*/
-/*      constructing model components (1/9)      */
+/*      constructing model components (1/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_maxNrg_H1 ( void ) {
+void Scenario::construct_maxNrg_H1 ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -2612,10 +2807,11 @@ void Scenario::construct_maxNrg_H1 ( void ) {
     economics->set_widthOfHeliostats        ( _heliostatWidth         );
     economics->set_exchangerModel           ( _exchangerModel         );
   }
-  catch ( const std::exception & e ) {
-    if ( field      ) delete field;
-    if ( economics  ) delete economics;   
-    throw e;
+  catch ( const std::exception & e ) {   
+    if ( field     ) delete field;
+    if ( economics ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
     
   _powerplant = new Powerplant ( time        ,
@@ -2629,9 +2825,9 @@ void Scenario::construct_maxNrg_H1 ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (2/9)      */
+/*      constructing model components (2/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_minSurf_H1 ( void ) {
+void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -2705,8 +2901,9 @@ void Scenario::construct_minSurf_H1 ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
     
   _powerplant = new Powerplant ( time        ,
@@ -2720,9 +2917,9 @@ void Scenario::construct_minSurf_H1 ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (3/9)      */
+/*      constructing model components (3/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_minCost_C1 ( void ) {
+void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -2793,8 +2990,9 @@ void Scenario::construct_minCost_C1 ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
 
   _powerplant = new Powerplant ( time        ,
@@ -2809,9 +3007,9 @@ void Scenario::construct_minCost_C1 ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (4/9)      */
+/*      constructing model components (4/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_minCost_C2 ( void ) {
+void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -2892,8 +3090,9 @@ void Scenario::construct_minCost_C2 ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
     
   _powerplant = new Powerplant ( time        ,
@@ -2908,9 +3107,9 @@ void Scenario::construct_minCost_C2 ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (5/9)      */
+/*      constructing model components (5/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_maxComp_HTF1 ( void ) {
+void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -2991,11 +3190,12 @@ void Scenario::construct_maxComp_HTF1 ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
        
-  _powerplant = new Powerplant ( time      ,
+  _powerplant = new Powerplant ( time        ,
 				 _model_type ,
 				 field       ,
 				 htfCycle    ,
@@ -3008,14 +3208,15 @@ void Scenario::construct_maxComp_HTF1 ( void ) {
   if  ( !_powerplant->set_heliostatFieldPowerOutput_MAXCOMP_HTF1() ) {
     delete _powerplant;
     _powerplant = NULL;
-    throw Simulation_Interruption ( "error in the construction of the problem" );
+    cnt_eval = false;
+    throw Simulation_Interruption ( "error in the construction of the problem: Powerplant initialization" );
   }
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (6/9)      */
+/*      constructing model components (6/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_minCost_TS ( void ) {
+void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -3075,8 +3276,9 @@ void Scenario::construct_minCost_TS ( void ) {
   catch ( const std::exception & e ) {
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
     
   _powerplant = new Powerplant ( time        ,
@@ -3093,14 +3295,15 @@ void Scenario::construct_minCost_TS ( void ) {
   if  ( !_powerplant->set_heliostatFieldPowerOutput_MINCOST_TS() ) {
     delete _powerplant;
     _powerplant = NULL;
+    cnt_eval = false;
     throw Simulation_Interruption ( "error in the construction of the problem" );
   }
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (7/9)      */
+/*      constructing model components (7/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_maxEff_RE ( void ) {
+void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -3171,8 +3374,9 @@ void Scenario::construct_maxEff_RE ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
     
   _powerplant = new Powerplant ( time      ,
@@ -3188,9 +3392,9 @@ void Scenario::construct_maxEff_RE ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (8/9)      */
+/*      constructing model components (8/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_maxHF_minCost ( void ) {
+void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -3261,8 +3465,9 @@ void Scenario::construct_maxHF_minCost ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
 
   _powerplant = new Powerplant ( time        ,
@@ -3278,9 +3483,9 @@ void Scenario::construct_maxHF_minCost ( void ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (9/9)      */
+/*      constructing model components (9/10)     */
 /*-----------------------------------------------*/
-void Scenario::construct_maxNrg_minPar ( void ) {
+void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
 
   if ( _powerplant ) {
     delete _powerplant;
@@ -3293,10 +3498,10 @@ void Scenario::construct_maxNrg_minPar ( void ) {
   Sun          sun  ( _latitude, time, _day, _raysPerSquareMeters);
   fFillDemandVector();
 
-  HeliostatField* field      = NULL;
-  HtfCycle      * htfCycle   = NULL;
-  Powerblock    * powerblock = NULL;
-  Economics     * economics  = NULL;
+  HeliostatField * field      = NULL;
+  HtfCycle       * htfCycle   = NULL;
+  Powerblock     * powerblock = NULL;
+  Economics      * economics  = NULL;
 
   try {
 
@@ -3361,8 +3566,9 @@ void Scenario::construct_maxNrg_minPar ( void ) {
     if ( field      ) delete field;
     if ( htfCycle   ) delete htfCycle;
     if ( powerblock ) delete powerblock;
-    if ( economics  ) delete economics;   
-    throw e;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
   }
    
   _powerplant = new Powerplant ( time        ,
@@ -3375,6 +3581,93 @@ void Scenario::construct_maxNrg_minPar ( void ) {
   // setting demand vector:
   _powerplant->set_demand         ( _demand               );
   _powerplant->set_heliostatModel ( _heliostatsFieldModel );
+}
+
+/*-----------------------------------------------*/
+/*      constructing model components (10/10)    */
+/*-----------------------------------------------*/
+void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
+
+  if ( _powerplant ) {
+    delete _powerplant;
+    _powerplant = NULL;
+  }
+  
+  _model_type = 2; // whole plant
+
+  Time_Manager time ( _numberOfTimeIncrements, 0, _minutesPerTimeIncrement);
+  Sun          sun  ( _latitude, time, _day, _raysPerSquareMeters);
+  fFillDemandVector();
+
+  HtfCycle       * htfCycle   = NULL;
+  Powerblock     * powerblock = NULL;
+  Economics      * economics  = NULL;
+
+  try {
+    
+    // powerblock model:
+    powerblock = new Powerblock ( _typeOfTurbine );
+
+    // constructing Htf Cycle with desired steam generator model:
+    htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
+			      _hotStorageHeight                 ,
+			      _hotStorageDiameter               ,
+			      _hotStorageInsulThickness         ,
+			      _coldMoltenSaltMinTemperature     ,
+			      powerblock                        ,
+			      _receiverApertureHeight           ,
+			      _receiverApertureWidth            ,
+			      _receiverTubesInsideDiam          ,
+			      _receiverTubesOutsideDiam         ,
+			      _receiverNbOfTubes                ,
+			      _minutesPerTimeIncrement            );
+  
+    htfCycle->setStorage ( _storageStartupCondition               ,
+			   0.98*_centralReceiverOutletTemperature ,
+			   _coldMoltenSaltMinTemperature            );
+
+    // investment cost model:
+    economics = new Economics;
+    economics->set_heightOfTower                  ( _towerHeight                     );
+    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
+    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
+    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
+    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
+    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
+    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_storageDiameter                ( _hotStorageDiameter              );
+    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
+    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
+    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
+    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
+    economics->set_exchangerModel                 ( _exchangerModel                  );
+  }
+  catch ( const std::exception & e ) {
+    if ( htfCycle   ) delete htfCycle;
+    if ( powerblock ) delete powerblock;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
+  }
+    
+  _powerplant = new Powerplant ( time        ,
+				 _model_type ,
+				 NULL        ,
+				 htfCycle    ,
+				 powerblock  ,
+				 economics     );
+
+  // setting demand vector:
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
+
+  if  ( !_powerplant->set_heliostatFieldPowerOutput_MINCOST_TS() ) {
+    delete _powerplant;
+    _powerplant = NULL;
+    cnt_eval    = false;
+    throw Simulation_Interruption ( "error in the construction of the problem" );
+  }
 }
 
 /*-------------------------------------------*/

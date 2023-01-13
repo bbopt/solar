@@ -24,24 +24,41 @@
 #include "helpFunctions.hpp"
 
 /*-----------------------------------------------------------*/
+/*                  display best known values                */
+/*-----------------------------------------------------------*/
+void display_best_solutions ( std::ostream & out ) {
+  out << "\tSOLAR1 \t-902,503.692418" << std::endl
+      << "\tSOLAR2 \t987,823.606284"  << std::endl
+      << "\tSOLAR3 \t77,486,732.8425" << std::endl
+      << "\tSOLAR4 \t108,197,236.146" << std::endl
+      << "\tSOLAR5 \t-28.8817193932"  << std::endl
+      << "\tSOLAR6 \t44,298,455.5682" << std::endl
+      << "\tSOLAR7 \t-4,939.4070342"  << std::endl
+      << "\tSOLAR10\t42.905683"       << std::endl;
+}
+
+/*-----------------------------------------------------------*/
 /*                   display list of problems                */
 /*-----------------------------------------------------------*/
 void display_problems ( std::ostream & out , const std::vector<Problem> & problems ) {
 
-  out << "\t#\t" << std::setw(15) << "pb_id"
-      << "\t"    << std::setw(37) << "obj.(f)"
-      << "\t"    << std::setw(15) << "# of objectives(p)"
-      << "\t"    << std::setw(15) << "# of var.(n)"
-      << "\t"    << std::setw(15) << "# of constr.(m)\n\n";
-
-  for ( size_t i = 0 ; i < problems.size() ; ++i )
-    out << "\t" << i+1
-	<< "\t" << std::setw(15) << problems[i].get_pb_id()
-	<< "\t" << std::setw(37) << problems[i].get_f_description()
+  out << "\t#\t"<< std::setw(22) << "pb_id"
+      << "\t"   << std::setw(40) << "obj.(f)"
+      << "\t"   << std::setw(15) << "# of objectives(p)"
+      << "\t"   << std::setw(15) << "# of var.(n)"
+      << "\t"   << std::setw(15) << "# of constr.(m)\n\n";
+ 
+  for ( size_t i = 0 ; i < problems.size() ; ++i ) {
+    std::ostringstream oss;
+    oss << "SOLAR" << i+1;
+    out << "\t" << oss.str()
+	<< "\t" << std::setw(22) << problems[i].get_pb_id()
+	<< "\t" << std::setw(40) << problems[i].get_f_description()
       	<< "\t" << std::setw(15) << problems[i].get_p()
 	<< "\t" << std::setw(15) << problems[i].get_n()
       	<< "\t" << std::setw(15) << problems[i].get_m()
 	<< std::endl;
+  }
 }
 
 /*-----------------------------------------------------------*/
@@ -94,7 +111,7 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
       << "          The random number generator can be validated by running 'solar -check'\n\n"
       << "     F: Fidelity of the simulator\n"
       << "          Real value in ]0;1]\n"
-      << "          Default: 1.0, which corresponds to the \"true blackbox\", or the \"truth\"\n"
+      << "          Default: 1.0 (full fidelity), which corresponds to the \"true blackbox\", or the \"truth\"\n"
       << "          Any value in ]0;1[ corresponds to a \"static surrogate\" of the truth\n"
       << "          The execution time increases with the fidelity\n"
       << "          A good default static surrogate is -fid=0.5\n\n"
@@ -106,7 +123,12 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
       << "          It is not possible to use R>1 with deterministic instances\n"
       << "\nHelp for a problem: solar pb_id or solar -h pb_id" << std::endl << std::endl
       << "List of problems:" << std::endl << std::endl;
-  display_problems ( out , problems );
+  display_problems       ( out , problems );
+
+  out << std::endl
+      << "Best known values for single-objective instances (one replication, full fidelity, default seed of zero):"
+      << std::endl << std::endl;
+  display_best_solutions ( out );
   out << std::endl;
 }
 
@@ -164,6 +186,10 @@ void display_help ( std::ostream               & out      ,
     // #9:
     else if ( pb->get_pb_id() == "MAXNRG_MINPAR" )
       print_maxNrg_minPar ( out );
+
+    // #10:
+    else if ( pb->get_pb_id() == "MINCOST_UNCONSTRAINED" )
+      print_minCost_unconstrained ( out );
 
     else {
       out << "Cannot find detailed help for this instance" << std::endl;
@@ -517,7 +543,7 @@ void print_minCost_TS ( std::ostream & out ) {
       << "\tThis instance runs a predetermined power plant using the molten salt cycle and power block models.\n"
       << "\tThe objective is to minimize the cost of the thermal storage units so that the power plant is able\n"
       << "\tto sustain a 120MW electrical power output during 24 hours. Since the heliostat field is not being\n"
-      << "\toptimized, its hourly power output is taken from prerecorded data instead of being simulated.\n"  
+      << "\toptimized, its hourly power output is taken from prerecorded data instead of being simulated\n"
       << "\tDeterministic instance\n"
       << "\tFidelity cannot be changed (must be 100%)\n"
       << std::endl;
@@ -738,4 +764,46 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0   1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
       << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl   
       << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0   - 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
+}
+
+/*--------------  #10 -------------------------------------*/
+void print_minCost_unconstrained ( std::ostream & out ) {
+/*---------------------------------------------------------*/
+
+  out << "\n-----------------------------------------------------------------\n"
+      << "Parameters:\n"
+      << "\tWhole plant\n"
+      << "\tLatitude: 30.05 deg N\n"
+      << "\tDay: January 1st\n"  // https://www.epochconverter.com/days/2019
+      << "\tDuration: 24 hours\n"
+      << "\tDemand: 120MW\n"
+      << "\tMust provide 100% of the demand requirement\n"
+      << "\tNumber of heliostats to fit in the field: 12,232\n"
+      << "\tDeterministic instance\n"
+      << "\tThis instance is the unconstrained version of instance #6\n"
+      << std::endl;
+
+  out << "Objective (first output)\n"
+      << "\tMinimize the cost of storage + penalties on the 6 constraints of Instance #6:\n"
+      << "\tUnconstrained objective = 1E-6 f + 0.5 ( (c1+)^2 + (2E-6 c2+)^2 + (c3+)^2 + (c4+)^2 + (c5+)^2 + (c6+)^2 )\n"
+      << "\twith f, c1, c2, ..., c6 the outputs of Instance #6 and cj+ = max{0,cj}, j=1,2,...,6\n"
+      << std::endl;
+
+  out << "Variables:\n"
+      << "\tHeat transfer loop:\n"
+      << "\t\tx1: Receiver outlet temperature (K)      : Real in [793;995]\n"
+      << "\t\tx2: Hot storage height   (m)             : Real in [2;50]\n"
+      << "\t\tx3: Hot storage diameter (m)             : Real in [2;30]\n"
+      << "\t\tx4: Hot storage insulation thickness  (m): Real in [0.01;5]\n"
+      << "\t\tx5: Cold storage insulation thickness (m): Real in [0.01;5]\n"
+      << std::endl
+      << "\n----------------------------------------------------------------- \n"
+      << "NOMAD parameters:\n\n"
+      << "\tDIMENSION        " << 5 << std::endl
+      << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $10" << std::endl
+      << "\tBB_OUTPUT_TYPE   " << "OBJ" << std::endl
+      << "\tBB_INPUT_TYPE    " << "(     R    R    R    R    R )" << std::endl
+      << "\tLOWER_BOUND      " << "( 793.0  2.0  2.0 0.01 0.01 )" << std::endl
+      << "\tX0               " << "( 900.0 10.0 12.0 0.20 0.20 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 995.0 50.0 30.0 5.00 5.00 )" << std::endl;
 }

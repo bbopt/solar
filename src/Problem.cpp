@@ -74,6 +74,10 @@ bool Problem::is_stochastic ( int output_index ) const {
 	 output_index ==  8 || output_index ==  9 || output_index == 10 || output_index == 11 ||
 	 output_index == 15 ) )
     return true;
+
+  // SOLAR10: Deterministic
+  if ( _pb_id == "MINCOST_UNCONSTRAINED" )
+    return false;
   
   return false;
 }
@@ -84,15 +88,16 @@ bool Problem::is_stochastic ( int output_index ) const {
 void create_problems ( std::vector<Problem> & problems ) {
 
   // pb_id, f, n, m
-  problems.push_back ( Problem ( "MAXNRG_H1"    , "total solar energy on the receiver"   , 1, 1,  9,  5 ) ); // #1
-  problems.push_back ( Problem ( "MINSURF_H1"   , "total heliostats field surface"       , 2, 1, 14, 13 ) ); // #2
-  problems.push_back ( Problem ( "MINCOST_C1"   , "total investment cost"                , 3, 1, 20, 13 ) ); // #3
-  problems.push_back ( Problem ( "MINCOST_C2"   , "total investment cost"                , 4, 1, 29, 16 ) ); // #4
-  problems.push_back ( Problem ( "MAXCOMP_HTF1" , "compliance to a demand profile"       , 5, 1, 20, 12 ) ); // #5
-  problems.push_back ( Problem ( "MINCOST_TS"   , "cost of storage"                      , 6, 1,  5,  6 ) ); // #6
-  problems.push_back ( Problem ( "MAXEFF_RE"    , "receiver efficiency"                  , 7, 1,  7,  6 ) ); // #7
-  problems.push_back ( Problem ( "MAXHF_MINCOST", "heliostat field performance and cost" , 8, 2, 13,  9 ) ); // #8
-  problems.push_back ( Problem ( "MAXNRG_MINPAR", "power and losses"                     , 9, 2, 29, 17 ) ); // #9
+  problems.push_back ( Problem ( "MAXNRG_H1"            , "total solar energy on the receiver"   ,  1, 1,  9,  5 ) ); // #1
+  problems.push_back ( Problem ( "MINSURF_H1"           , "total heliostats field surface"       ,  2, 1, 14, 13 ) ); // #2
+  problems.push_back ( Problem ( "MINCOST_C1"           , "total investment cost"                ,  3, 1, 20, 13 ) ); // #3
+  problems.push_back ( Problem ( "MINCOST_C2"           , "total investment cost"                ,  4, 1, 29, 16 ) ); // #4
+  problems.push_back ( Problem ( "MAXCOMP_HTF1"         , "compliance to a demand profile"       ,  5, 1, 20, 12 ) ); // #5
+  problems.push_back ( Problem ( "MINCOST_TS"           , "cost of storage"                      ,  6, 1,  5,  6 ) ); // #6
+  problems.push_back ( Problem ( "MAXEFF_RE"            , "receiver efficiency"                  ,  7, 1,  7,  6 ) ); // #7
+  problems.push_back ( Problem ( "MAXHF_MINCOST"        , "heliostat field performance and cost" ,  8, 2, 13,  9 ) ); // #8
+  problems.push_back ( Problem ( "MAXNRG_MINPAR"        , "power and losses"                     ,  9, 2, 29, 17 ) ); // #9
+  problems.push_back ( Problem ( "MINCOST_UNCONSTRAINED", "cost of storage + penalties"          , 10, 1,  5,  0 ) ); // #10
 }
 
 /*---------------------------------------------------------*/

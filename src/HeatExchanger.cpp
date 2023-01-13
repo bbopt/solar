@@ -125,7 +125,7 @@ HeatExchanger::HeatExchanger ( MoltenSalt * input          ,
   _shellWidth = 2 * (u*R_H + (1 - u)*r_H);
 
   if (_baffleSpacing / _shellWidth < 0.2 || _baffleSpacing / _shellWidth > 1.0)
-    throw std::invalid_argument ("_baffleSpacing inappropriate value for this shell diameter");
+    throw std::invalid_argument ("inappropriate value for shell diameter");
 
   _shellCrossSection = PI*pow(_shellWidth / 2.0, 2.0);
   _longitudinalPitch = _tubesSpacing * sin(PI / 3.0);
@@ -140,6 +140,10 @@ HeatExchanger::HeatExchanger ( MoltenSalt * input          ,
   //cross flow section properties
   _crossFlowRows = myround(ceil((1.0 - 2.0 * _baffleCut)*_totalRows));
   _L_E = (_tubesSpacing - _tubesDout) * (_crossFlowRows + 1.0);
+
+  // Hidden constraint: if _tubesSpacing == _tubesDout, then _L_E==0.0 will be a problem
+  // It is checked later and it throws an exception  
+    
   //computing window section properties
   _windowAngle = 2 * acos(1 - 2 * _baffleCut);
   _windowArea_FG = (PI*pow(_shellWidth, 2.0) / 4.0)*(_windowAngle / (2 * PI))
@@ -334,11 +338,13 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
   Q1 = 0.0;
   Del_m = m_dot_ms1;
 
-  try {
-    while ((fabs(Q_to_water - energyOutputRequired) > 1e2
-	    || fabs(m_dot_ms1 - m_dot_ms2)/m_dot_ms1 > 0.001)
-	   && count < 500) {
 
+  
+  try {
+
+    while ( ( fabs(Q_to_water - energyOutputRequired) > 1e2 || fabs(m_dot_ms1 - m_dot_ms2)/m_dot_ms1 > 0.001 )
+	    && count < 500) {
+    
       //Determining C_min and C_max
       m_dot_w * c_w < m_dot_ms1*c_ms ? (C_min = m_dot_w*c_w, C_max = m_dot_ms1*c_ms) :
 	(C_min = m_dot_ms1*c_ms, C_max = m_dot_w*c_w);
@@ -418,16 +424,16 @@ double HeatExchanger::fComputeRequiredMoltenSaltMassFlow ( double energyOutputRe
       Q1 = Q_to_water;
 
       ++count;
-
+      
       if ( count > 20 && m_dot_ms1 > 4.0*maximumFlow )
 	break;
     }
 
     if ( count >= 500 )
-      throw std::range_error ("Error: could not converge on steam generator outlet conditions.");
+      throw std::range_error ( "could not converge on steam generator outlet conditions" );
   }
   catch (...) {
-    T_out_ms = T_in_ms - Q_to_water / (h_w_o - h_w_i);
+    T_out_ms  = T_in_ms - Q_to_water / (h_w_o - h_w_i);
     m_dot_ms1 = energyOutputRequired / (c_ms*(T_in_ms - T_out_ms));
   }
 
@@ -500,6 +506,11 @@ double HeatExchanger::computePressureInTubes ( double steamRate ) const {
 /*------------------------------------------------------------------------------------------*/
 double HeatExchanger::computePressureInShells ( void ) const {
 
+  // It is here that we check the hidden constraint _tubesSpacing = _tubesDout
+  // which gives _L_E == 0.0; If not checked, w_e will be a NaN
+  if ( _L_E == 0.0 )
+    throw std::invalid_argument ("tubes spacing is equal to tubes outer diameter");
+  
   double A_E, A_F, A_B;
   double beta;
   double S_baf, H_baf;
@@ -508,7 +519,6 @@ double HeatExchanger::computePressureInShells ( void ) const {
   double dP_Qo;
   double eps, eps_l, eps_t;
   double f_z, f_B, f_zl, f_zt, f_alv, f_atv;
-  double L_e;
   double m_dot_ms;
   double Re;
   double Tin_ms, To_ms;
@@ -526,30 +536,28 @@ double HeatExchanger::computePressureInShells ( void ) const {
   //initializing variables
   // A_FG = _windowArea_FG;
   // A_FR = _windowArea_FR;
-  A_F = _windowArea_F;
-  d_a = _tubesDout;
-  d_g = _window_EqDiameter;
-  D_i = _shellWidth;
-  D_bun = _bundle_EqDiameter;
-  N_c = _totalRows;
-  rho = MS_DENSITY;
+  A_F    = _windowArea_F;
+  d_a    = _tubesDout;
+  d_g    = _window_EqDiameter;
+  D_i    = _shellWidth;
+  D_bun  = _bundle_EqDiameter;
+  N_c    = _totalRows;
+  rho    = MS_DENSITY;
   Tin_ms = _input->get_temperature();
-  To_ms = _output->get_temperature();
+  To_ms  = _output->get_temperature();
   eta_ms = MoltenSalt::fComputeViscosity(0.5*(Tin_ms + To_ms));
-  H_baf = _baffleCut * D_i;
-  S_baf = _baffleSpacing;
-  eta_w = WATER_300K_1ATM_VISCOSITY; //find average viscosity;
+  H_baf  = _baffleCut * D_i;
+  S_baf  = _baffleSpacing;
+  eta_w  = WATER_300K_1ATM_VISCOSITY; //find average viscosity;
   
   //computing dP_Qo -> crossflow sections
-  n_w = _crossFlowRows;
-  L_e = _L_E;
-  A_E = S_baf * L_e;
-  w_e = (m_dot_ms / rho) / A_E;
-  Re = w_e * d_a * rho / eta_ms;
-  f_zt = pow(eta_w / eta_ms, 0.14);
+  n_w   = _crossFlowRows;
+  A_E   = S_baf * _L_E;
   
-  f_zl = pow(eta_w / eta_ms, 0.57 / pow(((4 * _a*_b / PI) - 1)*Re, 0.25));
-
+  w_e   = (m_dot_ms / rho) / A_E;
+  Re    = w_e * d_a * rho / eta_ms;
+  f_zt  = pow(eta_w / eta_ms, 0.14);
+  f_zl  = pow(eta_w / eta_ms, 0.57 / pow(((4 * _a*_b / PI) - 1)*Re, 0.25));
   f_atv = 2.5 + (1.2 / pow(_a - 0.85, 1.08)) + 0.4*pow(_b / _a - 1, 3.) - 0.01*pow(_a / _b - 1, 3.0);
   eps_t = f_atv / pow(Re, 0.25);
 
@@ -562,7 +570,7 @@ double HeatExchanger::computePressureInShells ( void ) const {
   eps = eps_l*f_zl + eps_t*f_zt*(1 - exp(-(Re + 200) / 1000.0));
 
   dP_Qo = eps * n_w * rho*pow(w_e, 2.0) / 2.0;
-  
+
   //fL is supposed to be always 1 because we suppose no built in imperfections
   //fB is considered because for a low number of tubes the difference between the bundle
   //area and the shell's circular area can be significant. This also requires no additional
@@ -582,15 +590,15 @@ double HeatExchanger::computePressureInShells ( void ) const {
   f_B = exp(-beta * R_B);
 
   dP_Q = dP_Qo*f_B;
-
+    
   // dP_QE -> end sections are identical to other crossflow sections
   n_wE = myround(ceil(N_c * (1.0 - H_baf / D_i)));
   dP_QE = dP_Qo* f_B * n_wE / n_w;
   
   // dP_F -> window sections
 	
-  w_p = (m_dot_ms / rho) / A_F;
-  w_z = sqrt(w_e * w_p);
+  w_p  = (m_dot_ms / rho) / A_F;
+  w_z  = sqrt(w_e * w_p);
   n_wF = 0.8*_window_Nrows;
 
   dP_Fl = (56.0 * n_wF / (_e * rho * w_z / eta_ms)
@@ -613,6 +621,6 @@ double HeatExchanger::computePressureInShells ( void ) const {
 
   //final value for dP
   dP = _nbOfShells*((_nbOfBaffles - 1)*dP_Q + 2*dP_QE + _nbOfBaffles*dP_F + dP_S);
-
+ 
   return dP;
 }

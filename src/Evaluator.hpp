@@ -39,6 +39,7 @@ private:
   const Problem         & _problem;
   std::vector<double *>   _x;
   double                * _outputs;
+  double                * _intermediate_outputs;
   std::ostream          & _out;
   
   void display_x     ( int x_index ) const;
@@ -61,10 +62,11 @@ private:
   
 public:
         
-  Evaluator  ( const Problem & pb, std::ostream & out ) :
-    _problem ( pb                              ) ,
-    _outputs ( new double[pb.get_nb_outputs()] ) ,
-    _out     ( out                             )   { reset_outputs(1e20); }
+  Evaluator ( const Problem & pb, std::ostream & out ) :
+    _problem              ( pb                              ) ,
+    _outputs              ( new double[pb.get_nb_outputs()] ) ,
+    _intermediate_outputs ( NULL                            ) ,
+    _out                  ( out                             )   { reset_outputs(1e20); }
 
   ~Evaluator ( void );
 
@@ -76,6 +78,8 @@ public:
   
   void display_x ( void ) const;
 
+  bool has_intermediate_outputs ( void ) const { return _intermediate_outputs; }
+  
   // multiple evaluations:
   bool eval_x ( int           x_index              ,
 		int           seed                 ,
@@ -86,7 +90,8 @@ public:
 		std::string & err_msg              ,
 		bool          verbose                );
 
-  void display_outputs ( void ) const;
+  void display_outputs              ( void ) const;
+  void display_intermediate_outputs ( void ) const;
 };
 
 #endif

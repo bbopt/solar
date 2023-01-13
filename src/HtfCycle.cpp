@@ -166,9 +166,9 @@ HtfCycle::HtfCycle ( double       receiverTemp                ,
 /*----------------------------------------------------------------------*/
 void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
 			       double energyFromField     ,
-			       double requiredPowerOutput   ) {
-
-  Simulation_Interruption casNotSet("Could not start interation with a valid value for cas");
+			       double requiredPowerOutput ,
+			       bool   low_fid               ) {
+  
   double hotMass_i, hotMass_f, hotMass_avg;
   double hotTemp_i, hotTemp_f, hotTemp_avg, hotTemp_avg2;
   double hotLevel_i, hotLevel_f, hotLevel_avg;
@@ -184,9 +184,10 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
   double Cp = HEAT_CAPACITY;
   double minimumHotMass = 0.05*MS_DENSITY*_hotStorage.get_heightOfStorage()
     *PI*pow(_hotStorage.get_diameterOfStorage() / 2.0, 2.0);
-  
-  hotMassFlow_in = _centralReceiver.computeEnergyToFluid(energyFromField);
+
+  hotMassFlow_in = _centralReceiver.computeEnergyToFluid ( energyFromField );
   hotMass_i      = _hotStorage.get_storedMass();
+  
   Q_heat_hot     = 0.0;
   Q_heat_cold    = 0.0;
   
@@ -196,9 +197,11 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
   else if ( hotMassFlow_in  > 0.0 && hotMass_i  > 0.0 ) { cas = 4; }
   else if ( hotMassFlow_in == 0.0 && hotMass_i  < 0.0 ) { hotMass_i = 0.0; cas = 1; }
   else if ( hotMassFlow_in  > 0.0 && hotMass_i  < 0.0 ) { hotMass_i = 0.0; cas = 3; }
-  else { 
-    throw casNotSet;
-    std::cerr << "hotMassFlow_in = " << hotMassFlow_in << " hotMass_i = " << hotMass_i << std::endl;
+  else {
+    std::ostringstream oss;
+    oss << "error in the full iteration of the HTF cycle: hotMassFlow_in = "
+	<< hotMassFlow_in << " hotMass_i = " << hotMass_i;
+    throw Simulation_Interruption ( oss.str() );
   }
   
   switch ( cas ) {
@@ -212,9 +215,9 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
     break;
       
   case 2:
-    heatedMass = 0.0;
+    heatedMass    = 0.0;
     availableMass = hotMass_i;
-    hotTemp_i = _hotStorage.get_storedTemperature();
+    hotTemp_i     = _hotStorage.get_storedTemperature();
     if (steamGeneratorModel == 1)
       hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow ( requiredPowerOutput, hotTemp_i);
     else
@@ -242,22 +245,25 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
       hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
       hotTemp_avg2 = 0.0;
       count = 0;
-      while ( fabs(hotTemp_avg2 - hotTemp_avg) > 0.001 && count < 15 ) {
-	hotTemp_avg2 = hotTemp_avg;
-	Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_i);
-	U_f = U_i - timeInSeconds*Q_dot_avg;
-	hotTemp_f = U_f / (Cp * hotMass_f);
-	if (hotTemp_f < MELTING_POINT) {
-	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	  hotTemp_f = MELTING_POINT;
+
+      if ( !low_fid ) {
+	while ( fabs(hotTemp_avg2 - hotTemp_avg) > 0.001 && count < 15 ) {
+	  hotTemp_avg2 = hotTemp_avg;
+	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_i);
+	  U_f = U_i - timeInSeconds*Q_dot_avg;
+	  hotTemp_f = U_f / (Cp * hotMass_f);
+	  if (hotTemp_f < MELTING_POINT) {
+	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	    hotTemp_f = MELTING_POINT;
+	  }
+	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	  ++count;
 	}
-	hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	++count;
       }
     }
     else {
-      hotMass_f = hotMass_i - timeInSeconds * hotMassFlow_out;
-      hotMass_avg = (hotMass_i + hotMass_f) / 2.0;
+      hotMass_f    = hotMass_i - timeInSeconds * hotMassFlow_out;
+      hotMass_avg  = (hotMass_i + hotMass_f) / 2.0;
       hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
       U_f = U_i - timeInSeconds*(hotMassFlow_out*Cp*hotTemp_out - Q_dot_i);
       hotTemp_f = U_f / (Cp * hotMass_f);
@@ -272,35 +278,46 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
       else
 	hotMassFlow_out
 	  = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
+
       count = 0;
-      while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision ||
-	      fabs(hotMassFlow_out2 - hotMassFlow_out) / hotMassFlow_out > 0.001) &&
-	     count < 15) {
-	hotTemp_avg2 = hotTemp_avg;
-	hotMassFlow_out2 = hotMassFlow_out;
-	hotMass_f = hotMass_i - timeInSeconds*hotMassFlow_out;
-	hotMass_avg = (hotMass_f + hotMass_i) / 2.0;
-	hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
-	Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	U_f = U_i - timeInSeconds*(Cp*hotMassFlow_out*hotTemp_avg + Q_dot_avg);
-	hotTemp_f = U_f / (Cp*hotMass_f);
-	if (hotTemp_f < MELTING_POINT) {
-	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	  hotTemp_f = MELTING_POINT;
+      
+      if ( !low_fid ) {
+	while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision ||
+		fabs(hotMassFlow_out2 - hotMassFlow_out) / hotMassFlow_out > 0.001) &&
+	       count < 15) {
+	  hotTemp_avg2 = hotTemp_avg;
+	  hotMassFlow_out2 = hotMassFlow_out;
+	  hotMass_f = hotMass_i - timeInSeconds*hotMassFlow_out;
+	  hotMass_avg = (hotMass_f + hotMass_i) / 2.0;
+	  hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
+	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	  U_f = U_i - timeInSeconds*(Cp*hotMassFlow_out*hotTemp_avg + Q_dot_avg);
+	  hotTemp_f = U_f / (Cp*hotMass_f);
+	  if (hotTemp_f < MELTING_POINT) {
+	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	    hotTemp_f = MELTING_POINT;
+	  }
+	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	  if ( steamGeneratorModel == 1 )
+	    hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
+	  else
+	    hotMassFlow_out =
+	      _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
+	  ++count;
 	}
-	hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	if ( steamGeneratorModel == 1 )
-	  hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
-	else
-	  hotMassFlow_out =
-	    _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
-      ++count;
-    }
-    hotMassFlow_out*timeInSeconds > availableMass ? hotMassFlow_out = 0. : 0;
-    hotMass_f = hotMass_i - timeInSeconds*hotMassFlow_out;
+      }
+
+      // Removed 2022-12-15:
+      // hotMassFlow_out*timeInSeconds > availableMass ? hotMassFlow_out = 0.0 : 0;
+
+      // and replaced by:
+      if ( hotMassFlow_out*timeInSeconds > availableMass )
+	hotMassFlow_out = 0.0;
+
+      hotMass_f = hotMass_i - timeInSeconds*hotMassFlow_out;
   }
       
-  //Set final conditions for the flows and storage
+  // Set final conditions for the flows and storage
   _hotStorage.set_storage(hotMass_f, hotTemp_f);
   _steamGeneratorInlet.set_massFlow(hotMassFlow_out);
   _steamGeneratorInlet.set_temperature(hotTemp_avg);
@@ -356,20 +373,23 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
       hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
       hotTemp_avg2 = 0.0;
       count = 0;
-      while ( fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
-	      && count < 15 ) {
-	hotTemp_avg2 = hotTemp_avg;
+
+      if ( !low_fid ) {
+	while ( fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
+		&& count < 15 ) {
+	  hotTemp_avg2 = hotTemp_avg;
 	    
-	Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	    
-	U_f = timeInSeconds*(hotMassFlow_in*Cp*hotTemp_in - hotMassFlow_out*Cp*hotTemp_avg - Q_dot_avg);
-	hotTemp_f = U_f / (Cp*hotMass_f);
-	if (hotTemp_f < MELTING_POINT) {
-	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	  hotTemp_f = MELTING_POINT;
+	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	  
+	  U_f = timeInSeconds*(hotMassFlow_in*Cp*hotTemp_in - hotMassFlow_out*Cp*hotTemp_avg - Q_dot_avg);
+	  hotTemp_f = U_f / (Cp*hotMass_f);
+	  if (hotTemp_f < MELTING_POINT) {
+	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	    hotTemp_f = MELTING_POINT;
+	  }
+	  hotTemp_avg = (hotTemp_i - hotTemp_f) / 2.0;
+	  ++count;
 	}
-	hotTemp_avg = (hotTemp_i - hotTemp_f) / 2.0;
-	++count;
       }
 	
       //setting final conditions
@@ -434,19 +454,20 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
       hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
       hotTemp_avg2 = 0.0;
       count = 0;
-      while (fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
-	     && count < 15) {
-	hotTemp_avg2 = hotTemp_avg;
-	Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	U_f = timeInSeconds*(hotMassFlow_in*Cp*hotTemp_in - Q_dot_avg);
-	
-	hotTemp_f = U_f / (Cp*hotMass_f);
-	if (hotTemp_f < MELTING_POINT) {
-	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	  hotTemp_f = MELTING_POINT;
+      if ( !low_fid ) {
+	while (fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision && count < 15) {
+	  hotTemp_avg2 = hotTemp_avg;
+	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	  U_f = timeInSeconds*(hotMassFlow_in*Cp*hotTemp_in - Q_dot_avg);
+	  
+	  hotTemp_f = U_f / (Cp*hotMass_f);
+	  if (hotTemp_f < MELTING_POINT) {
+	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	    hotTemp_f = MELTING_POINT;
+	  }
+	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	  ++count;
 	}
-	hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	++count;
       }
       heatedMass = hotMassFlow_in*timeInSeconds;
       _hotStorage.set_storage(hotMass_f, hotTemp_f);
@@ -513,14 +534,16 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
 	hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
 	hotTemp_avg2 = 0.0;
 	count = 0;
-	while (fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision && count < 15) {
-	  hotTemp_avg2 = hotTemp_avg;
-	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	  
-	  U_f = U_i + timeInSeconds*(hotMassFlow_in * Cp * hotTemp_in - hotMassFlow_out * Cp * hotTemp_avg - Q_dot_avg);
-	  hotTemp_f = U_f / (Cp*hotMass_f);
-	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	  ++count;
+	if ( !low_fid ) {
+	  while (fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision && count < 15) {
+	    hotTemp_avg2 = hotTemp_avg;
+	    Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	    
+	    U_f = U_i + timeInSeconds*(hotMassFlow_in * Cp * hotTemp_in - hotMassFlow_out * Cp * hotTemp_avg - Q_dot_avg);
+	    hotTemp_f = U_f / (Cp*hotMass_f);
+	    hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	    ++count;
+	  }
 	}
 	//in this case, thermal losses will be neglected
 
@@ -565,31 +588,33 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
 	hotTemp_avg2 = 0.0;
 	hotMassFlow_out2 = 0.0;
 	count = 0;
-	while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
-		|| fabs(hotMassFlow_out2 - hotMassFlow_out) / hotMassFlow_out > 0.001)
-	       && count < 15) {
-	  hotTemp_avg2 = hotTemp_avg;
-	  hotMassFlow_out2 = hotMassFlow_out;
-	  
-	  hotMassFlow_in = (hotMass_f - hotMass_i + hotMassFlow_out*timeInSeconds) / timeInSeconds;
-	  
-	  U_i = hotMass_i*Cp*hotTemp_i;
-	  U_f = U_i + timeInSeconds*(Cp*hotMassFlow_in*hotTemp_in - Cp*hotMassFlow_out*hotTemp_avg - Q_dot_avg);
-	  hotTemp_f = U_f / (Cp*hotMass_f);
-	  if (hotTemp_f < MELTING_POINT) {
-	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	    hotTemp_f = MELTING_POINT;
+	if ( !low_fid ) {
+	  while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
+		  || fabs(hotMassFlow_out2 - hotMassFlow_out) / hotMassFlow_out > 0.001)
+		 && count < 15) {
+	    hotTemp_avg2 = hotTemp_avg;
+	    hotMassFlow_out2 = hotMassFlow_out;
+	    
+	    hotMassFlow_in = (hotMass_f - hotMass_i + hotMassFlow_out*timeInSeconds) / timeInSeconds;
+	    
+	    U_i = hotMass_i*Cp*hotTemp_i;
+	    U_f = U_i + timeInSeconds*(Cp*hotMassFlow_in*hotTemp_in - Cp*hotMassFlow_out*hotTemp_avg - Q_dot_avg);
+	    hotTemp_f = U_f / (Cp*hotMass_f);
+	    if (hotTemp_f < MELTING_POINT) {
+	      Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	      hotTemp_f = MELTING_POINT;
+	    }
+	    
+	    hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	    
+	    if (steamGeneratorModel == 1)
+	      hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
+	    else
+	      hotMassFlow_out =
+		_steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
+	    Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	    ++count;
 	  }
-	  
-	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	  
-	  if (steamGeneratorModel == 1)
-	    hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
-	  else
-	    hotMassFlow_out =
-	      _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
-	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	  ++count;
 	}
 
 	hotMassFlow_out*timeInSeconds > availableMass ? hotMassFlow_out = 0. : 0;
@@ -627,33 +652,35 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
 	  _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
       hotMassFlow_out2 = 0.0;
       count = 0;
-      while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
-	      || fabs(hotMassFlow_out2 - hotMassFlow_out) > 0.001)
-	     && count < 15) {
-	hotTemp_avg2 = hotTemp_avg;
-	hotMassFlow_out2 = hotMassFlow_out;
-	
-	hotMass_f = hotMass_i + timeInSeconds*(hotMassFlow_in - hotMassFlow_out);
-	hotMass_avg = (hotMass_i + hotMass_f) / 2.0;
-	hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
-	
-	Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
-	
-	U_f = U_i + timeInSeconds*(Cp*hotMassFlow_in*hotTemp_in - Cp*hotMassFlow_out*hotTemp_avg - Q_dot_avg);
-	hotTemp_f = U_f / (Cp*hotMass_f);
-	if (hotTemp_f < MELTING_POINT) {
-	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
-	  hotTemp_f = MELTING_POINT;
-	}
-	hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
-	
-	if (steamGeneratorModel == 1)
-	  hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
-	else
-	  hotMassFlow_out =
-	    _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
+      if ( !low_fid ) {
+	while ((fabs(hotTemp_avg2 - hotTemp_avg) > temperaturePrecision
+		|| fabs(hotMassFlow_out2 - hotMassFlow_out) > 0.001)
+	       && count < 15) {
+	  hotTemp_avg2 = hotTemp_avg;
+	  hotMassFlow_out2 = hotMassFlow_out;
 	  
-	++count;
+	  hotMass_f = hotMass_i + timeInSeconds*(hotMassFlow_in - hotMassFlow_out);
+	  hotMass_avg = (hotMass_i + hotMass_f) / 2.0;
+	  hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
+	
+	  Q_dot_avg = _hotStorage.fComputeEnergyLosses(hotTemp_avg, hotLevel_avg);
+	  
+	  U_f = U_i + timeInSeconds*(Cp*hotMassFlow_in*hotTemp_in - Cp*hotMassFlow_out*hotTemp_avg - Q_dot_avg);
+	  hotTemp_f = U_f / (Cp*hotMass_f);
+	  if (hotTemp_f < MELTING_POINT) {
+	    Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;
+	    hotTemp_f = MELTING_POINT;
+	  }
+	  hotTemp_avg = (hotTemp_i + hotTemp_f) / 2.0;
+	  
+	  if (steamGeneratorModel == 1)
+	    hotMassFlow_out = _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg);
+	  else
+	    hotMassFlow_out =
+	      _steamGenerator.fComputeRequiredMoltenSaltMassFlow(requiredPowerOutput, hotTemp_avg, availableMass / timeInSeconds);
+	  
+	  ++count;
+	}
       }
       hotMass_f = hotMass_i + timeInSeconds*(hotMassFlow_in - hotMassFlow_out);
       
@@ -704,22 +731,24 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
   coldTemp_avg2 = 0.0;
 
   count = 0;
-  
-  while ( fabs(coldTemp_avg2 - coldTemp_avg) > temperaturePrecision && count < 15) {
-    
-    coldTemp_avg2 = coldTemp_avg;
 
-    Q_dot_avg = _coldStorage.fComputeEnergyLosses(coldTemp_avg, coldLevl_avg);
-
-    U_f = U_i + timeInSeconds*(coldMassFlow_in*Cp*coldTemp_in - coldMassFlow_out*Cp*coldTemp_avg - Q_dot_avg);
+  if ( !low_fid ) {
+    while ( fabs(coldTemp_avg2 - coldTemp_avg) > temperaturePrecision && count < 15) {
     
-    coldTemp_f = U_f / (Cp*coldMass_f);
-    if (coldTemp_f < MELTING_POINT) {
-      Q_heat_cold = (MELTING_POINT - coldTemp_f) * Cp * coldMass_f;
-      coldTemp_f = MELTING_POINT;
+      coldTemp_avg2 = coldTemp_avg;
+
+      Q_dot_avg = _coldStorage.fComputeEnergyLosses(coldTemp_avg, coldLevl_avg);
+
+      U_f = U_i + timeInSeconds*(coldMassFlow_in*Cp*coldTemp_in - coldMassFlow_out*Cp*coldTemp_avg - Q_dot_avg);
+    
+      coldTemp_f = U_f / (Cp*coldMass_f);
+      if (coldTemp_f < MELTING_POINT) {
+	Q_heat_cold = (MELTING_POINT - coldTemp_f) * Cp * coldMass_f;
+	coldTemp_f = MELTING_POINT;
+      }
+      coldTemp_avg = (coldTemp_i + coldTemp_f) / 2.0;
+      ++count;
     }
-    coldTemp_avg = (coldTemp_i + coldTemp_f) / 2.0;
-    ++count;
   }
   
   maxColdMass = _coldStorage.get_heightOfStorage() *

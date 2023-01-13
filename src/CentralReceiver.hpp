@@ -72,7 +72,7 @@ public:
   CentralReceiver  ( MoltenSalt*, MoltenSalt*, double, double, double, double, double, int );
   ~CentralReceiver ( void ) {}
  
-  double computeEnergyToFluid ( double );
+  double computeEnergyToFluid ( double Q_in );
 
   //function shall provide an option to calculate if the output temperature
   //is imposed or if the mass flow is imposed.

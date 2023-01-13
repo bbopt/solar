@@ -36,7 +36,7 @@ double kernelSmoothing ( std::vector<int>& xData, std::vector<double>& yData, in
 /*-------------------------------------------------------------------------------*/
 
   double kernel;
-  double yOutput = 0.;
+  double yOutput   = 0.;
   double sumKernel = 0.;
 
   for (unsigned int i = 0; i < yData.size(); ++i) {

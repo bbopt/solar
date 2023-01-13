@@ -79,19 +79,19 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
   double mu = MoltenSalt::fComputeViscosity(T_ms);
   double m_dot_2, h_ms, T_re_sur,Nus, Re, Pr, V, Q_loss, f;
   double Q_cond, Q_em, Q_ref, Q_tot1, Q_tot2, Q_abs;
-  int count = 0;
+  int count  = 0;
   int count2 = 0;
   
   m_dot_2 = eff * Q_in / (HEAT_CAPACITY * (To - Ti));
   
   try {
 
-    while (fabs(m_dot_2 - m_dot_1) > fabs(0.001*m_dot_1) && count < 150) {
-
-      Q_tot1 = 0;
+    while ( fabs(m_dot_2 - m_dot_1) > fabs(0.001*m_dot_1) && count < 150 ) {
+          
+      Q_tot1  = 0;
       m_dot_1 = m_dot_2;
       /*  remove */
-      V = m_dot_1 / (1.* _numberOfTubes * MS_DENSITY * PI * pow(_tubesInsideDiameter, 2.) / 4.);
+      V  = m_dot_1 / (1.0* _numberOfTubes * MS_DENSITY * PI * pow(_tubesInsideDiameter, 2.0) / 4.0);
       Re = MS_DENSITY * V * _tubesInsideDiameter / mu;
       Pr = HEAT_CAPACITY * mu / MS_CONDUCTIVITY;
       
@@ -103,7 +103,7 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
       }
       else {
 	//for high Re the flow is assumed to be turbulent
-	f = pow(0.790*log(Re) - 1.64, -2.);
+	f = pow(0.790*log(Re) - 1.64, -2.0);
 	Nus = ((f / 8.0)*(Re - 1000)*Pr) / (1.0 + 12.7*sqrt(f / 8.0)*(pow(Pr, 2.0 / 3.0) - 1.0));
       }
       
@@ -112,72 +112,75 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
 	* ( (_tubesOutsideDiameter / (h_ms * _tubesInsideDiameter))													+ ((_tubesOutsideDiameter / (2.*SS_COND)) * log(_tubesOutsideDiameter / _tubesInsideDiameter)) )
 	+ T_ms;
 
-      Del_T = T_re_sur/2.0;
+      Del_T  = T_re_sur/2.0;
       count2 = 0;
 
-      while (fabs(Q_tot1 - Q_in) > 100) {
-
-	if (count2 > 0) {
-	  if (Q_tot1 < Q_in && Q_tot2 < Q_in)
+      while ( fabs(Q_tot1 - Q_in) > 100 ) {
+	
+	if ( count2 > 0 ) {
+	  if ( Q_tot1 < Q_in && Q_tot2 < Q_in )
 	    T_re_sur += Del_T;
-	  else if (Q_tot1 > Q_in && Q_tot2 < Q_in) {
-	    Del_T /= 5.;
+	  else if ( Q_tot1 > Q_in && Q_tot2 < Q_in ) {
+	    Del_T    /= 5.0;
 	    T_re_sur -= Del_T;
 	  }
-	      else if (Q_tot1 < Q_in && Q_tot2 > Q_in) {
-		Del_T /= 5.;
-		T_re_sur += Del_T;
-	      }
-	      else if (Q_tot1 > Q_in && Q_tot2 > Q_in)
-		T_re_sur -= (Del_T*(2.0/3.0));
+	  else if ( Q_tot1 < Q_in && Q_tot2 > Q_in ) {
+	    Del_T    /= 5.0;
+	    T_re_sur += Del_T;
+	  }
+	  else if ( Q_tot1 > Q_in && Q_tot2 > Q_in )
+	    T_re_sur -= (Del_T*(2.0/3.0));
 	}
 	
 	Q_tot2 = Q_tot1;
 	Q_abs = (T_re_sur - T_ms)*(_numberOfTubes*_numberOfPasses * _apertureHeight)
 	  / ( (_tubesOutsideDiameter / (h_ms * _tubesInsideDiameter))
-	       + ((_tubesOutsideDiameter / (2.0*SS_COND))
-		  * log(_tubesOutsideDiameter / _tubesInsideDiameter)) );
+	      + ((_tubesOutsideDiameter / (2.0*SS_COND))
+		 * log(_tubesOutsideDiameter / _tubesInsideDiameter)) );
 	  
-	//compute all losses type
-	Q_ref = computeReflectionLosses(Q_in);
-	Q_em = computeEmissionLosses(T_re_sur);
+	// Compute all losses type:
+	Q_ref  = computeReflectionLosses(Q_in);
+	Q_em   = computeEmissionLosses(T_re_sur);
 	Q_cond = computeConductionLosses(T_re_sur);
 	Q_loss = Q_ref + Q_em + Q_cond;
 	
 	Q_tot1 = Q_loss + Q_abs;
 	
 	++count2;
+
+	if ( count2 > 1E6 ) // Added 2022-11-11
+	  throw std::runtime_error ( "could not find converging value for central receiver absorbed energy (case 1)" );
       }
       
-      eff = 1 - (Q_loss / Q_in);
+      eff     = 1 - (Q_loss / Q_in);
       m_dot_2 = eff * Q_in / (HEAT_CAPACITY * (To - Ti));
       
       ++count;
     }
     
-    if (count >= 150)
-      throw std::runtime_error ("Could not find converging value for central receiver absorbed energy");
-    if (eff <= 0.0) {
-      eff = 0.0;
+    if ( count >= 150 )
+      throw std::runtime_error ( "could not find converging value for central receiver absorbed energy (case 2)" );
+    if ( eff <= 0.0 ) {
+      eff     = 0.0;
       m_dot_2 = 0.0;
     }
   }
   catch ( const std::runtime_error & ) {
-    m_dot_2 = 0.0;
-    eff = 0.0;
-    Q_loss = 0.0;
+    m_dot_2  = 0.0;
+    eff      = 0.0;
+    Q_loss   = 0.0;
     T_re_sur = 0.0;
   }
   
-  _input->set_massFlow(m_dot_2);
-  _output->set_massFlow(m_dot_2);
+  _input->set_massFlow  ( m_dot_2 );
+  _output->set_massFlow ( m_dot_2 );
   _receiverEfficiency = eff;
   
-  //Gathering data
-  _losses.push_back(Q_loss);
-  _efficiency.push_back(eff);
-  _surfaceTemperature.push_back(T_re_sur);
-  _msRate.push_back(m_dot_2);
+  // Gathering data:
+  _losses.push_back             ( Q_loss   );
+  _efficiency.push_back         ( eff      );
+  _surfaceTemperature.push_back ( T_re_sur );
+  _msRate.push_back             ( m_dot_2  );
   
   return m_dot_2;
 }
@@ -251,10 +254,11 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
   double q_1, q_2;
   q_1 = 0.;
   q_2 = q_out;
-  
-  try {
-    while (fabs(q_2 - q_1) / q_2 > 0.001  && count < 150) {
 
+  try {
+    
+    while ( fabs(q_2 - q_1) / q_2 > 0.001  && count < 150 ) {
+    
       q_1 = q_2;
 	
       T_surf_out = fSolveForT(k_rad_wet, k_conv, T, q_1, 0.01);
@@ -267,8 +271,8 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
       ++count;
     }
     
-    if (count >= 150)
-      throw std::runtime_error ( "Could not find converging value for receiver conduction losses rate" );
+    if ( count >= 150 )
+      throw std::runtime_error ( "could not find converging value for receiver conduction losses rate" );
 
   }
   catch ( const std::runtime_error & ) {
@@ -290,7 +294,7 @@ double CentralReceiver::fSolveForT ( double coef_T4, double coef_T, double T_max
 
   T_1 = 0.;
   T_2 = T_max;
-
+  
   try {
     while (fabs(T_2 - T_1) > eps && count < 150) {
       T_1 = T_2;
@@ -318,22 +322,31 @@ double CentralReceiver::fSolveForT ( double coef_T4, double coef_T, double T_max
 /*--------------------------------------------------------------*/
 double CentralReceiver::computePressureInTubes ( void ) const {
 /*--------------------------------------------------------------*/
-
-  double A_tubes = PI*pow(_tubesInsideDiameter / 2.0, 2.0); //m^2
-  double V = _input->get_massFlow() / (MS_DENSITY * A_tubes * _numberOfTubes); //m/s
-  double mu = MoltenSalt::fComputeViscosity(_input->get_temperature());
-  double Re = V * _tubesInsideDiameter / mu;
+ 
+  // 2022-10-21:
+  // -----------
+  // With SOLAR3 and x6.txt:
+  // 22.63675024781991 32.246473558685054 142.86672891680968 26.92517304730389 21.093252906684114 22.0 29.857785323972358 0.36449306092140193 2.7899958004033376 870.2245260346899 49.556166148312144 20.253259690932857 0.03720503051690485 3.489708072839301 565.4948792302774 36.0 1.5450597157331276 0.023546568862376955 0.047943056313100675 8.0
+  // when fid=1, we get Re=325864 and the exeption is thrown -- Hidden constraint.
+  // but for fid < 1, the evaluation can complete (but is imprecise).
+  
+  
+  double A_tubes = PI * pow ( _tubesInsideDiameter / 2.0, 2.0 ); //m^2
+  double V       = _input->get_massFlow() / (MS_DENSITY * A_tubes * _numberOfTubes); //m/s
+  double mu      = MoltenSalt::fComputeViscosity(_input->get_temperature());
+  double Re      = V * _tubesInsideDiameter / mu;
   double Lambda;
 	
-  if (V > 0) {
-    if (Re < 2300)
+  if ( V > 0 ) {
+    if ( Re < 2300 )
       Lambda = 64.0 / Re;
-    else if (Re < 4000)
+    else if ( Re < 4000 )
       Lambda = 0.5*(64.0 / Re + 0.3164*pow(Re, -0.25));
-    else if (Re < 100000)
+    else if ( Re < 100000 )
       Lambda = 0.3164*pow(Re, -0.25);
-    else
-      throw std::out_of_range ("Reynolds number out of range");;
+    else {      
+      throw std::out_of_range ( "Reynolds number out of range" );
+    }
     return Lambda * _apertureHeight * _numberOfPasses * MS_DENSITY * V*V / (8.0 * A_tubes / (PI*_tubesInsideDiameter));
   }
   return 0.0;

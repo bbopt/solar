@@ -43,20 +43,20 @@ class Powerplant
 {
 private:
 
-  //Simulation components
+  // Simulation components
   Time_Manager _time;
   int  _model_type; // 1:heliostats field; 2: whole plant
   int  _heliostatsFieldModel;
 
-  //Powerplant components
-  HtfCycle      * _moltenSaltLoop;
-  HeliostatField* _heliostatsField;
-  Powerblock    * _powerblock;
-  Economics     * _investmentCost;
+  // Powerplant components
+  HtfCycle       * _moltenSaltLoop;
+  HeliostatField * _heliostatsField;
+  Powerblock     * _powerblock;
+  Economics      * _investmentCost;
 
   std::vector<double> _heliostatFieldPowerOutput;
   
-  //Include day, starting hour, demand info, storage starting conditions, etc.
+  // Include day, starting hour, demand info, storage starting conditions, etc.
 	
   std::vector<double> _receiverOutletFlow;
   std::vector<double> _receiverPumpHead;
@@ -86,11 +86,11 @@ public:
   Powerplant ( const Time_Manager&, int, HeliostatField*, HtfCycle*, Powerblock*, Economics* );
   ~Powerplant ( void ) { clean(); }
 
-  const HtfCycle* get_moltenSaltLoop ( void ) const { return _moltenSaltLoop;  }
-  HeliostatField* get_heliostatField ( void ) const { return _heliostatsField; }
-  Economics     * get_investmentCost ( void ) const { return _investmentCost;  }
+  const HtfCycle * get_moltenSaltLoop ( void ) const { return _moltenSaltLoop;  }
+  HeliostatField * get_heliostatField ( void ) const { return _heliostatsField; }
+  Economics      * get_investmentCost ( void ) const { return _investmentCost;  }
 
-  void   fSimulatePowerplant         ( void   );
+  void   fSimulatePowerplant         ( bool low_fid );
   void   fSimulateHeliostatField     ( void   );
   double fComputeSteamRate           ( double );
   double fComputePressureInExchanger ( void   );

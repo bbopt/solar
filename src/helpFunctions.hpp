@@ -31,21 +31,22 @@
 #include <iomanip>
 #include <fstream>
 
-void display_usage    ( std::ostream & out );
-void display_info     ( std::ostream & out , const std::string & version );
-void display_help     ( std::ostream & out , const std::vector<Problem> & , const std::string & pb_id );
-void display_help     ( std::ostream & out , const std::vector<Problem> & );
-void display_problems ( std::ostream & out , const std::vector<Problem> & );
+void display_usage          ( std::ostream & out );
+void display_info           ( std::ostream & out , const std::string & version );
+void display_help           ( std::ostream & out , const std::vector<Problem> & , const std::string & pb_id );
+void display_help           ( std::ostream & out , const std::vector<Problem> & );
+void display_problems       ( std::ostream & out , const std::vector<Problem> & );
+void display_best_solutions ( std::ostream & out );
 
-void print_maxNrg_H1     ( std::ostream & out );
-void print_minSurf_H1    ( std::ostream & out );
-void print_minCost_C1    ( std::ostream & out );
-void print_minCost_C2    ( std::ostream & out );
-void print_maxComp_HTF1  ( std::ostream & out );
-void print_minCost_TS    ( std::ostream & out );
-void print_maxEff_RE     ( std::ostream & out );
-void print_maxHF_minCost ( std::ostream & out );
-void print_maxNrg_minPar ( std::ostream & out );
-
+void print_maxNrg_H1             ( std::ostream & out ); // # 1
+void print_minSurf_H1            ( std::ostream & out ); // # 2
+void print_minCost_C1            ( std::ostream & out ); // # 3
+void print_minCost_C2            ( std::ostream & out ); // # 4
+void print_maxComp_HTF1          ( std::ostream & out ); // # 5
+void print_minCost_TS            ( std::ostream & out ); // # 6
+void print_maxEff_RE             ( std::ostream & out ); // # 7
+void print_maxHF_minCost         ( std::ostream & out ); // # 8
+void print_maxNrg_minPar         ( std::ostream & out ); // # 9
+void print_minCost_unconstrained ( std::ostream & out ); // #10
 
 #endif
