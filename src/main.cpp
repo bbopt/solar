@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.5.2              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.5.3              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2023-01-13                                                                   */
+/*  2023-01-27                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -40,7 +40,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.5.2, 2023-01-13";
+const std::string VERSION = "0.5.3, 2023-01-27";
 
 // validation functions:
 bool check ( bool fast );
@@ -62,9 +62,12 @@ bool get_options ( int           argc         ,
 		   double      & fidelity     ,
 		   int         & replications   );
 
-/*-----------------------------------------------------------*/
-/*                       main function                       */
-/*-----------------------------------------------------------*/
+/*------------------------------------------------------------------------------*/
+/*                                  main function                               */
+/*------------------------------------------------------------------------------*/
+/* + another version of the main function is available after this one           */
+/* + it is called main_minimal and is a minimal example of a single evaluation  */
+/*------------------------------------------------------------------------------*/
 int main ( int argc , char ** argv ) {
   
   // create problem descriptions:
@@ -256,6 +259,59 @@ int main ( int argc , char ** argv ) {
 	      << "Total real time: " << clock1.get_real_time() << std::endl;
  
   return error ? 1 : 0;
+}
+
+/*------------------------------------------------------------------------*/
+/*                   minimal example of a single evaluation               */
+/*------------------------------------------------------------------------*/
+/*  + this simple example is equivalent to <solar 10 x.txt>               */
+/*  + it allows to retrieve the simulation_completed and cnt_eval flags   */
+/*  + to use it, rename main_minimal by main and rename the "true" solar  */
+/*------------------------------------------------------------------------*/
+int main_minimal ( void ) {
+
+  // set the problem SOLAR10:
+  std::vector<Problem> problems;
+  create_problems ( problems );
+  const Problem * pb = find_problem ( problems, "10" );
+
+  // will contain the outputs: they are not available as real values but only
+  // through an output stream (to ensure the right number of decimals):
+  std::ostringstream output_stream;
+
+  // creation of the evaluator:
+  Evaluator evaluator ( *pb, output_stream );
+  
+  // set the input point:
+  double x[] = { 900, 10, 12, 0.2, 0.2 };
+  evaluator.set_x(x);
+
+  // parameters of the evaluation:
+  int         x_index              = 0;     // only one point
+  int         seed                 = 0;     // random seed
+  double      fidelity             = 1.0;   // full fidelity
+  int         replications         = 1;     // one replication
+  bool        simulation_completed = false; // output flag
+  bool        cnt_eval             = false; // output flag
+  bool        verbose              = false; // no display
+  std::string error_msg;                    // error message
+  
+  // the evaluation:
+  evaluator.eval_x ( x_index, seed, fidelity, replications, simulation_completed, cnt_eval, error_msg, verbose );
+  
+  // get the outputs: this puts the outputs into output_stream:
+  // (SOLAR10 has only one output, the objecitve)
+  evaluator.display_outputs();
+
+  // to get the output as a real:
+  // double f = std::atof(output_stream.str().c_str());
+  
+  // display the outputs: objective and flags:
+  std::cout << "output              : " << output_stream.str()  << std::endl
+	    << "simulation completed: " << simulation_completed << std::endl
+	    << "count evaluation    : " << cnt_eval             << std::endl;
+  
+  return 0;
 }
 
 /*----------------------------------------------------------*/
