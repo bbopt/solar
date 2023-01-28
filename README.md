@@ -106,6 +106,8 @@ of value *-122,505.5978*.
 Other points and NOMAD parameters files can be found in the
 [./tests](tests) directory.
 
+It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp) to call SOLAR from a code. A minimal example is provided.
+
 ### How to cite
 
 ```
