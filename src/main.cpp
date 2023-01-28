@@ -2,7 +2,7 @@
 /*  SOLAR - The solar thermal power plant simulator - version 0.5.3              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2023-01-27                                                                   */
+/*  2023-01-28                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -40,7 +40,7 @@
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.5.3, 2023-01-27";
+const std::string VERSION = "0.5.3, 2023-01-28";
 
 // validation functions:
 bool check ( bool fast );
@@ -267,6 +267,7 @@ int main ( int argc , char ** argv ) {
 /*  + this simple example is equivalent to <solar 10 x.txt>               */
 /*  + it allows to retrieve the simulation_completed and cnt_eval flags   */
 /*  + to use it, rename main_minimal by main and rename the "true" solar  */
+/*    main function                                                       */
 /*------------------------------------------------------------------------*/
 int main_minimal ( void ) {
 
