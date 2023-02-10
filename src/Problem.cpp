@@ -89,7 +89,7 @@ void create_problems ( std::vector<Problem> & problems ) {
 
   // pb_id, f, n, m
   problems.push_back ( Problem ( "MAXNRG_H1"            , "total solar energy on the receiver"   ,  1, 1,  9,  5 ) ); // #1
-  problems.push_back ( Problem ( "MINSURF_H1"           , "total heliostats field surface"       ,  2, 1, 14, 13 ) ); // #2
+  problems.push_back ( Problem ( "MINSURF_H1"           , "total heliostats field surface"       ,  2, 1, 14, 12 ) ); // #2
   problems.push_back ( Problem ( "MINCOST_C1"           , "total investment cost"                ,  3, 1, 20, 13 ) ); // #3
   problems.push_back ( Problem ( "MINCOST_C2"           , "total investment cost"                ,  4, 1, 29, 16 ) ); // #4
   problems.push_back ( Problem ( "MAXCOMP_HTF1"         , "compliance to a demand profile"       ,  5, 1, 20, 12 ) ); // #5

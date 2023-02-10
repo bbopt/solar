@@ -452,10 +452,10 @@ void Evaluator::display_outputs ( void ) const {
 	 << _outputs[7] << " "
 	 << std::setprecision( 8) << _outputs[ 8] << " "
 	 << std::setprecision( 8) << _outputs[ 9] << " "
-	 << std::setprecision( 8) << _outputs[10] << " "
-	 << std::setprecision(12) << _outputs[11] << " "
-	 << _outputs[12] << " "
-	 << _outputs[13] << std::setprecision(12);
+         // << std::setprecision( 8) << _outputs[10] << " " c10 removed in version 0.5.4
+	 << std::setprecision(12) << _outputs[10] << " "
+	 << _outputs[11] << " "
+	 << _outputs[12] << std::setprecision(12);
 
   // solar 3:
   else if ( pb_id == "MINCOST_C1" )

@@ -1,4 +1,4 @@
-# SOLAR v0.5.3 (January 2023)
+# SOLAR v0.5.4 (February 2023)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation

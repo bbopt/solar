@@ -246,7 +246,7 @@ void Scenario::init_minSurf_H1 ( double fidelity ) {
   _cFieldSurface           = 4e6;   // 400 hectares
   _cDemandComplianceRatio  = 100;
   _cBudget                 = 300e6; // 300 millions
-  _cParasitics             = 0.18;
+  _cParasitics             = 0.18;  // not used
 
   // design parameters:
   _hotStorageDiameter           = 23.0;
@@ -776,11 +776,11 @@ bool Scenario::set_x_maxHF_minCost ( const double * x ) {
 /*--------------------------------------------*/
 void Scenario::init_maxNrg_minPar ( double fidelity ) {
 
-  // Demand profile : 1, from 3 pm to 9 pm
-  // Maximum demand : 250MW
-  // Latitude : 25 deg
-  // Day : 180
-  // Duration : 24 hours
+  // Demand profile: 1, from 3 pm to 9 pm
+  // Maximum demand: 250MW
+  // Latitude      : 25 deg
+  // Day           : 180
+  // Duration      : 24 hours
   // maximum field surface of 5M m^2 (500 hectares)
   
   // Scenario parameters:
@@ -1082,7 +1082,7 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
   // x13: _receiverTubesInsideDiam
   // x14: _receiverTubesOutsideDiam
   
-  for ( int i = 0 ; i < 14 ; ++i )
+  for ( int i = 0 ; i < 13 ; ++i )
     outputs[i] = 1e20;
 
   cnt_eval = true;
@@ -1132,19 +1132,23 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     // c7: check pressure in tubes:
     outputs[7] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
 
-    // Check if molten salt temperature does not drop below the melting point (c8, c9, c10):
+    // Check if molten salt temperature does not drop below the melting point (c8, c9):
     outputs[ 8] = MELTING_POINT - _powerplant->get_minHotStorageTemp ();
     outputs[ 9] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
-    outputs[10] = MELTING_POINT - _powerplant->get_minSteamGenTemp   ();  
 
-    // c11: x13 <= x14:
-    outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
+    // This was the 10th constraint before version 0.5.4. It is now a hidden constraint.
+    // (it seems to be always feasible)
+    if ( MELTING_POINT - _powerplant->get_minSteamGenTemp() > 0.0 )
+      throw Simulation_Interruption ( "Problem with the molten salt temperature" );
+
+    // c10: x13 <= x14:
+    outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
    
-    // c12: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
-    outputs[12] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
+    // c11: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
+    outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
 
-    // c13:
-    outputs[13] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;        
+    // c12:
+    outputs[12] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;        
   }
   catch ( const std::exception & e ) {
 
@@ -1167,10 +1171,10 @@ bool Scenario::simulate_minSurf_H1 ( double * outputs , bool & cnt_eval ) {
     
     outputs[ 4] = 2 * _heliostatLength - _towerHeight;                  //  c4: 2x1 - x3 <= 0
     outputs[ 5] = _minimumDistanceToTower - _maximumDistanceToTower;    //  c5:  x8 <= x9
-    outputs[11] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam; // c11: x13 <= x14
+    outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam; // c10: x13 <= x14
 
-    // c12: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
-    outputs[12] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
+    // c11: check if tubes fit in receiver: x11*x14 - x5 * PI / 2.0 <= 0:
+    outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
     throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
@@ -1233,7 +1237,8 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
     
     // c1: check total land area is below 800000 m^2:
     // PI * x3 * x3 * ( x9*x9 - x8*x8 ) * x7 / 180 <= 800000 :
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * _fieldAngularWidth / 180.0 - _cFieldSurface;
     
     // c2: check if compliance to demand is 100%:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
@@ -1272,7 +1277,8 @@ bool Scenario::simulate_minCost_C1 ( double * outputs , bool & cnt_eval ) {
     
     // output a priori constraints:
     
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * _fieldAngularWidth / 180.0 - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * _fieldAngularWidth / 180.0 - _cFieldSurface;
    
     outputs[3] = 2 * _heliostatLength - _towerHeight;
     outputs[4] = _minimumDistanceToTower - _maximumDistanceToTower;
@@ -1350,9 +1356,9 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
 
     // c1: total land area is below 200 hectares:
     // PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
-
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    
     // c2: compliance to demand is 100%:
     outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
 
@@ -1382,7 +1388,7 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // c12: central receiver outlet is higher than that required by the turbine:
     outputs[12] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
  
-    // c13:
+    // c13: Parasitics do not exceed 20% of energy production
     {
       double sum = 1.0;
       for ( unsigned int i = 0; i < _powerplant->get_powerplantPowerOutput().size(); ++i )
@@ -1396,7 +1402,7 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // c15: x22 <= x23:
     outputs[15] = _exchangerTubesDin  - _exchangerTubesDout;
 
-    // c16:
+    // c16: Pressure in steam generator tubes does not exceed yield pressure:
     outputs[16] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
   catch ( const std::exception & e ) {
@@ -1404,7 +1410,8 @@ bool Scenario::simulate_minCost_C2 ( double * outputs , bool & cnt_eval ) {
     // output a priori constraints:
 
     // c1: PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000:
-    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
     // c3: 2x1-x3 <= 0:
     outputs[3] = 2 * _heliostatLength - _towerHeight;
@@ -1499,7 +1506,7 @@ bool Scenario::simulate_maxComp_HTF1 ( double * outputs , bool & cnt_eval ) {
     // c6: Receiver tubes Din <= Dout: x9 <= x10:
     outputs[6] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
     
-    // c7: Tubes fit in receiver: x7*x10 <= 6*PI/2:
+    // c7: Tubes fit in receiver: x7*x10 <= 6*PI/2 (_receiverApertureWidth is fixed to 6):
     outputs[7] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
     // c8: central receiver outlet is higher than that required by the turbine:
@@ -1725,8 +1732,8 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
     
     // c1: total land area:
     // PI*x3*x3*( x9*x9 - x8*x8 ) * x7 / 180 <= 4e6:
-    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
     // c2: tower at least twice as high as heliostats: 2x1-x3 <= 0:
     outputs[3] = 2 * _heliostatLength - _towerHeight;
@@ -1757,7 +1764,8 @@ bool Scenario::simulate_maxHF_minCost ( double * outputs , bool & cnt_eval ) {
 
     // output a priori constraints:
     
-    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) * (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[2] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
 
     outputs[3] = 2 * _heliostatLength - _towerHeight;
     
@@ -1850,8 +1858,8 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     outputs[3] = 4.32e+11 - sum; // 4.32e+11 = 3600.0 * 120.0e6
     
     // c3: total land area: PI*x3*x3*( x9*x9 - x8*x8 ) * x7 / 180 <= 5e6:
-    outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
     
     // c4: tower at least twice as high as heliostats: 2x1-x3 <= 0:
     outputs[5] = 2 * _heliostatLength - _towerHeight;
@@ -1879,17 +1887,17 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // c13: central receiver outlet is higher than that required by the turbine:
     outputs[14] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
 
-    // c15:
+    // c14: Ratio parasitics vs power output <= 20%:
     if ( sum > 1.0 )
-      outputs[15] = outputs[1]/sum - 0.20;
+      outputs[15] = outputs[1]/sum - _cParasitics;
 
-    // c16: x23 <= x20:
+    // c15: x23 <= x20:
     outputs[16] = _exchangerTubesDout - _exchangerTubesSpacing;
 
-    // c17: x22 <= x23:
+    // c16: x22 <= x23:
     outputs[17] = _exchangerTubesDin  - _exchangerTubesDout;
 
-    // c18:
+    // c17: Pressure in steam generator tubes <= yield pressure:
     outputs[18] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
   }
   catch ( const std::exception & e ) {
@@ -1897,8 +1905,8 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // output a priori constraints:
     
     // total land area is below 2000k m^2:
-    outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0)) *
-      (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    outputs[4] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+      * (_fieldAngularWidth / 180.0) - _cFieldSurface;
     
     // tower at least twice as high as heliostats:
     outputs[5] = 2 * _heliostatLength - _towerHeight;
@@ -1912,7 +1920,7 @@ bool Scenario::simulate_maxNrg_minPar ( double * outputs , bool & cnt_eval ) {
     // Tubes fit in receiver:
     outputs[13] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
     
-    // c14: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
+    // c13: central receiver outlet is higher than that required by the turbine: Removed in version 0.4.0
     // outputs[14] = _minReceiverOutletTemp - _centralReceiverOutletTemperature;   
     
     outputs[16] = _exchangerTubesDout - _exchangerTubesSpacing;

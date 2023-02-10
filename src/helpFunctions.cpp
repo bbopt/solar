@@ -285,7 +285,7 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\t\tx13: Receiver tubes inner diameter (m): Real in [0.005;0.1]\n"
       << "\t\tx14: Receiver tubes outer diameter (m): Real in [0.005;0.1]\n"   
       << std::endl
-      << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
+      << "Constraints (outputs 2 to 13 with format ci <= 0):\n"
       << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 4e6 or: objective <= 4e6\n"
       << "\t c2: Compliance to demand (stochastic)\n"
       << "\t c3: Cost of plant <= budget=$300M\n"
@@ -295,16 +295,17 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\t c7: Pressure in receiver tubes <= yield pressure                  (stochastic)\n"
       << "\t c8: Molten salt melting point  <= hot storage lowest temperature  (stochastic)\n"
       << "\t c9: Molten salt melting point  <= cold storage lowest temperature (stochastic)\n"
-      << "\tc10: Molten salt melting point  <= steam generator outlet temperature\n"
-      << "\tc11: Receiver inside diameter   <= outside diameter: A priori, linear constraint: x13 <= x14\n"
-      << "\tc12: Tubes fit in receiver: A priori constraint: x11*x14 - x5 * PI / 2.0 <= 0\n"    
-      << "\tc13: Receiver outlet temperature >= steam turbine inlet temperature\n";
+    // c10 removed in version 0.5.4:
+    // << "\tc10: Molten salt melting point  <= steam generator outlet temperature\n"
+      << "\tc10: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint:     x13 <= x14\n"
+      << "\tc11: Number of tubes in receiver fit inside receiver   : A priori constraint        : x11*x14 <= x5*PI/2\n"    
+      << "\tc12: Receiver outlet temperature >= steam turbine inlet temperature\n";
   
   out << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 14 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $2" << std::endl
-      << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
+      << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
       << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R     R     R  I    R      R      R )" << std::endl
       << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0   1.0 793.0  1 0.01  0.005 0.0050 )" << std::endl
       << "\tX0               " << "( 11.0 11.0 140.0 10.0 10.0 2650 89.0  0.5   5.0 838.0 36 0.30  0.020 0.0216 )" << std::endl
@@ -353,18 +354,20 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\t\tx20: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
       << std::endl
       << "Constraints (outputs 2 to 14 with format ci <= 0):\n"
-      << "\tc1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 800000\n"
-      << "\tc2: Compliance to demand (stochastic)\n"
-      << "\tc3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
-      << "\tc4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
-      << "\tc5: Check that x6 heliostats can fit in the field\n"
-      << "\tc6: Pressure in tubes does not exceed yield pressure (stochastic)\n"
-      << "\tc7, c8, c9: Molten salt temperature does not fall below the melting point in storages and\n"
-      << "\t            at the steam generator outlet (c7 and c8: stochastic)\n"
-      << "\tc10: Tubes inside diameter is smaller than outer diameter  : A priori, linear constraint: x18 <= x19\n"
-      << "\tc11: Tubes can fit inside the receiver: A priori constraint: x16*x19 - x5*PI/2 <= 0\n"
-      << "\tc12: Receiver outlet temperature is higher than that required by the turbine\n"
-      << "\tc13: Check if storage is back to initial conditions (stochastic)\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 800000\n"
+      << "\t c2: Compliance to demand (stochastic)\n"
+      << "\t c3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
+      << "\t c4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"
+      << "\t c5: Check that x6 heliostats can fit in the field\n"
+      << "\t c6: Pressure in receiver tubes <= yield pressure (stochastic)\n"
+      << "\t c7: Molten salt melting point  <= hot storage lowest temperature  (stochastic)\n"
+      << "\t c8: Molten salt melting point  <= cold storage lowest temperature (stochastic)\n"
+    // c9 should be stochastic but this behavior was never observed
+      << "\t c9: Molten salt melting point  <= steam generator outlet temperature\n"   
+      << "\tc10: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint:     x18 <= x19\n"
+      << "\tc11: Number of tubes in receiver fit inside receiver   : A priori constraint        : x16*x19 <= x5*PI/2\n"
+      << "\tc12: Receiver outlet temperature >= steam turbine inlet temperature\n"
+      << "\tc13: Storage is back at least at its original conditions (stochastic)\n"
       << "\n-----------------------------------------------------------------\n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 20       << std::endl
@@ -435,17 +438,17 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\t c3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
       << "\t c5: Check that x6 heliostats can fit in the field\n"
-      << "\t c6: Pressure in receiver tubes does not exceed yield pressure (stochastic)\n"
-      << "\t c7: Hot storage temperature  >= molten salt melting point (stochastic)\n"
-      << "\t c8: Cold storage temperature >= molten salt melting point (stochastic)\n"
-      << "\t c9: Steam generator outlet temperature >= molten salt melting point (stochastic)\n"
-      << "\tc10: Receiver inside diameter <= receiver outside diameter: A priori, linear constraint: x18 <= x19\n"
+      << "\t c6: Pressure in receiver tubes <= yield pressure (stochastic)\n"
+      << "\t c7: Molten salt melting point  <= hot storage lowest temperature     (stochastic)\n"  
+      << "\t c8: Molten salt melting point  <= cold storage lowest temperature    (stochastic)\n"
+      << "\t c9: Molten salt melting point  <= steam generator outlet temperature (stochastic)\n"   
+      << "\tc10: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x18 <= x19\n"
       << "\tc11: Number of tubes in receiver fit inside receiver: A priori constraint: x16*x19 <= x5*PI/2\n"
-      << "\tc12: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
-      << "\tc13: Parasitics do not exceed 20% of energy production (stochastic)\n"
-      << "\tc14: Steam generator outer tubes diameter <= tubes spacing: A priori, linear constraint: x23 <= x20\n"
-      << "\tc15: Steam generator inside diameter      <= steam generator outside diameter: A priori, linear constraint: x22 <= x23\n"
-      << "\tc16: Pressure in steam generator tubes    <= yield pressure\n"
+      << "\tc12: Receiver outlet temperature >= steam turbine inlet temperature\n"
+      << "\tc13: Parasitic losses <= 18% of the generated output (stochastic)\n"
+      << "\tc14: Steam generator tubes outer diameter  <= tubes spacing: A priori, linear constraint: x23 <= x20\n"
+      << "\tc15: Steam generator tubes inside diameter <= Steam generator tubes outer diameter: A priori, linear constraint: x22 <= x23\n"
+      << "\tc16: Pressure in steam generator tubes <= yield pressure\n"
 
       << "\n-----------------------------------------------------------------\n"
       << "NOMAD parameters:\n\n"
@@ -508,13 +511,13 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\t c3: Molten salt melting point  <= hot storage lowest temperature\n"
       << "\t c4: Molten salt melting point  <= cold storage lowest temperature\n"
       << "\t c5: Molten salt melting point  <= steam generator outlet temperature\n"
-      << "\t c6: Receiver inside diameter   <= receiver outside diameter: A priori, linear constraint: x9 <= x10\n"
-      << "\t c7: Number of tubes in receiver fit inside receiver: A priori constraint: x7*x10 <= 6*PI/2\n"
+      << "\t c6: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x9 <= x10\n"
+      << "\t c7: Number of tubes in receiver fit inside receiver: A priori constraint: x7*x10 <= 3*PI\n"
       << "\t c8: Receiver outlet temperature >= steam turbine inlet temperature\n"
-      << "\t c9: Parasitic losses <= 18% of the generated output\n"
-      << "\tc10: Steam generator tubes outer diameter <= tubes spacing       : A priori, linear constraint: x14 <= x11\n"
-      << "\tc11: Steam generator tubes inner diameter <= tubes outer diameter: A priori, linear constraint: x13 <= x14\n"
-      << "\tc12: Pressure in steam generator tubes does not exceed yield pressure\n";
+      << "\t c9: Parasitic losses <= 18% of the generated output \n"
+      << "\tc10: Steam generator tubes outer diameter  <= tubes spacing       : A priori, linear constraint: x14 <= x11\n"
+      << "\tc11: Steam generator tubes inside diameter <= Steam generator tubes outer diameter: A priori, linear constraint: x13 <= x14\n"
+      << "\tc12: Pressure in steam generator tubes <= yield pressure\n";
 
   out << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
@@ -562,11 +565,11 @@ void print_minCost_TS ( std::ostream & out ) {
       << std::endl
       << "Constraints (outputs 2 to 7 with format ci <= 0):\n"
       << "\tc1: Compliance to demand\n"
-      << "\tc2: Pressure in receiver tubes does not exceed yield pressure\n"
+      << "\tc2: Pressure in receiver tubes  <= yield pressure\n"
       << "\tc3: Molten salt melting point   <= hot storage lowest temperature\n"
       << "\tc4: Molten salt melting point   <= cold storage lowest temperature\n"
       << "\tc5: Receiver outlet temperature >= steam turbine inlet temperature\n"
-      << "\tc6: At midnight, storage must be at least at its original conditions\n"
+      << "\tc6: Storage is back at least at its original conditions\n"
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 5 << std::endl
@@ -609,11 +612,11 @@ void print_maxEff_RE ( std::ostream & out ) {
       << std::endl
       << "Constraints (outputs 2 to 7 with format ci <= 0):\n"
       << "\tc1: Cost of plant <= budget=$45M\n"
-      << "\tc2: Pressure in tubes does not exceed yield pressure (stochastic)\n"
-      << "\tc3: Tubes inside diameter <= tubes outside diameter: A priori, linear constraint: x6 <= x7\n"
-      << "\tc4: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
-      << "\tc5: Tubes fit in receiver: A priori constraint: x4*x7 <= x2*PI/2\n"
-      << "\tc6: Parasitics do not exceed 5% of the absorbed power (stochastic)\n"   
+      << "\tc2: Pressure in receiver tubes     <= yield pressure (stochastic)\n"
+      << "\tc3: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x6 <= x7\n"
+      << "\tc4: Receiver outlet temperature    >= steam turbine inlet temperature\n"
+      << "\tc5: Number of tubes in receiver fit inside receiver: A priori constraint: x4*x7 <= x2*PI/2\n"
+      << "\tc6: Parasitic losses <= 3% of the generated output  (stochastic)\n"   
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
       << "\tDIMENSION        " << 7 << std::endl
@@ -638,8 +641,8 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\tMaximum field surface area: 400 hectares\n"
       << "\tMinimum energy production: 400MWh\n"
       << std::endl;
-    
-  out << "Objectives (first and second outputs)\n"
+  
+  out << "Objectives (first and second outputs; first objective is stochastic)\n"
       << "\tMaximize heliostat field performance (absorbed energy in Joules) and minimize cost of field, tower and receiver ($)\n"
       << std::endl;
 
@@ -666,10 +669,10 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\tc3: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
       << "\tc4: Check that x6 heliostats can fit in the field\n"
       << "\tc5: Pressure in receiver tubes <= yield pressure (stochastic)\n"
-      << "\tc6: Tubes inside diameter   <= tubes outside diameter: A priori, linear constraint: x12 <= x13\n"
-      << "\tc7: Tubes fit in receiver: A priori constraint: x10*x13 <= x5*PI/2\n"
-      << "\tc8: Minimal acceptable energy production (stochastic)\n"
-      << "\tc9: Parasitics must not exceed 8% of absorbed energy (stochastic)\n"
+      << "\tc6: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x12 <= x13\n"
+      << "\tc7: Number of tubes in receiver fit inside receiver: A priori constraint: x10*x13 <= x5*PI/2\n"
+      << "\tc8: Minimal acceptable energy production (lower bound on the first objective, stochastic)\n"
+      << "\tc9: Parasitic losses <= 8% of the generated output  (stochastic)\n"
   
       << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
@@ -694,7 +697,7 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tDuration: 24 hours\n"
       << "\tMaximum field surface area: 500 hectares\n"
       << "\tBudget: $1.2B\n"
-      << "\tMinimum energy production: 250MWh\n"
+      << "\tMinimum energy production: 120MWh\n"
       << std::endl;
   
   out << "Objectives (first and second outputs; the two objectives are stochastic)\n"
@@ -738,7 +741,7 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << std::endl
       << "Constraints (outputs 3 to 19 with format ci <= 0):\n"
       << "\t c1: Cost of plant <= budget=$1.2B\n"
-      << "\t c2: Minimum energy production is reached (stochastic)\n"
+      << "\t c2: Minimal acceptable energy production (stochastic)\n"
       << "\t c3: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 5e6\n"
       << "\t c4: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
       << "\t c5: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"  
@@ -747,13 +750,13 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\t c8: Molten salt melting point  <= hot storage lowest temperature     (stochastic)\n"
       << "\t c9: Molten salt melting point  <= cold storage lowest temperature    (stochastic)\n"
       << "\tc10: Molten salt melting point  <= steam generator outlet temperature (stochastic)\n"
-      << "\tc11: Receiver inside diameter   <= receiver outside diameter: A priori, linear constraint: x18 <= x19\n"
-      << "\tc12: Tubes fit in receiver: A priori constraint:  x16*x19 <= x5*PI/2\n"
-      << "\tc13: Receiver outlet temperature must exceed steam turbine inlet temperature\n"
-      << "\tc14: Ratio parasitics vs power output     <= 20% (stochastic)\n"
-      << "\tc15: Steam generator outer tubes diameter <= tubes spacing\n"
-      << "\tc16: Steam generator inside diameter      <= steam generator outside diameter: A priori, linear constraint: x23 <= x20\n"
-      << "\tc17: Pressure in steam generator tubes    <= yield pressure                  : A priori, linear constraint: x22 <= x23\n";
+      << "\tc11: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x18 <= x19\n"
+      << "\tc12: Number of tubes in receiver fit inside receiver: A priori constraint:  x16*x19 <= x5*PI/2\n"
+      << "\tc13: Receiver outlet temperature >= steam turbine inlet temperature\n"
+      << "\tc14: Parasitic losses <= 20% of the generated output  (stochastic)\n"
+      << "\tc15: Steam generator tubes outer diameter  <= tubes spacing: A priori, linear constraint: x23 <= x20\n"
+      << "\tc16: Steam generator tubes inside diameter <= Steam generator tubes outer diameter: A priori, linear constraint: x22 <= x23\n"
+      << "\tc17: Pressure in steam generator tubes <= yield pressure\n";
 
   out << "\n----------------------------------------------------------------- \n"
       << "NOMAD parameters:\n\n"
