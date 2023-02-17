@@ -1,4 +1,4 @@
-# SOLAR v0.5.4 (February 2023)
+# SOLAR v0.5.5 (February 2023)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -70,16 +70,17 @@ Help for a problem: solar pb_id or solar -h pb_id
 The list of instances is:
 
 ```
-	#	          pb_id	                              obj.(f)	# of objectives(p)	   # of var.(n)	# of constr.(m)
-	1	      MAXNRG_H1	   total solar energy on the receiver	              1	              9	              5
-	2	     MINSURF_H1	       total heliostats field surface	              1	             14	             13
-	3	     MINCOST_C1	                total investment cost	              1	             20	             13
-	4	     MINCOST_C2	                total investment cost	              1	             29	             16
-	5	   MAXCOMP_HTF1	       compliance to a demand profile	              1	             20	             12
-	6	     MINCOST_TS	                      cost of storage	              1	              5	              6
-	7	      MAXEFF_RE	                  receiver efficiency	              1	              7	              6
-	8	  MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
-	9	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
+	#	              pb_id	                              obj.(f)	# of objectives(p)	   # of var.(n)	# of constr.(m)
+	1	          MAXNRG_H1	   total solar energy on the receiver	              1	              9	              5
+	2	         MINSURF_H1	       total heliostats field surface	              1	             14	             13
+	3	         MINCOST_C1	                total investment cost	              1	             20	             13
+	4	         MINCOST_C2	                total investment cost	              1	             29	             16
+	5	       MAXCOMP_HTF1	       compliance to a demand profile	              1	             20	             12
+	6	         MINCOST_TS	                      cost of storage	              1	              5	              6
+	7	          MAXEFF_RE	                  receiver efficiency	              1	              7	              6
+	8	      MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
+	9    	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
+   10 MINCOST_UNCONSTRAINED	          cost of storage + penalties	              1	              5	              0
 ```
 List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
 ```
@@ -89,7 +90,7 @@ List of best know values for single-objective instances (one replication, full f
 	SOLAR4 	108,197,236.146
 	SOLAR5 	-28.8817193932
 	SOLAR6 	44,298,455.5682
-	SOLAR7 	-4,939.4070342
+	SOLAR7 	-4,948.69746863
 	SOLAR10	42.905683
 ```
 
