@@ -85,12 +85,12 @@ The list of instances is:
 List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
 ```
 	SOLAR1 	-902,503.692418
-	SOLAR2 	987,823.606284
-	SOLAR3 	77,486,732.8425
+	SOLAR2 	841,839.671915
+	SOLAR3 	69,551,262.3879
 	SOLAR4 	108,197,236.146
 	SOLAR5 	-28.8817193932
 	SOLAR6 	44,298,455.5682
-	SOLAR7 	-4,948.69746863
+	SOLAR7 	-4,972.88689831
 	SOLAR10	42.905683
 ```
 
