@@ -5,7 +5,7 @@ LIBS               = -lc -lm
 INCLUDE            = -I.
 COMPILE            = $(COMPILATOR) $(COMPILATOR_OPTIONS) $(INCLUDE) -c
 OBJS               = main.o CentralReceiver.o Time_Manager.o Economics.o Global.o Turbine.o \
-                     HeatExchanger.o Heliostat.o HeliostatField.o HtfCycle.o helpFunctions.o RNG.o \
+                     HeatExchanger.o Heliostat.o HeliostatField.o HtfCycle.o helpFunctions.o sampling.o Random_Pickup.o RNG.o \
                      MoltenSalt.o Powerblock.o Powerplant.o Problem.o Scenario.o Sunray.o Sun.o ThermalStorage.o \
                      Clock.o Evaluator.o
 
@@ -39,10 +39,13 @@ helpFunctions.o: helpFunctions.hpp helpFunctions.cpp Scenario.o
 HtfCycle.o: HtfCycle.cpp HtfCycle.hpp CentralReceiver.o ThermalStorage.o HeatExchanger.o MoltenSalt.o Global.o Constants.hpp
 	$(COMPILE) HtfCycle.cpp
 
-main.o: main.cpp Evaluator.o
+main.o: main.cpp sampling.o Evaluator.o
 	$(COMPILE) main.cpp
 
-Evaluator.o: Evaluator.cpp Evaluator.hpp helpFunctions.o Global.o Clock.o
+sampling.o: sampling.cpp sampling.hpp Evaluator.o Random_Pickup.o
+	$(COMPILE) sampling.cpp
+
+Evaluator.o: Evaluator.cpp Evaluator.hpp Problem.o helpFunctions.o Global.o Clock.o
 	$(COMPILE) Evaluator.cpp
 
 Clock.o: Clock.cpp Clock.hpp
@@ -62,6 +65,9 @@ Problem.o: Problem.cpp Problem.hpp Global.o
 
 Scenario.o: Scenario.cpp Scenario.hpp Global.o Powerplant.o Problem.o
 	$(COMPILE) Scenario.cpp
+
+Random_Pickup.o: Random_Pickup.cpp Random_Pickup.hpp RNG.o
+	$(COMPILE) Random_Pickup.cpp
 
 RNG.o: RNG.cpp RNG.hpp
 	$(COMPILE) RNG.cpp

@@ -28,12 +28,12 @@
 /*-----------------------------------------------------------*/
 void display_best_solutions ( std::ostream & out ) {
   out << "\tSOLAR1 \t-902,503.692418" << std::endl
-      << "\tSOLAR2 \t987,823.606284"  << std::endl
-      << "\tSOLAR3 \t77,486,732.8425" << std::endl
+      << "\tSOLAR2 \t841,839.671915"  << std::endl
+      << "\tSOLAR3 \t70,813,885.0684" << std::endl
       << "\tSOLAR4 \t108,197,236.146" << std::endl
       << "\tSOLAR5 \t-28.8817193932"  << std::endl
-      << "\tSOLAR6 \t44,298,455.5682" << std::endl
-      << "\tSOLAR7 \t-4,939.4070342"  << std::endl
+      << "\tSOLAR6 \t43,955,452.8547" << std::endl
+      << "\tSOLAR7 \t-4,972.88703862"  << std::endl
       << "\tSOLAR10\t42.905683"       << std::endl;
 }
 
@@ -280,7 +280,7 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\t\t x9: Maximum distance from tower (% of tower height): Real in [1;20]\n"
       << "\tHeat transfer loop:\n"
       << "\t\tx10: Receiver outlet temperature   (K): Real in [793;995]\n"
-      << "\t\tx11: Receiver number of tubes         : Integer >= 1\n"
+      << "\t\tx11: Receiver number of tubes         : Integer in {1,2,...,9424}\n"
       << "\t\tx12: Receiver insulation thickness (m): Real in [0.01 ;5  ]\n"
       << "\t\tx13: Receiver tubes inner diameter (m): Real in [0.005;0.1]\n"
       << "\t\tx14: Receiver tubes outer diameter (m): Real in [0.005;0.1]\n"   
@@ -306,10 +306,10 @@ void print_minSurf_H1 ( std::ostream & out ) {
       << "\tDIMENSION        " << 14 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $2" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R     R     R  I    R      R      R )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0   1.0 793.0  1 0.01  0.005 0.0050 )" << std::endl
-      << "\tX0               " << "( 11.0 11.0 140.0 10.0 10.0 2650 89.0  0.5   5.0 838.0 36 0.30  0.020 0.0216 )" << std::endl
-      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0  20.0 995.0  - 5.00  0.100 0.1000 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R     R     R    I    R      R      R )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0   1.0 793.0    1 0.01  0.005 0.0050 )" << std::endl
+      << "\tX0               " << "( 11.0 11.0 140.0 10.0 10.0 2650 89.0  0.5   5.0 838.0   36 0.30  0.020 0.0216 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0  20.0 995.0 9424 5.00  0.100 0.1000 )" << std::endl;
 }
 
 /*--------------  #3  ---------------------------*/
@@ -346,7 +346,7 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\t\tx13: Hot storage insulation thickness  (m): Real in [0.01;5]\n"
       << "\t\tx14: Cold storage insulation thickness (m): Real in [0.01;5]\n"
       << "\t\tx15: Mininum cold storage temperature  (K): Real in [495;650]\n"
-      << "\t\tx16: Receiver number of tubes             : Integer >= 1\n"
+      << "\t\tx16: Receiver number of tubes             : Integer in {1,2,...,9424}\n"
       << "\t\tx17: Receiver insulation thickness (m)    : Real in [0.01 ;5  ]\n"
       << "\t\tx18: Receiver tubes inner diameter (m)    : Real in [0.005;0.1]\n"
       << "\t\tx19: Receiver tubes outer diameter (m)    : Real in [0.005;0.1]\n"
@@ -373,10 +373,10 @@ void print_minCost_C1 ( std::ostream & out ) {
       << "\tDIMENSION        " << 20       << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $3" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R   I    R    R    R     R    R    R    R    R     R  I    R     R     R I )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0   1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0  1 0.01 0.005 0.005 1 )" << std::endl
-      << "\tX0               " << "(  8.0  8.0 150.0  7.0  7.0 250 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 40 0.30 0.015 0.017 3 )" << std::endl
-      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0   - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0  - 5.00 0.100 0.100 8 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R   I    R    R    R     R    R    R    R    R     R    I    R     R     R I )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0   1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0    1 0.01 0.005 0.005 1 )" << std::endl
+      << "\tX0               " << "(  8.0  8.0 150.0  7.0  7.0 250 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0   40 0.30 0.015 0.017 3 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0   - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0 9424 5.00 0.100 0.100 8 )" << std::endl;
 }
 
 /*--------------  #4  ---------------------------*/
@@ -415,7 +415,7 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\t\tx13: Hot storage insulation thickness  (m): Real in [0.01;5]\n"
       << "\t\tx14: Cold storage insulation thickness (m): Real in [0.01;5]\n"
       << "\t\tx15: Mininum cold storage temperature  (K): Real in [495;650]\n"
-      << "\t\tx16: Receiver number of tubes             : Integer >= 1\n"
+      << "\t\tx16: Receiver number of tubes             : Integer in {1,2,...,7853}\n"
       << "\t\tx17: Receiver insulation thickness     (m): Real in [0.01 ;5  ]\n"
       << "\t\tx18: Receiver tubes inner diameter     (m): Real in [0.005;0.1]\n"
       << "\t\tx19: Receiver tubes outer diameter     (m): Real in [0.006;0.1]\n"
@@ -455,10 +455,10 @@ void print_minCost_C2 ( std::ostream & out ) {
       << "\tDIMENSION        " << 29 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $4" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R   I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0   1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
-      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl  
-      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0   - 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R    I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0    1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
+      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0  500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl  
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0 7853 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
 }
 
 /*--------------  #5  ---------------------------*/
@@ -488,7 +488,7 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\t\t x4: Hot storage insulation thickness  (m): Real in [0.01;2]\n"
       << "\t\t x5: Cold storage insulation thickness (m): Real in [0.01;2]\n"
       << "\t\t x6: Mininum cold storage temperature  (K): Real in [495;650]\n"
-      << "\t\t x7: Receiver number of tubes             : Integer >= 1\n"
+      << "\t\t x7: Receiver number of tubes             : Integer in {1,2,...,1884}\n"
       << "\t\t x8: Receiver insulation thickness     (m): Real in [0.100;2.0]\n"
       << "\t\t x9: Receiver tubes inner diameter     (m): Real in [0.005;0.1]\n"
       << "\t\tx10: Receiver tubes outer diameter     (m): Real in [0.005;0.1]\n"
@@ -515,7 +515,7 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\t c7: Number of tubes in receiver fit inside receiver: A priori constraint: x7*x10 <= 3*PI\n"
       << "\t c8: Receiver outlet temperature >= steam turbine inlet temperature\n"
       << "\t c9: Parasitic losses <= 18% of the generated output \n"
-      << "\tc10: Steam generator tubes outer diameter  <= tubes spacing       : A priori, linear constraint: x14 <= x11\n"
+      << "\tc10: Steam generator tubes outer diameter  <= tubes spacing: A priori, linear constraint: x14 <= x11\n"
       << "\tc11: Steam generator tubes inside diameter <= Steam generator tubes outer diameter: A priori, linear constraint: x13 <= x14\n"
       << "\tc12: Pressure in steam generator tubes <= yield pressure\n";
 
@@ -524,10 +524,10 @@ void print_maxComp_HTF1 ( std::ostream & out ) {
       << "\tDIMENSION        " << 20 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $5" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(     R    R    R    R    R   R  I    R     R     R      R    R       R     R    R I    I  I I I )" << std::endl
-      << "\tLOWER_BOUND      " << "( 793.0  1.0  1.0 0.01 0.01 495  1 0.10 0.005 0.005  0.006  0.5   0.005 0.006 0.15 2    1  1 1 1 )" << std::endl
-      << "\tX0               " << "( 900.0 10.0 12.0 0.15 0.10 560 24 0.35 0.020 0.023  0.050  8.0   0.020 0.023 0.20 2 5000  5 5 1 )" << std::endl
-      << "\tUPPER_BOUND      " << "( 995.0 30.0 30.0 2.00 2.00 650  - 2.00 0.100 0.100  0.200 10.0   0.100 0.100 0.4  -    - 10 9 8 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(     R    R    R    R    R   R    I    R     R     R      R    R       R     R    R I    I  I I I )" << std::endl
+      << "\tLOWER_BOUND      " << "( 793.0  1.0  1.0 0.01 0.01 495    1 0.10 0.005 0.005  0.006  0.5   0.005 0.006 0.15 2    1  1 1 1 )" << std::endl
+      << "\tX0               " << "( 900.0 10.0 12.0 0.15 0.10 560   24 0.35 0.020 0.023  0.050  8.0   0.020 0.023 0.20 2 5000  5 5 1 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 995.0 30.0 30.0 2.00 2.00 650 1884 2.00 0.100 0.100  0.200 10.0   0.100 0.100 0.4  -    - 10 9 8 )" << std::endl;
 }
 
 /*--------------  #6  ---------------------------*/
@@ -605,7 +605,7 @@ void print_maxEff_RE ( std::ostream & out ) {
       << "\t\tx2: Receiver aperture width  (m): Real in [ 1; 30]\n"
       << "\tHeat transfer loop:\n"
       << "\t\tx3: Receiver outlet temperature   (K): Real in [793;995]\n"
-      << "\t\tx4: Receiver number of tubes         : Integer >= 1\n"
+      << "\t\tx4: Receiver number of tubes         : Integer in {1,2,...,8567}\n"
       << "\t\tx5: Receiver insulation thickness (m): Real in [0.01  ;5.0]\n"
       << "\t\tx6: Receiver tubes inner diameter (m): Real in [0.005 ;0.1]\n"
       << "\t\tx7: Receiver tubes outer diameter (m): Real in [0.0055;0.1]\n"
@@ -622,10 +622,10 @@ void print_maxEff_RE ( std::ostream & out ) {
       << "\tDIMENSION        " << 7 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $7" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R  I    R     R      R )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0 793.0  1 0.01 0.005 0.0055 )" << std::endl
-      << "\tX0               " << "(  7.0  7.0 850.0 40 0.20 0.010 0.0110 )" << std::endl
-      << "\tUPPER_BOUND      " << "( 30.0 30.0 995.0  - 5.00 0.100 0.1000 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    I    R     R      R )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0 793.0    1 0.01 0.005 0.0055 )" << std::endl
+      << "\tX0               " << "(  7.0  7.0 850.0   40 0.20 0.010 0.0110 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 30.0 30.0 995.0 8567 5.00 0.100 0.1000 )" << std::endl;
 }
 
 /*--------------  #8  ---------------------------*/
@@ -658,7 +658,7 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\t\t x8: Minimum distance from tower (% of tower height): Real in [0;20]\n"
       << "\t\t x9: Maximum distance from tower (% of tower height): Real in [1;20]\n"
       << "\tHeat transfer loop:\n"
-      << "\t\tx10: Receiver number of tubes         : Integer >= 1\n"
+      << "\t\tx10: Receiver number of tubes         : Integer in {1,2,...,7853}\n"
       << "\t\tx11: Receiver insulation thickness (m): Real in [0.01 ;5  ]\n"
       << "\t\tx12: Receiver tubes inner diameter (m): Real in [0.005;0.1]\n"
       << "\t\tx13: Receiver tubes outer diameter (m): Real in [0.006;0.1]\n"
@@ -679,10 +679,10 @@ void print_maxHF_minCost ( std::ostream & out ) {
       << "\tDIMENSION        " << 13 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $8" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R  I    R     R      R )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0  1 0.01 0.005 0.0060 )" << std::endl
-      << "\tX0               " << "( 11.0 11.0 200.0 10.0 10.0 2650 89.0  0.5  8.0 36 0.30 0.020 0.0216 )" << std::endl
-      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0  - 5.00 0.100 0.1000 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R    I    R     R      R )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0    1 0.01 0.005 0.0060 )" << std::endl
+      << "\tX0               " << "( 11.0 11.0 200.0 10.0 10.0 2650 89.0  0.5  8.0   36 0.30 0.020 0.0216 )" << std::endl
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 7853 5.00 0.100 0.1000 )" << std::endl;
 }
 
 /*--------------  #9  ---------------------------*/
@@ -722,7 +722,7 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\t\tx13: Hot storage insulation thickness  (m): Real in [0.01;5]\n"
       << "\t\tx14: Cold storage insulation thickness (m): Real in [0.01;5]\n"
       << "\t\tx15: Mininum cold storage temperature  (K): Real in [495;650]\n"
-      << "\t\tx16: Receiver number of tubes             : Integer >= 1\n"
+      << "\t\tx16: Receiver number of tubes             : Integer in {1,2,...,7853}\n"
       << "\t\tx17: Receiver insulation thickness (m)    : Real in [0.01 ;5  ]\n"
       << "\t\tx18: Receiver tubes inner diameter (m)    : Real in [0.005;0.1]\n"
       << "\t\tx19: Receiver tubes outer diameter (m)    : Real in [0.006;0.1]\n"
@@ -763,10 +763,10 @@ void print_maxNrg_minPar ( std::ostream & out ) {
       << "\tDIMENSION        " << 29 << std::endl
       << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $9" << std::endl
       << "\tBB_OUTPUT_TYPE   " << "OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
-      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R   I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
-      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0   1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
-      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0 500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl   
-      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0   - 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R    I    R      R     R     R    R      R     R    R I     I  I I I )" << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0    1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 )" << std::endl
+      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0  500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 )" << std::endl   
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0 7853 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 )" << std::endl;
 }
 
 /*--------------  #10 -------------------------------------*/

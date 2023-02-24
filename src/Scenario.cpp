@@ -2021,7 +2021,7 @@ bool Scenario::simulate_minCost_unconstrained ( double * outputs              ,
 }
 
 /*-------------------------------------------------*/
-/*          validate problem maxNrg_H1 (#1)        */
+/*      check bounds for problem maxNrg_H1 (#1)    */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxNrg_H1 ( void ) const {
 
@@ -2074,7 +2074,7 @@ bool Scenario::check_apriori_constraints_maxNrg_H1 ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*         validate problem minSurf_H1 (#2)        */
+/*     check bounds for problem minSurf_H1 (#2)    */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minSurf_H1 ( void ) const {
 
@@ -2108,7 +2108,7 @@ bool Scenario::check_bounds_minSurf_H1 ( void ) const {
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
 
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 9424 )
     return false;
 
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
@@ -2151,7 +2151,7 @@ bool Scenario::check_apriori_constraints_minSurf_H1 ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*          validate problem minCost_C1 (#3)       */
+/*      check bounds for problem minCost_C1 (#3)   */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minCost_C1 ( void ) const {
  
@@ -2200,7 +2200,7 @@ bool Scenario::check_bounds_minCost_C1 ( void ) const {
   if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 9424 )
     return false;
 
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
@@ -2246,7 +2246,7 @@ bool Scenario::check_apriori_constraints_minCost_C1 ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*          validate problem minCost_C2 (#4)       */
+/*      check bounds for problem minCost_C2 (#4)   */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minCost_C2 ( void ) const {
 
@@ -2295,7 +2295,7 @@ bool Scenario::check_bounds_minCost_C2 ( void ) const {
   if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 7853 )
     return false;
   
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
@@ -2374,7 +2374,7 @@ bool Scenario::check_apriori_constraints_minCost_C2 ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*         validate problem maxComp_HTF1 (#5)      */
+/*     check bounds for problem maxComp_HTF1 (#5)  */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxComp_HTF1 ( void ) const {
  
@@ -2396,7 +2396,7 @@ bool Scenario::check_bounds_maxComp_HTF1 ( void ) const {
   if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
   
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 1884 )
     return false;
   
   if ( _receiverInsulThickness < 0.1 || _receiverInsulThickness > 2 )
@@ -2465,7 +2465,7 @@ bool Scenario::check_apriori_constraints_maxComp_HTF1 ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*         validate problem minCost_TS (#6)        */
+/*      check bounds for problem minCost_TS (#6)   */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_minCost_TS ( void ) const {
  
@@ -2497,7 +2497,7 @@ bool Scenario::check_apriori_constraints_minCost_TS ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*         validate problem maxEff_RE (#7)         */
+/*       check bounds for problem maxEff_RE (#7)   */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxEff_RE ( void ) const {
 
@@ -2510,7 +2510,7 @@ bool Scenario::check_bounds_maxEff_RE ( void ) const {
   if ( _centralReceiverOutletTemperature > 995 )
     return false;
  
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 8567 )
     return false;
   
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5.0 )
@@ -2543,7 +2543,7 @@ bool Scenario::check_apriori_constraints_maxEff_RE ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*        validate problem maxHF_minCost (#8)      */
+/*    check bounds for problem maxHF_minCost (#8)  */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxHF_minCost ( void ) const {
 
@@ -2574,7 +2574,7 @@ bool Scenario::check_bounds_maxHF_minCost ( void ) const {
   if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
     return false;
    
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 7853 )
     return false;
   
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
@@ -2614,7 +2614,7 @@ bool Scenario::check_apriori_constraints_maxHF_minCost ( void ) const {
 }
 
 /*-------------------------------------------------*/
-/*        validate problem maxNrg_minPar (#9)      */
+/*    check bounds for problem maxNrg_minPar (#9)  */
 /*-------------------------------------------------*/
 bool Scenario::check_bounds_maxNrg_minPar ( void ) const {
 
@@ -2663,7 +2663,7 @@ bool Scenario::check_bounds_maxNrg_minPar ( void ) const {
   if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
     return false;
 
-  if ( _receiverNbOfTubes < 1 )
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 7853 )
     return false;
 
   if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )

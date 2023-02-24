@@ -21,53 +21,36 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
+#include "Random_Pickup.hpp"
 
-/*-----------------------------------------------*/
-/*  RNG class imported from NOMAD                */
-/*-----------------------------------------------*/
-#ifndef __RNG__
-#define __RNG__
+Random_Pickup::Random_Pickup ( int n ) : _n0   ( n          ) ,
+					 _n    ( n          ) ,
+					 _elts ( new int[n] )   {
+  for ( int i = 0 ; i < n ; ++i )
+    _elts[i] = i;
+}
 
-#include <cmath>
-#include <stdexcept>
-#include <climits>
+void Random_Pickup::reset ( void ) {
+  _n = _n0;
+  for ( int i = 0 ; i < _n ; ++i )
+    _elts[i] = i;
+}
 
-// use of 'access' or '_access', and getpid() or _getpid():
-#ifdef _MSC_VER
-#include <io.h>
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
-
-#if !defined(UINT32_MAX)
-typedef unsigned int uint32_t;
-#define UINT32_MAX    0xffffffff
-#endif
-
-class RNG {
-
-private:
-  
-  static uint32_t x_def,y_def,z_def,_x,_y,_z;
-  static int _s;
-
-  // reset seed to its default value:
-  static void reset_private_seed_to_default ( void ) {
-    _x=x_def;
-    _y=y_def;
-    _z=z_def;
+int Random_Pickup::pickup ( void ) {
+  if ( _n == 0 )
+    return 0;
+  int ind = RNG::rand()%_n;
+  int tmp = _elts[ind];
+  if ( ind < _n - 1 ) {
+    _elts[ind ] = _elts[_n-1];
+    _elts[_n-1] = tmp;
   }
-  
-public:  
-  
-  static int  get_seed ( void ) { return static_cast<int>(_s); }
-  static void set_seed ( int s );
-  static int  get_pid  ( void );
+  --_n;
+  return tmp;
+}
 
-  static uint32_t rand ( void );
-  static double   rand ( double a, double b) { return a+((b-a)*RNG::rand())/UINT32_MAX; }
+void Random_Pickup::cancel_last_pickup ( void ) {
+  if ( _n < _n0 )
+    ++_n;
+}
 
-};
-
-#endif

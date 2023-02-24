@@ -27,6 +27,7 @@
 #include "helpFunctions.hpp"
 #include "Global.hpp"
 #include "Clock.hpp"
+#include "Problem.hpp"
 #include <iostream>
 #include <ostream>
 #include <fstream>

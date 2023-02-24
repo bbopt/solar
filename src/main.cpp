@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------------*/
-/*  SOLAR - The solar thermal power plant simulator - version 0.5.4              */
+/*  SOLAR - The solar thermal power plant simulator - version 0.5.5              */
 /*  https://github.com/bbopt/solar                                               */
 /*                                                                               */
-/*  2023-02-10                                                                   */
+/*  2023-02-24                                                                   */
 /*                                                                               */
 /*  Miguel Diago, Sebastien Le Digabel, Mathieu Lemyre-Garneau, Bastien Talgorn  */
 /*                                                                               */
@@ -28,19 +28,19 @@
 /* (one replication, full fidelity, default seed of zero):                       */
 /*                                                                               */
 /* SOLAR1    -902,503.692418                                                     */
-/* SOLAR2     987,823.606284                                                     */
-/* SOLAR3  77,486,732.8425                                                       */
+/* SOLAR2     841,839.671915                                                     */
+/* SOLAR3  70,813,885.0684                                                       */
 /* SOLAR4 108,197,236.146                                                        */
 /* SOLAR5         -28.8817193932                                                 */
-/* SOLAR6  44,298,455.5682                                                       */
-/* SOLAR7      -4,939.4070342                                                    */
+/* SOLAR6  43,955,452.8547                                                       */
+/* SOLAR7      -4,972.88703862                                                   */
 /* SOLAR10         42.905683                                                     */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
 #include "Evaluator.hpp"
 
 // version:
-const std::string VERSION = "0.5.4, 2023-02-10";
+const std::string VERSION = "0.5.5, 2023-02-24";
 
 // validation functions:
 bool check ( bool fast );
@@ -268,6 +268,7 @@ int main ( int argc , char ** argv ) {
 /*  + it allows to retrieve the simulation_completed and cnt_eval flags   */
 /*  + to use it, rename main_minimal by main and rename the "true" solar  */
 /*    main function                                                       */
+/*  + see main_minimal2() for a variation of this example                 */
 /*------------------------------------------------------------------------*/
 int main_minimal ( void ) {
 
@@ -301,7 +302,7 @@ int main_minimal ( void ) {
   evaluator.eval_x ( x_index, seed, fidelity, replications, simulation_completed, cnt_eval, error_msg, verbose );
   
   // get the outputs: this puts the outputs into output_stream:
-  // (SOLAR10 has only one output, the objecitve)
+  // (SOLAR10 has only one output, the objective)
   evaluator.display_outputs();
 
   // to get the output as a real:
@@ -311,6 +312,61 @@ int main_minimal ( void ) {
   std::cout << "output              : " << output_stream.str()  << std::endl
 	    << "simulation completed: " << simulation_completed << std::endl
 	    << "count evaluation    : " << cnt_eval             << std::endl;
+  
+  return 0;
+}
+
+/*---------------------------------------------------------------------------------*/
+/*  another minimal example of a single evaluation (with inputs read from a file)  */
+/*---------------------------------------------------------------------------------*/
+int main_minimal2 ( int argc, char ** argv ) {
+
+  if ( argc != 2 )
+    return 1;
+
+  // set the problem: SOLAR5
+  std::vector<Problem> problems;
+  create_problems ( problems );
+  const Problem * pb = find_problem ( problems, "5" );
+  int n = 20;
+  
+  std::ostringstream output_stream;
+  Evaluator evaluator ( *pb, output_stream );
+  
+  // set the input point:
+  double * x = new double[n];
+  std::ifstream in ( argv[1] );
+
+  if ( in.fail() ) {
+    delete [] x;
+    in.close();
+    return 1;
+  }
+   
+  for ( int i = 0 ; i < n ; ++i )
+    in >> x[i];
+  in.close();
+  evaluator.set_x(x);
+  delete [] x;
+  
+  // parameters of the evaluation:
+  int         x_index              = 0;     // only one point
+  int         seed                 = 0;     // random seed
+  double      fidelity             = 1.0;   // full fidelity
+  int         replications         = 1;     // one replication
+  bool        simulation_completed = false; // output flag
+  bool        cnt_eval             = false; // output flag
+  bool        verbose              = false; // no display
+  std::string error_msg;                    // error message
+  
+  // the evaluation:
+  evaluator.eval_x ( x_index, seed, fidelity, replications, simulation_completed, cnt_eval, error_msg, verbose );
+  
+  // get the outputs: this puts the outputs into output_stream:
+  evaluator.display_outputs();
+  
+  // display the outputs: objective and flags:
+  std::cout << output_stream.str()  << " " << cnt_eval << std::endl;
   
   return 0;
 }

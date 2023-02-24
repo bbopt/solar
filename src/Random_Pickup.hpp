@@ -23,51 +23,24 @@
 /*-------------------------------------------------------------------------------*/
 
 /*-----------------------------------------------*/
-/*  RNG class imported from NOMAD                */
+/*      class imported from NOMAD                */
 /*-----------------------------------------------*/
-#ifndef __RNG__
-#define __RNG__
+#ifndef __RANDOM_PICKUP__
+#define __RANDOM_PICKUP__
 
-#include <cmath>
-#include <stdexcept>
-#include <climits>
+#include "RNG.hpp"
 
-// use of 'access' or '_access', and getpid() or _getpid():
-#ifdef _MSC_VER
-#include <io.h>
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
-
-#if !defined(UINT32_MAX)
-typedef unsigned int uint32_t;
-#define UINT32_MAX    0xffffffff
-#endif
-
-class RNG {
-
+class Random_Pickup {
 private:
-  
-  static uint32_t x_def,y_def,z_def,_x,_y,_z;
-  static int _s;
-
-  // reset seed to its default value:
-  static void reset_private_seed_to_default ( void ) {
-    _x=x_def;
-    _y=y_def;
-    _z=z_def;
-  }
-  
-public:  
-  
-  static int  get_seed ( void ) { return static_cast<int>(_s); }
-  static void set_seed ( int s );
-  static int  get_pid  ( void );
-
-  static uint32_t rand ( void );
-  static double   rand ( double a, double b) { return a+((b-a)*RNG::rand())/UINT32_MAX; }
-
+  int   _n0;
+  int   _n;
+  int * _elts;
+public:
+  Random_Pickup ( int n );
+  virtual ~Random_Pickup ( void ) { delete [] _elts; }
+  void reset ( void );
+  int pickup ( void );
+  void cancel_last_pickup ( void );
 };
 
 #endif
