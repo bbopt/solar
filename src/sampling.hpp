@@ -21,14 +21,14 @@
 /*  along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
-#ifndef __HELPFUNCTIONS_H__
-#define __HELPFUNCTIONS_H__
+#ifndef __SAMPLING_H__
+#define __SAMPLING_H__
 
 #include "Evaluator.hpp"
 #include "Random_Pickup.hpp"
 
 void sampling ( void );
-void get_random_points (size_t p, size_t n, const double * lb, const double * ub, std::vector<double *> & points );
-void get_LH_points     (size_t p, size_t n, const double * lb, const double * ub, std::vector<double *> & points );
+void get_random_points ( size_t p, size_t n, const double * lb, const double * ub, std::vector<double *> & points );
+void get_LH_points     ( size_t p, size_t n, const double * lb, const double * ub, std::vector<double *> & points );
   
 #endif

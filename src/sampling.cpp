@@ -37,10 +37,10 @@ void sampling ( void ) {
   create_problems ( problems );
 
   // number of sampling points:
-  size_t p = 10000;
-
+  size_t p = 30;
+  
   // set the instance:
-  int instance = 9;
+  int instance = 6;
 
   int n = 0 , m = 0;
   const Problem * pb = NULL;
@@ -327,6 +327,18 @@ void sampling ( void ) {
       points[k][28] = myround(points[k][28]);
     }
   }
+
+  // For only displaying the LH points:
+  // {
+  //   for ( size_t k = 0 ; k < p ; ++k ) {
+  //     for ( int i = 0 ; i < n ; ++i )
+  //  	std::cout << points[k][i] << " ";
+  //      std::cout << std::endl;
+  //   }
+  //   for ( size_t k = 0 ; k < p ; ++k )
+  //     delete [] points[k];
+  //   return;
+  // }
   
   std::vector<double> all_f;
   std::vector<double> all_f1;

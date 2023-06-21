@@ -1,4 +1,4 @@
-# SOLAR v0.5.5 (February 2023)
+# SOLAR v0.5.6 (June 2023)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -89,7 +89,7 @@ List of best know values for single-objective instances (one replication, full f
 	SOLAR3 	70,813,885.0684
 	SOLAR4 	108,197,236.146
 	SOLAR5 	-28.8817193932
-	SOLAR6 	43,955,452.8547
+	SOLAR6 	43,954,935.1836
 	SOLAR7 	-4,972.88703862
 	SOLAR10	42.905683
 ```
