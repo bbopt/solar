@@ -34,7 +34,7 @@ void display_best_solutions ( std::ostream & out ) {
       << "\tSOLAR5 \t-28.8817193932"  << std::endl
       << "\tSOLAR6 \t43,954,935.1836" << std::endl  
       << "\tSOLAR7 \t-4,972.88703862" << std::endl
-      << "\tSOLAR10\t42.542949"       << std::endl;
+      << "\tSOLAR10\t42.447789"       << std::endl;
 }
 
 /*-----------------------------------------------------------*/
