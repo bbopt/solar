@@ -1,5 +1,5 @@
 EXE                = ../bin/solar
-COMPILATOR         = g++
+COMPILATOR         = $(CXX)
 COMPILATOR_OPTIONS = -O3 -Wall -Wextra -pedantic -Wcast-align
 LIBS               = -lc -lm
 INCLUDE            = -I.

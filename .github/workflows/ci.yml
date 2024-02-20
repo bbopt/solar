@@ -1,0 +1,59 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: SOLAR/${{ matrix.os }}/${{ matrix.compiler }}/${{ matrix.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        version: ['11', '12', '13']
+        include:
+          - compiler: gcc
+          - os: ubuntu-latest
+            compiler: intel
+            version: '2023.2'    
+          - os: windows-latest
+            compiler: intel
+            version: '2023.2'
+          - os: windows-latest
+            compiler: intel-classic
+            version: '2021.10'
+          - os: ubuntu-latest
+            compiler: intel-classic
+            version: '2021.10'
+          - os: macos-latest
+            compiler: intel-classic
+            version: '2021.10'
+          - os: ubuntu-latest
+            compiler: nvidia-hpc
+            version: '23.11'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out SOLAR
+        uses: actions/checkout@v4
+
+      - name: Set environment variables for SOLAR
+        shell: bash
+        run: |
+          echo "SOLAR_HOME=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+      - name: Install compilers
+        uses: fortran-lang/setup-fortran@main
+        with:
+          compiler: ${{ matrix.compiler }}
+          version: ${{ matrix.version }}
+
+      # Uncomment this section to obtain ssh access to VM
+      # - name: Setup tmate session
+      # if: matrix.os == 'windows-latest'
+      # uses: mxschmitt/action-tmate@v3
+
+      - name: Compile SOLAR
+        shell: bash
+        run: make
