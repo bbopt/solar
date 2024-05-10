@@ -1,4 +1,4 @@
-# SOLAR v0.5.7 (July 2023)
+# SOLAR v0.6.2 (May 2024)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -21,8 +21,8 @@ Type `./bin/solar` and you will be guided with the following help:
 Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)
 Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v
      S: Random seed: integer >=0 or "diff"; Default=0
-     F: Fidelity: real in ]0;1]; Default=1.0 (truth)
-     R: Replications: integer >= 1 ; Default=1
+     F: Fidelity: real in [0;1]; Default=1.0 (truth)
+     R: Replications: integer >= 1 or real in ]0;1[ ; Default=1
 
 Validation: solar -check (can take several minutes)
 Help(1)   : solar -h
@@ -51,15 +51,17 @@ The different options are:
           The random number generator can be validated by running 'solar -check'
 
      F: Fidelity of the simulator
-          Real value in ]0;1]
+          Real value in [0;1]
           Default: 1.0, which corresponds to the "true blackbox", or the "truth"
           Any value in ]0;1[ corresponds to a "static surrogate" of the truth
+          With -fid=0.0, only the a priori constraints and analytical objectives are computed
           The execution time increases with the fidelity
-          A good default static surrogate is -prec=0.5
+          A good default static surrogate is -fid=0.5
 
-     R: Number of replications
-          Integer >= 1, default=1
-          Number of times that the simulator is run at the same point
+     R: Replications
+          Integer >= 1 or real in ]0;1[, default=1
+          If R is integer, it is the number of times that the simulator is run at the same point
+          If R is real, it corresponds to a probability that the outputs are stabilized after a variable number of replications
           Each replication uses a different random seed dependent on the -seed option
           The mean value of stochastic outputs is displayed
           It is not possible to use R>1 with deterministic instances
@@ -91,9 +93,10 @@ List of best know values for single-objective instances (one replication, full f
 	SOLAR5 	-28.8817193932
 	SOLAR6 	43,954,935.1836
 	SOLAR7 	-4,972.88703862
-	SOLAR10	42.542949
+	SOLAR10	42.416671
 ```
-`SOLAR10` best solutions found with the help of J. Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO).
+`SOLAR10` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
+and Tom Ragonneau with COBYQA.
 
 ### Example
 

@@ -49,6 +49,7 @@ private:
 
   bool compute_mean_var ( std::vector<double> & output       ,
 			  int                   output_index ,
+			  int                 & M            ,
 			  double              & mean         ,
 			  double              & var            ) const;
 
@@ -85,7 +86,7 @@ public:
   bool eval_x ( int           x_index              ,
 		int           seed                 ,
 		double        fidelity             ,
-		int           replications         ,
+		double        replications         ,
 		bool        & simulation_completed ,
 		bool        & cnt_eval             ,
 		std::string & err_msg              ,

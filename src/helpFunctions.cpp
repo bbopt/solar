@@ -34,7 +34,7 @@ void display_best_solutions ( std::ostream & out ) {
       << "\tSOLAR5 \t-28.8817193932"  << std::endl
       << "\tSOLAR6 \t43,954,935.1836" << std::endl  
       << "\tSOLAR7 \t-4,972.88703862" << std::endl
-      << "\tSOLAR10\t42.447789"       << std::endl;
+      << "\tSOLAR10\t42.416671"       << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -66,16 +66,16 @@ void display_problems ( std::ostream & out , const std::vector<Problem> & proble
 /*-----------------------------------------------------------*/
 void display_usage ( std::ostream & out ) {
   out << std::endl
-      << "Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)" << std::endl
-      << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v"  << std::endl
-      << " pb_id: Problem instance: integer in {1, 2, ..., 10}"              << std::endl
-      << "     S: Random seed     : integer >=0 or \"diff\"; Default=0"      << std::endl
-      << "     F: Fidelity        : real in ]0;1]; Default=1.0 (truth)"      << std::endl
-      << "     R: Replications    : integer >= 1 ; Default=1\n"              << std::endl
-      << "Validation: solar -check (can take several minutes)"               << std::endl
-      << "Help(1)   : solar -h"                                              << std::endl
-      << "Help(2)   : solar -h pb_id"                                        << std::endl
-      << "Info      : solar -i\n"                                            << std::endl;
+      << "Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)"    << std::endl
+      << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v"     << std::endl
+      << " pb_id: Problem instance: integer in {1, 2, ..., 10}"                 << std::endl
+      << "     S: Random seed     : integer >=0 or \"diff\"; Default=0"         << std::endl
+      << "     F: Fidelity        : real in [0;1]; Default=1.0 (truth)"         << std::endl
+      << "     R: Replications    : integer >= 1 or real in ]0;1[; Default=1\n" << std::endl
+      << "Validation: solar -check (can take several minutes)"                  << std::endl
+      << "Help(1)   : solar -h"                                                 << std::endl
+      << "Help(2)   : solar -h pb_id"                                           << std::endl
+      << "Info      : solar -i\n"                                               << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -98,9 +98,9 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
   out << std::endl
       << "Run simulation: solar pb_id x.txt -seed=S -fid=F -rep=R -v (optional)\n\n"
       << " pb_id: Problem instance (see list of problems below)\n\n"
-      << " x.txt: Input vector: Point at which the simulator is evaluated\n"
+      << " x.txt: Point at which the simulator is evaluated\n"
       << "        Values separated with spaces\n"
-      << "        It is possible to specify several vectors: Use one line for each\n\n"
+      << "        It is possible to specify several points: Use one line for each\n\n"
       << "    -v: Verbose option\n\n"
       << "     S: Random seed:\n"
       << "          Some SOLAR instances are stochastic. This parameter impacts the value of stochastic outputs\n"
@@ -110,17 +110,19 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
       << "          Use -seed=diff to let SOLAR use a different random seed each time\n"
       << "          The random number generator can be validated by running 'solar -check'\n\n"
       << "     F: Fidelity of the simulator\n"
-      << "          Real value in ]0;1]\n"
+      << "          Real value in [0;1]\n"
       << "          Default: 1.0 (full fidelity), which corresponds to the \"true blackbox\", or the \"truth\"\n"
       << "          Any value in ]0;1[ corresponds to a \"static surrogate\" of the truth\n"
+      << "          With -fid=0.0, only the a priori constraints and analytical objectives are computed\n"
       << "          The execution time increases with the fidelity\n"
       << "          A good default static surrogate is -fid=0.5\n\n"
       << "     R: Number of replications\n"
-      << "          Integer >= 1, default=1\n"
-      << "          Number of times that the simulator is run at the same point\n"
+      << "          Integer >= 1 or real in ]0;1[, default=1\n"
+      << "          If R is integer, it is the number of times that the simulator is run at the same point\n"
+      << "          If R is real, it corresponds to a probability that the outputs are stabilized after a variable number of replications\n"
       << "          Each replication uses a different random seed dependent on the -seed option\n"
       << "          The mean value of stochastic outputs is displayed\n"
-      << "          It is not possible to use R>1 with deterministic instances\n"
+      << "          It is not possible to use R!=1 with deterministic instances\n"
       << "\nHelp for a problem: solar pb_id or solar -h pb_id" << std::endl << std::endl
       << "List of problems:" << std::endl << std::endl;
   display_problems       ( out , problems );

@@ -31,6 +31,30 @@ std::string separatorString() {
 #endif
 }
 
+/*-------------------------------------------------------------------------------------------*/
+/*  compute the cumulative density function of a standard normal (Gaussian) random variable  */
+/*-------------------------------------------------------------------------------------------*/
+double compute_Phi ( double x ) {
+
+  if ( x == 0.0 )
+    return 0.5;
+
+  double t;
+  
+  if ( x < 0.0 ) {   
+    t = 1 / ( 1 - 0.2316419 * x );
+    return exp(-x*x/2.0)
+      *t*(0.319381530-0.356563782*t+1.781477937*pow(t,2.0)-1.821255978*pow(t,3.0)+1.330274429*pow(t,4.0))
+      /2.506628274631;
+  }
+  
+  t = 1 / ( 1 + 0.2316419 * x );
+
+  return 1.0 - exp(-x*x/2.0)
+    *t*(0.319381530-0.356563782*t+1.781477937*pow(t,2.0)-1.821255978*pow(t,3.0)+1.330274429*pow(t,4.0))
+    /2.506628274631;
+}
+
 /*-------------------------------------------------------------------------------*/
 double kernelSmoothing ( std::vector<int>& xData, std::vector<double>& yData, int xValue ) {
 /*-------------------------------------------------------------------------------*/
@@ -68,7 +92,7 @@ double kernelSmoothing ( std::vector<double>& xData, std::vector<double>& yData,
 /*------------------------------------------*/
 /*           custom round function          */
 /*------------------------------------------*/
-int  myround ( const double x ) {
+int myround ( const double x ) {
   return static_cast<int> ((x < 0.0 ? -std::floor(.5-x) : std::floor(.5+x)));
 }
 

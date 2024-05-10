@@ -167,16 +167,16 @@ private:
   bool check_bounds_maxNrg_minPar         ( void ) const; // # 9
   bool check_bounds_minCost_unconstrained ( void ) const; // #10
   
-  bool check_apriori_constraints_maxNrg_H1             ( void ) const; // # 1
-  bool check_apriori_constraints_minSurf_H1            ( void ) const; // # 2
-  bool check_apriori_constraints_minCost_C1            ( void ) const; // # 3
-  bool check_apriori_constraints_minCost_C2            ( void ) const; // # 4
-  bool check_apriori_constraints_maxComp_HTF1          ( void ) const; // # 5
-  bool check_apriori_constraints_minCost_TS            ( void ) const; // # 6
-  bool check_apriori_constraints_maxEff_RE             ( void ) const; // # 7
-  bool check_apriori_constraints_maxHF_minCost         ( void ) const; // # 8
-  bool check_apriori_constraints_maxNrg_minPar         ( void ) const; // # 9
-  bool check_apriori_constraints_minCost_unconstrained ( void ) const; // #10
+  bool check_apriori_constraints_maxNrg_H1             ( double * outputs ) const; // # 1
+  bool check_apriori_constraints_minSurf_H1            ( double * outputs ) const; // # 2
+  bool check_apriori_constraints_minCost_C1            ( double * outputs ) const; // # 3
+  bool check_apriori_constraints_minCost_C2            ( double * outputs ) const; // # 4
+  bool check_apriori_constraints_maxComp_HTF1          ( double * outputs ) const; // # 5
+  bool check_apriori_constraints_minCost_TS            ( void             ) const; // # 6
+  bool check_apriori_constraints_maxEff_RE             ( double * outputs ) const; // # 7
+  bool check_apriori_constraints_maxHF_minCost         ( double * outputs ) const; // # 8
+  bool check_apriori_constraints_maxNrg_minPar         ( double * outputs ) const; // # 9
+  bool check_apriori_constraints_minCost_unconstrained ( void             ) const; // #10
   
   void fFillDemandVector ( void );
 
@@ -191,16 +191,17 @@ private:
   void construct_maxNrg_minPar         ( bool & cnt_eval ); // # 9
   void construct_minCost_unconstrained ( bool & cnt_eval ); // #10
 
-  bool simulate_maxNrg_H1             ( double * outputs, bool & cnt_eval ); // # 1
-  bool simulate_minSurf_H1            ( double * outputs, bool & cnt_eval ); // # 2
-  bool simulate_minCost_C1            ( double * outputs, bool & cnt_eval ); // # 3
-  bool simulate_minCost_C2            ( double * outputs, bool & cnt_eval ); // # 4
-  bool simulate_maxComp_HTF1          ( double * outputs, bool & cnt_eval ); // # 5
-  bool simulate_minCost_TS            ( double * outputs, bool & cnt_eval ); // # 6
-  bool simulate_maxEff_RE             ( double * outputs, bool & cnt_eval ); // # 7
-  bool simulate_maxHF_minCost         ( double * outputs, bool & cnt_eval ); // # 8
-  bool simulate_maxNrg_minPar         ( double * outputs, bool & cnt_eval ); // # 9
-  bool simulate_minCost_unconstrained ( double * outputs              ,
+  bool simulate_maxNrg_H1             ( double fidelity, double * outputs, bool & cnt_eval ); // # 1
+  bool simulate_minSurf_H1            ( double fidelity, double * outputs, bool & cnt_eval ); // # 2
+  bool simulate_minCost_C1            ( double fidelity, double * outputs, bool & cnt_eval ); // # 3
+  bool simulate_minCost_C2            ( double fidelity, double * outputs, bool & cnt_eval ); // # 4
+  bool simulate_maxComp_HTF1          ( double fidelity, double * outputs, bool & cnt_eval ); // # 5
+  bool simulate_minCost_TS            ( double fidelity, double * outputs, bool & cnt_eval ); // # 6
+  bool simulate_maxEff_RE             ( double fidelity, double * outputs, bool & cnt_eval ); // # 7
+  bool simulate_maxHF_minCost         ( double fidelity, double * outputs, bool & cnt_eval ); // # 8
+  bool simulate_maxNrg_minPar         ( double fidelity, double * outputs, bool & cnt_eval ); // # 9
+  bool simulate_minCost_unconstrained ( double   fidelity             ,
+					double * outputs              ,
 					double * intermediate_outputs ,
 					bool     low_fid              ,
 					bool   & cnt_eval               ); // #10
@@ -213,7 +214,7 @@ public:
   ~Scenario ( void );
   
   bool set_x    ( const double * x );
-  bool simulate ( double * outputs, double * intermediate_outputs, double fidelity, bool & cnt_eval );
+  bool simulate ( double fidelity, double * outputs, double * intermediate_outputs, bool & cnt_eval );
 };
 
 /*------------------*/

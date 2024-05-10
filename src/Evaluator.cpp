@@ -118,10 +118,12 @@ bool Evaluator::set_x ( const double * x ) {
 /*------------------------------------------------------------*/
 bool Evaluator::compute_mean_var ( std::vector<double> & output       ,
 				   int                   output_index ,
+				   int                 & M            ,
 				   double              & mean         ,
 				   double              & var            ) const {
 
   mean = var = 0.0;
+  M = 0;
  
   if ( output.empty() ) {
     mean = var = 1e20;
@@ -144,34 +146,34 @@ bool Evaluator::compute_mean_var ( std::vector<double> & output       ,
   for ( i = 0 ; i < n ; ++i ) {
     if ( output[i] == 1e20 ) {
       ++nb_fails;
-      
-      // we do not accept more than 20% of failures:
-      if ( nb_fails > n*0.2 ) {
-	mean = var = 1e20;
-	return true;
-      }
-      
     }
     else
       mean += output[i];
   }
-  mean = mean / (1.0*(n-nb_fails));
-    
-  var = 0.0;
-  for ( i = 0 ; i < n ; ++i ) {
-    if ( output[i] != 1e20 )
-      var += pow(output[i]-mean,2.0);
-  }
   
-  var = sqrt(var/(n-nb_fails-1.0));
-  if ( mean != 0.0 )
-    var /= fabs(mean);
+  // number of valid samples:
+  M = static_cast<int>(n)-nb_fails;
   
-  if ( !_problem.is_stochastic(output_index) && fabs(var) > 1e-10 ) {
-    // std::cout << " i=" << output_index << " var=" << var << std::endl; // DEBUG
+  // security checks on the number of valid samples
+  // (we do not accept more than 20% of failures):
+  if ( M < 2 || nb_fails > n*0.2 ) {
+    mean = var = 1e20;
     return false;
   }
-      
+  
+  mean = mean / M;
+    
+  var = 0.0;
+
+  if ( _problem.is_stochastic(output_index) ) {
+    for ( i = 0 ; i < n ; ++i ) {
+      if ( output[i] != 1e20 )
+	var += pow(output[i]-mean,2.0);
+    }
+    // sample variance:
+    var = var / ( M - 1.0 );
+  }
+  
   return true;
 }
 
@@ -181,15 +183,15 @@ bool Evaluator::compute_mean_var ( std::vector<double> & output       ,
 bool Evaluator::eval_x ( int           x_index              ,
 			 int           seed                 ,
 			 double        fidelity             ,
-			 int           replications         ,
+			 double        replications         ,
 			 bool        & simulation_completed ,
 			 bool        & cnt_eval             ,
 			 std::string & err_msg              ,
 			 bool          verbose                ) {
   
   if ( !_problem.is_stochastic() ) {
-    if ( replications > 1 ) {
-      err_msg = "Number or replications > 1 for a deterministic instance";
+    if ( replications != 1.0 ) {
+      err_msg = "Number or replications != 1 for a deterministic instance";
       return false;
     }
     if ( seed != 0 ) {
@@ -198,15 +200,26 @@ bool Evaluator::eval_x ( int           x_index              ,
     }
   }
   
-  if ( replications == 1 )
+  if ( replications == 1.0 )
     return eval_x ( x_index, seed, fidelity, simulation_completed, cnt_eval, err_msg, verbose );
   
   reset_outputs(1e20);
   cnt_eval = simulation_completed = false;
+
+  int i_rep = 50000; // max. number of replications with dynamic stop rule
   
-  if ( replications <= 1 ) {
-    err_msg = "Number or replications must be > 1";
-    return false;
+  if ( is_int(replications) ) {
+    i_rep = myround(replications);
+    if ( i_rep <= 1 ) {
+      err_msg = "Number or replications must be > 1";
+      return false;
+    }
+  }
+  else {
+    if ( replications <= 0.0 || replications >= 1.0 ) {
+      err_msg = "Replications parameter must be in ]0;1[";
+      return false;
+    }
   }
 
   if ( x_index < 0 || x_index >= static_cast<int>(_x.size()) ) {
@@ -222,22 +235,35 @@ bool Evaluator::eval_x ( int           x_index              ,
     else
       _out << "x=( ";
     display_x ( x_index );
-    _out <<  ") and " << replications << " replications:" << std::endl;
+    _out <<  ") and ";
+    if ( replications > 1 )
+      _out << i_rep << " replications:";
+    else
+      _out << "variable number of replications with parameter=" << replications;
+    _out << " ..." << std::endl;
   }
 
   simulation_completed = true;
-  bool simc, cnt;
-  int nbo = _problem.get_nb_outputs();
+  bool simc, cnt, stop;
+  int  nbo          = _problem.get_nb_outputs();
+  int  cnt_stop     = 0;
+  int  max_cnt_stop = 5;
   
   std::vector<double> * output_matrix = new std::vector<double>[nbo];
   double              * means         = new double[nbo];
   double              * vars          = new double[nbo];
- 
-  for ( int o = 0; o < nbo; ++o )
-    means[o] = vars[o] = 1e20;
- 
-  for ( int r = 0 ; r < replications ; ++r ) {
+  double              * delta_abs     = new double[nbo];
+  int                 * M             = new int   [nbo]; 
 
+  int    rep_cnt        = i_rep;
+  double requested_prec = 1000.0;
+  double P              = replications;
+ 
+  /*----------------------------*/
+  /*  main loop (replications)  */
+  /*----------------------------*/
+  for ( int r = 0 ; r < i_rep ; ++r ) {   
+    
     if ( verbose )
       _out << "\tRun #" << std::setw(3) << r+1 << " (seed=" << seed << ") ..." << std::flush;
 
@@ -249,6 +275,8 @@ bool Evaluator::eval_x ( int           x_index              ,
       delete [] output_matrix;
       delete [] means;
       delete [] vars;
+      delete [] delta_abs;
+      delete [] M;
       if ( verbose )
 	_out << " Fail\n";
       if ( cnt )
@@ -256,7 +284,7 @@ bool Evaluator::eval_x ( int           x_index              ,
       if ( !simc )
 	simulation_completed = false;
       return false;
-    }
+    }   
 
     if ( verbose ) {
       if ( !err_msg.empty() )
@@ -264,74 +292,143 @@ bool Evaluator::eval_x ( int           x_index              ,
       _out << "... outputs: ";
       display_outputs();
     }
+
+    stop = (r>0);
+
+    if ( replications > 1 )
+      stop = false;
     
-    // compute mean and coeff. of variation:
+    // compute means and variances (loop on the outputs):
     for ( int o = 0; o < nbo; ++o ) {
       
       output_matrix[o].push_back(_outputs[o]);
-      
-      if ( verbose ) {
+
+      if ( r == 0 ) {
+
+	for ( int oo = 0; oo < nbo; ++oo ) {
+	  means    [oo] = _outputs[oo];
+	  vars     [oo] = 1e20;  
+	  delta_abs[oo] = 0.0;
+	  if ( _problem.is_stochastic(oo) ) {
+	    if ( _outputs[oo] != 0.0 ) {
+	      delta_abs[oo] = fabs(_outputs[oo]) / requested_prec;
+	    }
+	    else
+	      delta_abs[oo] = 1.0 / requested_prec;
+	  }
+	}
+      }
+
+      else {
+
+	if  ( !compute_mean_var ( output_matrix[o], o, M[o], means[o], vars[o] ) ) {
+
+	  if ( verbose )
+	    _out << " Fail\n";
 	
-	if  ( !compute_mean_var ( output_matrix[o], o, means[o], vars[o] ) ) {
 	  reset_outputs(1e20);
 	  delete [] output_matrix;
 	  delete [] means;
 	  delete [] vars;
-	  _out << " Fail\n";
+	  delete [] delta_abs;
+	  delete [] M;
 
 	  std::ostringstream err;
 	  err << "problem with the computation of mean and coeff. of variation for output #" << o;
 	  err_msg = err.str();
 	  
-	  return false;
+	  return false;	
 	}
-	
-	if ( _problem.is_stochastic(o) )
-	  _out << "\t m" << o << "=" << means[o]; //  << " v" << o << "=" << vars[o];
       }
-    }
-    
+	
+      if ( verbose && _problem.is_stochastic(o) )
+	_out << "\t m" << o << "=" << means[o];
+
+      // dynamic number of replications (dynamic stop rule):
+      // ---------------------------------------------------
+      if ( replications < 1.0 && r > 0 && _problem.is_stochastic(o) ) {
+
+	// Review on Monte Carlo Simulation Stopping Rules: How Many Samples Are Really Enough?
+	// DOI: 10.11128/sne.32.on.10591
+	
+	// rule1: Chebyshev inequality stopping Rule: disabled
+	// rule2: Gauss-distribution stopping Rule
+	
+	// double rule1 = 1e20;
+	double rule2 = 1e20;
+	
+	// if ( M[o] > 0 )
+	//   rule1 = (1.0-P)-vars[o]/(M[o]*pow(delta_abs[o],2.0));
+	if ( vars[o] > 0.0 )
+	  rule2 = (1.0-P)-2*compute_Phi ( -(sqrt(1.0*M[o])*delta_abs[o])/(sqrt(vars[o])) );
+	
+	// if ( rule1 < 0.0 || rule2 < 0.0 )
+	if ( rule2 < 0.0 )
+	  stop = false;
+
+	// display progress:
+	if ( verbose ) {
+	  _out << " [Gauss-distr. rule: " << rule2 << " --> ";
+	  if ( stop )
+	    _out << "yes(" << cnt_stop+1 << "/" << max_cnt_stop << ")";
+	  else
+	    _out << "no";
+	  _out << "]";
+	}
+
+	// debug:
+	// std::cout << "\nReplication=" << r << " O=" << o << ": "
+	//    	  << "M=" << M[o] << " mean=" << means[o] << " var=" << vars[o]
+	// 	  << " R1=" << rule1
+	//  	  << " R2=" << rule2
+	//  	  << " stop=" << stop << " cnt_stop=" << cnt_stop+1
+	//   	  << std::endl;
+      }
+    } // end of loop on the outputs
+
     if ( verbose )
       _out << std::endl;
   					  
     err_msg.clear();
-
+    
     if ( cnt )
       cnt_eval = true;
     if ( !simc )
       simulation_completed = false;
 
-    // Seed update:
+    // seed update:
     {
       double seed_tmp = seed + 11.0 + RNG::rand()%298712;
       if ( seed_tmp > 1.0*INT_MAX )
 	seed_tmp = RNG::rand()%179841;
       seed = static_cast<int>(floor(seed_tmp));
     }
-    
-  }
 
-  bool error = false;
-  
-  if ( !verbose ) {
-    for ( int o = 0; o < nbo; ++o ) {
-      if  ( !compute_mean_var ( output_matrix[o], o, means[o], vars[o] ) ) {
-	error = true;
-	std::ostringstream err;
-	err << "problem with the computation of mean and coeff. of variation for output #" << o;
-	err_msg = err.str();
+    if ( stop ) {
+      ++cnt_stop;
+      if ( cnt_stop >= max_cnt_stop ) {
+	rep_cnt = r+1;
+	break;
       }
     }
-  }
-	  
+    else
+      cnt_stop = 0;
+    
+  } // end of main loop
+
+  if ( verbose )
+    _out << "... done (" << rep_cnt << " replications)" << std::endl;
+  
   for ( int o = 0; o < nbo; ++o )
     _outputs[o] = means[o];
   
   delete [] output_matrix;
   delete [] means;
   delete [] vars;
-
-  return !error;
+  delete [] delta_abs;
+  delete [] M;
+  
+  return true;
 }
 
 /*---------------------------------------------*/
@@ -376,7 +473,7 @@ bool Evaluator::eval_x ( int           x_index              ,
       _out <<  ") ..." << std::endl;
     }
 
-    simulation_completed = scenario.simulate ( _outputs , _intermediate_outputs, fidelity, cnt_eval );
+    simulation_completed = scenario.simulate ( fidelity, _outputs , _intermediate_outputs, cnt_eval );
 
     if ( verbose )
       _out << "... done" << std::endl;
@@ -565,7 +662,7 @@ void Evaluator::display_outputs ( void ) const {
 	 << _outputs[12] << " "
 	 << _outputs[13] << " "
 	 << _outputs[14] << " "
-	 << std::setprecision(11) << _outputs[15] << " " // New in Version 0.4.2
+	 << std::setprecision( 9) << _outputs[15] << " " // New in Version 0.6.1
 	 << std::setprecision(12) << _outputs[16] << " "
 	 << _outputs[17] << " "
 	 << _outputs[18] << std::setprecision(12);
