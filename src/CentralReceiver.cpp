@@ -61,7 +61,7 @@ CentralReceiver::CentralReceiver ( MoltenSalt* input               ,
 /*----------------------------------------------------------------------------*/
 double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
 
-  //The procedure will go through if energy is inputed from the field
+  // the procedure will go through if energy is inputed from the field
   if (Q_in <= 0.0){ 
     _losses.push_back(0.0);
     _efficiency.push_back(0.0);
@@ -70,7 +70,7 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
     return 0.0;
   }
 
-  double To = _output->get_temperature();
+  double To  = _output->get_temperature();
   double Ti  = _input->get_temperature();
   double eff = 0.7; //default efficiency assumed at 70%
   double m_dot_1 = 0.;
@@ -86,23 +86,25 @@ double CentralReceiver::computeEnergyToFluid ( double Q_in ) {
   
   try {
 
+    Q_tot2 = 0.0; // compilator warning solved in version 1.0 (2024-05-22)
+    
     while ( fabs(m_dot_2 - m_dot_1) > fabs(0.001*m_dot_1) && count < 150 ) {
           
-      Q_tot1  = 0;
+      Q_tot1  = 0.0;
       m_dot_1 = m_dot_2;
-      /*  remove */
+
       V  = m_dot_1 / (1.0* _numberOfTubes * MS_DENSITY * PI * pow(_tubesInsideDiameter, 2.0) / 4.0);
       Re = MS_DENSITY * V * _tubesInsideDiameter / mu;
       Pr = HEAT_CAPACITY * mu / MS_CONDUCTIVITY;
       
       if (Re <= 3000.0) {
-	//for low Re the flow will be laminar and we can't use this
-	//equation. For laminar flow in circular tubes with constant
-	//heat flux on the surface Nus =  4.36
+	// for low Re the flow will be laminar and we can't use this
+	// equation. For laminar flow in circular tubes with constant
+	// heat flux on the surface Nus =  4.36
 	Nus = 4.36;
       }
       else {
-	//for high Re the flow is assumed to be turbulent
+	// for high Re the flow is assumed to be turbulent
 	f = pow(0.790*log(Re) - 1.64, -2.0);
 	Nus = ((f / 8.0)*(Re - 1000)*Pr) / (1.0 + 12.7*sqrt(f / 8.0)*(pow(Pr, 2.0 / 3.0) - 1.0));
       }
@@ -212,7 +214,7 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
 
   int count = 0;
 
-  //Hilpert's correlation for Nu, finding h
+  // Hilpert's correlation for Nu, finding h
   double C, m;
   if (Re >= 4.0 && Re < 40.0) {
     C = 0.911;
@@ -226,28 +228,28 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
     C = 0.193;
     m = 0.618;
   }
-  if (Re >= 40000.0 /*  should be upperbound  */) {
+  if (Re >= 40000.0 ) { // should be an upperbound
     C = 0.027;
     m = 0.805;
   }
   Nu = C*pow(Re, m)*pow(Pr, 1.0 / 3.0);
   double h_out = AIR_CONDUCTIVITY*Nu / (_apertureWidth  + 2.0*t_insul);
   
-  //The overall heat transfer coefficient including outside surface convection
+  // the overall heat transfer coefficient including outside surface convection
   double UA = (PI*0.5*_apertureWidth*_apertureHeight)
     / ( + (0.5*_apertureWidth / k_insul)* log((0.5*_apertureWidth + t_insul) / (0.5*_apertureWidth))
 	+ ((0.5*_apertureWidth) / ((0.5*_apertureWidth + t_insul)*h_out)) );
   
-  //The overall heat transfer coefficient for conduction through the tank wall
+  // the overall heat transfer coefficient for conduction through the tank wall
   double UA_cond = (PI*0.5*_apertureWidth*_apertureHeight) / 
     ((0.5*_apertureWidth / k_insul)*log((0.5*_apertureWidth + t_insul) / (0.5*_apertureWidth)) );
   
-  //The heat transfer resistance for convection 
+  // the heat transfer resistance for convection 
   double R_conv = 1.0 / (h_out*A_out);
   double k_conv = 1.0 / R_conv;
   double k_rad_wet = BOLTZMANN*EPSILON_OUT*A_out;
 	
-  //First approximation of heat transfer to outer air excluding radiation losses
+  // first approximation of heat transfer to outer air excluding radiation losses
   double q_out = UA*(T - T_ATM);
   double T_surf_out = T - q_out / UA_cond;
   
@@ -263,7 +265,7 @@ double CentralReceiver::computeConductionLosses ( double T ) const {
 	
       T_surf_out = fSolveForT(k_rad_wet, k_conv, T, q_1, 0.01);
       
-      k_insul = k_0 + k_1*(((T_surf_out + T) / 2.0) - 273.0); //W/mK
+      k_insul = k_0 + k_1*(((T_surf_out + T) / 2.0) - 273.0); // W/mK
       
       UA_cond = (PI*0.5*_apertureWidth*_apertureHeight)
 	/ ( +(0.5*_apertureWidth / k_insul)*log((0.5*_apertureWidth + t_insul) / (0.5*_apertureWidth)) );
@@ -307,7 +309,6 @@ double CentralReceiver::fSolveForT ( double coef_T4, double coef_T, double T_max
       if (T_2 < T_ATM && T_1 < T_ATM) 
 	throw std::range_error
 		("Newton method gives impossible result for external surface temperature (Receiver) Setting to T_max");
-
     }
 
     if ( count >= 150 )
