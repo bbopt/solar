@@ -92,7 +92,7 @@ List of best know values for single-objective instances (one replication, full f
 	SOLAR4 	108,197,236.146
 	SOLAR5 	-28.8817193932
 	SOLAR6 	43,954,935.1836
-	SOLAR7 	-4,972.88703862
+	SOLAR7 	-4,972.88689831
 	SOLAR10	42.416671
 ```
 `SOLAR10` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
