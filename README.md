@@ -95,6 +95,8 @@ List of best know values for single-objective instances (one replication, full f
 	SOLAR7.1 	-4,972.88689831
 	SOLAR10.1	42.416671
 ```
+The `.1` notation highlights that these values are valid for the
+versions 1.X of  **SOLAR**
 `SOLAR10.1` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
 and Tom Ragonneau with COBYQA.
 
