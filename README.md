@@ -82,7 +82,7 @@ The list of instances is:
 	7	      MAXEFF_RE	                  receiver efficiency	              1	              7	              6
 	8         MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
 	9    	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
-   10 MINCOST_UNCONSTRAINED	          cost of storage + penalties	              1	              5	              0
+    10 MINCOST_UNCONSTRAINED	          cost of storage + penalties	              1	              5	              0
 ```
 List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
 ```
