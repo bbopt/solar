@@ -82,20 +82,20 @@ The list of instances is:
 	7	      MAXEFF_RE	                  receiver efficiency	              1	              7	              6
 	8         MAXHF_MINCOST	 heliostat field performance and cost	              2	             13	              9
 	9    	  MAXNRG_MINPAR	                     power and losses	              2	             29	             17
-       10 MINCOST_UNCONSTRAINED	          cost of storage + penalties	              1	              5	              0
+   10 MINCOST_UNCONSTRAINED	          cost of storage + penalties	              1	              5	              0
 ```
 List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
 ```
-	SOLAR1 	-902,503.692418
-	SOLAR2 	841,839.671915
-	SOLAR3 	70,813,885.0684
-	SOLAR4 	108,197,236.146
-	SOLAR5 	-28.8817193932
-	SOLAR6 	43,954,935.1836
-	SOLAR7 	-4,972.88689831
-	SOLAR10	42.416671
+	SOLAR1.1 	-902,503.692418
+	SOLAR2.1 	841,839.671915
+	SOLAR3.1 	70,813,885.0684
+	SOLAR4.1 	108,197,236.146
+	SOLAR5.1 	-28.8817193932
+	SOLAR6.1 	43,954,935.1836
+	SOLAR7.1 	-4,972.88689831
+	SOLAR10.1	42.416671
 ```
-`SOLAR10` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
+`SOLAR10.1` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
 and Tom Ragonneau with COBYQA.
 
 ### Example
