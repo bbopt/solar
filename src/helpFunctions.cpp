@@ -24,7 +24,7 @@
 #include "helpFunctions.hpp"
 
 /*-----------------------------------------------------------*/
-/*                  display best known values                */
+/*       display best known values (valid for version 1)     */
 /*-----------------------------------------------------------*/
 void display_best_solutions ( std::ostream & out ) {
   out << "\tSOLAR1 \t-902,503.692418" << std::endl
@@ -128,10 +128,11 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
   display_problems       ( out , problems );
 
   out << std::endl
-      << "Best known values for single-objective instances (one replication, full fidelity, default seed of zero):"
+      << "Best known values for single-objective instances, with one replication, full fidelity, and default seed of zero:"
       << std::endl << std::endl;
   display_best_solutions ( out );
-  out << std::endl;
+  out << std::endl << "\t--> These values are valid only for SOLAR version 1"
+      << std::endl << std::endl;
 }
 
 /*-----------------------------------------------------------*/
