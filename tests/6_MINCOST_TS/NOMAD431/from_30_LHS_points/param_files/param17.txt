@@ -1,0 +1,15 @@
+DIMENSION        5
+BB_EXE           solar
+
+
+BB_OUTPUT_TYPE   OBJ CSTR CSTR CSTR CSTR CSTR CSTR NOTHING 
+BB_INPUT_TYPE    (     R    R    R    R    R )
+LOWER_BOUND      ( 793.0  2.0  2.0 0.01 0.01 )
+X0               ( 936.772 31.8932 20.9305 4.358 1.22371  )
+UPPER_BOUND      ( 995.0 50.0 30.0 5.00 5.00 )
+
+
+display_stats bbe sol bbo obj
+display_all_eval yes
+
+# MAX_BB_EVAL 10000
