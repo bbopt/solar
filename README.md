@@ -119,14 +119,13 @@ It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp
 ### How to cite
 
 ```
-@mastersthesis{MScMLG,
-  Author = {Mathieu Lemyre Garneau},
-  Title  = {{Modelling of a solar thermal power plant for benchmarking blackbox optimization solvers}},
-  School = {Polytechnique Montr\'eal},
-  Year   = {2015},
-  Url    = {https://publications.polymtl.ca/1996/},
-  Note   = {Text available at \url{https://publications.polymtl.ca/1996},
-            code available at \url{https://github.com/bbopt/solar}}
+@techreport{solar_paper,
+  Author      = {N. Andr\'{e}s-Thi\'{o} and C. Audet and M. Diago and A.E. Gheribi and S. {Le~Digabel} and X. Lebeuf and M. {Lemyre~Garneau} and C. Tribes},
+  Title       = {{{\tt solar}: A solar thermal power plant simulator for blackbox optimization benchmarking}},
+  Institution = {Les cahiers du GERAD},
+  Number      = {G-2024-XX},
+  Year        = {2024},
+  Url         = {http://www.optimization-online.org/XXX},
+  ArxivUrl    = {http://arxiv.org/abs/XXX}
 }
 ```
-(article to come)
