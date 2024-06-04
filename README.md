@@ -126,6 +126,6 @@ It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp
   Number      = {G-2024-XX},
   Year        = {2024},
   Url         = {http://www.optimization-online.org/XXX},
-  ArxivUrl    = {http://arxiv.org/abs/XXX}
+  ArxivUrl    = {http://arxiv.org/abs/2406.00140}
 }
 ```
