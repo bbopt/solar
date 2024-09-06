@@ -123,7 +123,7 @@ It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp
   Author      = {N. Andr\'{e}s-Thi\'{o} and C. Audet and M. Diago and A.E. Gheribi and S. {Le~Digabel} and X. Lebeuf and M. {Lemyre~Garneau} and C. Tribes},
   Title       = {{{\tt solar}: A solar thermal power plant simulator for blackbox optimization benchmarking}},
   Institution = {Les cahiers du GERAD},
-  Number      = {G-2024-XX},
+  Number      = {G-2024-37},
   Year        = {2024},
   Url         = {http://www.optimization-online.org/XXX},
   ArxivUrl    = {http://arxiv.org/abs/2406.00140}
