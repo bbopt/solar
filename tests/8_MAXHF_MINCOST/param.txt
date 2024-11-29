@@ -1,0 +1,7 @@
+DIMENSION        13
+BB_EXE           $SOLAR_HOME/bin/solar $8
+BB_OUTPUT_TYPE   OBJ OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR
+BB_INPUT_TYPE    (    R    R     R    R    R    I    R    R    R    I    R     R      R )
+LOWER_BOUND      (  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0    1 0.01 0.005 0.0060 )
+X0               ( 11.0 11.0 200.0 10.0 10.0 2650 89.0  0.5  8.0   36 0.30 0.020 0.0216 )
+UPPER_BOUND      ( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 7853 5.00 0.100 0.1000 )
