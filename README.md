@@ -125,7 +125,8 @@ It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp
   Institution = {Les cahiers du GERAD},
   Number      = {G-2024-37},
   Year        = {2024},
-  Url         = {http://www.optimization-online.org/XXX},
-  ArxivUrl    = {http://arxiv.org/abs/2406.00140}
+  Url         = {https://optimization-online.org/?p=26581},
+  ArxivUrl    = {http://arxiv.org/abs/2406.00140},
+  Note        = {To appear in {\em Optimization and Engineering}}
 }
 ```
