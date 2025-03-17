@@ -1,4 +1,4 @@
-# SOLAR v1.0 (May 2024)
+# SOLAR v1.0.1 (March 2025)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -88,7 +88,7 @@ List of best know values for single-objective instances (one replication, full f
 ```
 	SOLAR1.1 	-902,503.692418
 	SOLAR2.1 	841,839.671915
-	SOLAR3.1 	70,813,885.0684
+	SOLAR3.1 	64,982,811.9203
 	SOLAR4.1 	108,197,236.146
 	SOLAR5.1 	-28.8817193932
 	SOLAR6.1 	43,954,935.1836
@@ -98,8 +98,10 @@ List of best know values for single-objective instances (one replication, full f
 The `.1` notation highlights that these values are valid for the
 versions 1.X of  **SOLAR**.
 
+`SOLAR3.1` best solution found by Xavier Lebeuf.
 `SOLAR10.1` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
 and Tom Ragonneau with COBYQA.
+
 
 ### Example
 
@@ -124,8 +126,9 @@ It is also possible to modify the `main()` function in [./src/main.cpp](main.cpp
   Title       = {{{\tt solar}: A solar thermal power plant simulator for blackbox optimization benchmarking}},
   Institution = {Les cahiers du GERAD},
   Number      = {G-2024-37},
-  Year        = {2024},
-  Url         = {https://optimization-online.org/?p=26581},
+  Year        = {2025},
+  Doi         = {10.1007/s11081-024-09952-x},
+  Url         = {https://dx.doi.org/10.1007/s11081-024-09952-x},
   ArxivUrl    = {http://arxiv.org/abs/2406.00140},
   Note        = {To appear in {\em Optimization and Engineering}}
 }
