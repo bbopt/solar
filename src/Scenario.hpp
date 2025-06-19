@@ -93,6 +93,7 @@ private:
   // Heat Transfer loop:
   double _centralReceiverOutletTemperature; // K
   double _hotStorageHeight;                 // m
+  double _coldStorageHeight;                // m  // P.B.: New in V2
   double _hotStorageDiameter;               // m
   double _hotStorageInsulThickness;         // m
   double _coldStorageInsulThickness;        // m

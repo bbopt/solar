@@ -26,40 +26,43 @@
 /*----------------------------------------------------------------*/
 /*                          constructor #1                        */
 /*----------------------------------------------------------------*/
-HtfCycle::HtfCycle ( double       receiverTemp           ,
-		     double       storageHeight          ,
-		     double       storageDiameter        ,
-		     double       insulationThickness    ,
-		     double       exchangerExitTemp      ,
-		     Powerblock * powerblock             ,
-		     double       apertureHeight         ,
-		     double       apertureWidth          ,
-		     double       receiverTubesDin       ,
-		     double       receiverTubesThickness ,
-		     int          receiverNbTubes        ,
-		     int          timeInterval             )  :
+HtfCycle::HtfCycle ( double       receiverTemp            ,
+		     double       hot_storageHeight       ,  // New in version 2: Separated the two heights to allow
+		     double       cold_storageHeight      ,  // for an additionnal variable in new instances (P.B.)
+		     double       storageDiameter         ,
+		     double       receiver_insulThickness ,  // New in version 2: Replaced "insulationThickness" with
+		     double       hot_insulThickness      ,  // 3 separate thicknesses for 2 additionnal variables
+		     double       cold_insulThickness     ,  // in new instances (P.B.)	     
+		     double       exchangerExitTemp       ,
+		     Powerblock * powerblock              ,
+		     double       apertureHeight          ,
+		     double       apertureWidth           ,
+		     double       receiverTubesDin        ,
+		     double       receiverTubesThickness  ,
+		     int          receiverNbTubes         ,
+		     int          timeInterval              ) :
 
   // Mechanical components:
-  _centralReceiver ( &_centralReceiverInlet ,
-		     &_centralReceiverOutlet,
-		     apertureHeight         ,
-		     apertureWidth          ,
-		     insulationThickness    ,
-		     receiverTubesDin       ,
-		     receiverTubesThickness ,
-		     receiverNbTubes          ) ,
+  _centralReceiver ( &_centralReceiverInlet  ,
+		     &_centralReceiverOutlet ,
+		     apertureHeight          ,
+		     apertureWidth           ,
+		     receiver_insulThickness ,  // P.B.: Instead of "insulationThickness" in V1
+		     receiverTubesDin        ,
+		     receiverTubesThickness  ,
+		     receiverNbTubes           ) ,
 
   _hotStorage  ( &_centralReceiverOutlet ,
 		 &_steamGeneratorInlet   ,
-		 storageHeight           ,
+		 hot_storageHeight       ,
 		 storageDiameter         ,
-		 insulationThickness       ) ,
-
+		 hot_insulThickness        ) , // P.B.: Instead of "insulationThickness" in V1
+  
   _coldStorage ( &_steamGeneratorOutlet ,
 		 &_centralReceiverInlet ,
-		 1.2*storageHeight      ,
+		 cold_storageHeight     ,      // P.B.: Instead of "1.2*storageHeight" in V1
 		 storageDiameter        ,
-		 insulationThickness      ) ,
+		 cold_insulThickness      ) ,  // P.B.: Instead of "insulationThickness" in V1
 
   _steamGenerator ( &_steamGeneratorInlet, &_steamGeneratorOutlet, powerblock ) ,
 
@@ -84,9 +87,12 @@ HtfCycle::HtfCycle ( double       receiverTemp           ,
 /*                          constructor #2                        */
 /*----------------------------------------------------------------*/
 HtfCycle::HtfCycle ( double       receiverTemp                ,
-		     double       storageHeight               ,
+		     double       hot_storageHeight           ,  // New in version 2: Separated the two heights to allow
+		     double       cold_storageHeight          ,  // for an additionnal variable in new instances (P.B.)
 		     double       storageDiameter             ,
-		     double       insulationThickness         ,
+		     double       receiver_insulThickness     ,  // New in version 2: Replaced "insulationThickness" with
+		     double       hot_insulThickness          ,  // 3 separate thicknesses for 2 additionnal variables
+		     double       cold_insulThickness         ,  // in new instances (P.B.)	     
 		     double       exchangerExitTemp           ,
 		     Powerblock * powerblock                  ,
 		     double       apertureHeight              ,
@@ -106,26 +112,26 @@ HtfCycle::HtfCycle ( double       receiverTemp                ,
 		     int          exchangerNbOfShells           ) :
 
   // Mechanical components:
-  _centralReceiver ( &_centralReceiverInlet ,
-		     &_centralReceiverOutlet,
-		     apertureHeight         ,
-		     apertureWidth          ,
-		     insulationThickness    ,
-		     receiverTubesDin       ,
-		     receiverTubesThickness ,
-		     receiverNbTubes          ) ,
+  _centralReceiver ( &_centralReceiverInlet  ,
+		     &_centralReceiverOutlet ,
+		     apertureHeight          ,
+		     apertureWidth           ,
+		     receiver_insulThickness ,
+		     receiverTubesDin        ,
+		     receiverTubesThickness  ,
+		     receiverNbTubes           ) ,
 
-  _hotStorage ( &_centralReceiverOutlet,
-		&_steamGeneratorInlet  ,
-		storageHeight          ,
-		storageDiameter        ,
-		insulationThickness      ) ,
+  _hotStorage ( &_centralReceiverOutlet ,
+		&_steamGeneratorInlet   ,
+		hot_storageHeight       ,
+		storageDiameter         ,
+		hot_insulThickness        ) ,
 
-  _coldStorage ( &_steamGeneratorOutlet,
-		 &_centralReceiverInlet,
-		 1.2*storageHeight     ,
-		 storageDiameter       ,
-		 insulationThickness     ) ,
+  _coldStorage ( &_steamGeneratorOutlet ,
+		 &_centralReceiverInlet ,
+		 cold_storageHeight     ,    // P.B.: Instead of "1.2*storageHeight" in V1
+		 storageDiameter        ,
+		 cold_insulThickness      ) ,
 
   _steamGenerator ( &_steamGeneratorInlet      ,
 		    &_steamGeneratorOutlet     ,

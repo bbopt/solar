@@ -61,6 +61,7 @@ Scenario::Scenario ( const std::string & problem , double fidelity ) :
   _maximumDistanceToTower           ( 0.0     ) ,
   _centralReceiverOutletTemperature ( 0.0     ) ,
   _hotStorageHeight                 ( 0.0     ) ,
+  _coldStorageHeight                ( 0.0     ) ,
   _hotStorageDiameter               ( 0.0     ) ,
   _hotStorageInsulThickness         ( 0.0     ) ,
   _coldStorageInsulThickness        ( 0.0     ) ,
@@ -244,6 +245,7 @@ void Scenario::init_minSurf_H1 ( double fidelity ) {
   // design parameters:
   _hotStorageDiameter           = 23.0;
   _hotStorageHeight             = 10.5;
+  _coldStorageHeight            = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness     = 0.3;
   _coldStorageInsulThickness    = 0.2;
   _coldMoltenSaltMinTemperature = 555.0; // 282 + 273
@@ -352,6 +354,7 @@ bool Scenario::set_x_minCost_C1 ( const double * x ) {
   // Htf cycle:
   _centralReceiverOutletTemperature = x[ 9];
   _hotStorageHeight                 = x[10];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
@@ -442,6 +445,7 @@ bool Scenario::set_x_minCost_C2 ( const double * x ) {
   // Htf cycle:
   _centralReceiverOutletTemperature = x[ 9];
   _hotStorageHeight                 = x[10];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
@@ -530,6 +534,7 @@ bool Scenario::set_x_maxComp_HTF1 ( const double * x ) {
   // htf cycle:
   _centralReceiverOutletTemperature = x[ 0];
   _hotStorageHeight                 = x[ 1];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[ 2];
   _hotStorageInsulThickness         = x[ 3];
   _coldStorageInsulThickness        = x[ 4];
@@ -612,6 +617,7 @@ bool Scenario::set_x_minCost_TS ( const double * x ) {
   // -----------------
   _centralReceiverOutletTemperature = x[0];
   _hotStorageHeight                 = x[1];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[2];
   _hotStorageInsulThickness         = x[3];
   _coldStorageInsulThickness        = x[4];
@@ -647,6 +653,7 @@ void Scenario::init_maxEff_RE ( double fidelity ) {
   
   _hotStorageDiameter           = 25;
   _hotStorageHeight             = 30;
+  _coldStorageHeight            = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness     = 5;
   _coldStorageInsulThickness    = 5;
   _coldMoltenSaltMinTemperature = 550;
@@ -717,6 +724,7 @@ void Scenario::init_maxHF_minCost ( double fidelity ) {
   _centralReceiverOutletTemperature = 950;
   _hotStorageDiameter               = 25;
   _hotStorageHeight                 = 30;
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness         = 5;
   _coldStorageInsulThickness        = 5;
   _coldMoltenSaltMinTemperature     = 550;
@@ -832,6 +840,7 @@ bool Scenario::set_x_maxNrg_minPar ( const double * x ) {
   // Htf cycle:
   _centralReceiverOutletTemperature = x[ 9];
   _hotStorageHeight                 = x[10];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
@@ -919,6 +928,7 @@ bool Scenario::set_x_minCost_unconstrained ( const double * x ) {
   // -----------------
   _centralReceiverOutletTemperature = x[0];
   _hotStorageHeight                 = x[1];
+  _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[2];
   _hotStorageInsulThickness         = x[3];
   _coldStorageInsulThickness        = x[4];
@@ -2086,7 +2096,7 @@ bool Scenario::check_bounds_minCost_C1 ( void ) const {
   
   if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
     return false;
-
+  
   if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
       
@@ -2186,7 +2196,7 @@ bool Scenario::check_bounds_minCost_C2 ( void ) const {
  
   if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
     return false;
- 
+  
   if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
     return false;
  
@@ -2806,8 +2816,11 @@ void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -2898,8 +2911,11 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -2919,7 +2935,7 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -2988,8 +3004,11 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3019,7 +3038,7 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3088,8 +3107,11 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3119,7 +3141,7 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3182,8 +3204,11 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3206,7 +3231,7 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3282,8 +3307,11 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3303,7 +3331,7 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3373,8 +3401,11 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3394,7 +3425,7 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3464,8 +3495,11 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3495,7 +3529,7 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
@@ -3552,8 +3586,11 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
     // constructing Htf Cycle with desired steam generator model:
     htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
 			      _hotStorageHeight                 ,
+			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
-			      _hotStorageInsulThickness         ,
+			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
+			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
+			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
 			      _coldMoltenSaltMinTemperature     ,
 			      powerblock                        ,
 			      _receiverApertureHeight           ,
@@ -3576,7 +3613,7 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
     economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
     economics->set_lengthOfHeliostats             ( _heliostatLength                 );
     economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
+    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
     economics->set_storageDiameter                ( _hotStorageDiameter              );
     economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
     economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );

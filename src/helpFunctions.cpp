@@ -27,14 +27,14 @@
 /*       display best known values (valid for version 1)     */
 /*-----------------------------------------------------------*/
 void display_best_solutions ( std::ostream & out ) {
-  out << "\tSOLAR1 \t-902,503.692418" << std::endl
-      << "\tSOLAR2 \t841,839.671915"  << std::endl
-      << "\tSOLAR3 \t62,775,886.3251" << std::endl
-      << "\tSOLAR4 \t108,197,236.146" << std::endl
-      << "\tSOLAR5 \t-28.8817193932"  << std::endl
-      << "\tSOLAR6 \t43,954,935.1836" << std::endl  
-      << "\tSOLAR7 \t-4,972.88689831" << std::endl
-      << "\tSOLAR10\t42.416671"       << std::endl;
+  out << "\tSOLAR1.1 \t-902,503.692418" << std::endl
+      << "\tSOLAR2.1 \t841,839.671915"  << std::endl
+      << "\tSOLAR3.1 \t62,775,886.3251" << std::endl
+      << "\tSOLAR4.1 \t108,197,236.146" << std::endl
+      << "\tSOLAR5.1 \t-28.8817193932"  << std::endl
+      << "\tSOLAR6.1 \t43,954,935.1836" << std::endl  
+      << "\tSOLAR7.1 \t-4,972.88689831" << std::endl
+      << "\tSOLAR10.1\t42.416671"       << std::endl;
 }
 
 /*-----------------------------------------------------------*/
