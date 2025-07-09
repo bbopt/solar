@@ -1,0 +1,16 @@
+DIMENSION           7
+BB_EXE              solar
+
+BB_OUTPUT_TYPE      CNT_EVAL OBJ PB PB PB PB PB PB
+BB_INPUT_TYPE       (R R R I R R R)
+LOWER_BOUND         (1.0 1.0 793.0 1 0.01 0.005 0.0055)
+X0                  (1.024393  20.742773 942.802318  29   1.531371   0.066684   0.085983)
+UPPER_BOUND         (30.0 30.0 995.0 8567 5.00 0.100 0.1000)
+SEED	    	     6
+
+display_stats       bbe { success_type } [bbo] gen_step
+display_all_eval    yes
+history_file        history.txt
+
+
+MAX_TIME	    115200
