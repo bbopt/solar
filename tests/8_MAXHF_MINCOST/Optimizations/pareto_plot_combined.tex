@@ -1,0 +1,22 @@
+\documentclass{standalone}
+\usepackage{pgfplots} 
+\pgfplotsset{width=12cm,compat=1.16} 
+\begin{document}
+\begin{tikzpicture} 
+\begin{axis}[ 
+       grid = both,
+       title = {Pareto approximation for Solar 8},
+       xlabel = {$f_1$},
+       ylabel = {$f_2$},
+       xtick distance = 1E12,
+       ytick distance = 0.25E8,
+ legend style={ 
+    font=\small, 
+    cells={anchor=southeast}, 
+    at={(1,-0.2)}, 
+   legend cell align=left, } ]
+  \addplot [only marks, color=black] table [x index = 0, y index = 1 , header = false ] {pareto_solutions.data}; 
+ \addlegendentry{Combined bi-objective optimizations (int variables fixed)} 
+ \end{axis} 
+ \end{tikzpicture}
+ \end{document}
