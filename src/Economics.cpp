@@ -24,77 +24,45 @@
 #include "Economics.hpp"
 
 /*--------------------------------------------------------*/
-/*                         constructor #1                 */
-/*--------------------------------------------------------*/
-Economics::Economics ( void ) {
-
-  // module costs:
-  _costOfField          = 0.0;
-  _costPerHeliostat     = 0.0;
-  _costOfTower          = 0.0;
-  _costOfStorage        = 0.0;
-  _costOfPowerblock     = 0.0;
-  _costOfSteamGenerator = 0.0;
-  _costOfReceiver       = 0.0;
-  _totalCost            = 0.0;
-
-  // parameters:
-  _hotStorageInsulationThickness  = 0.01;
-  _coldStorageInsulationThickness = 0.01;
-  _hotStorageHeight               = 1.0;
-  _storageDiameter                = 1.0;
-  _receiverInsulationThickness    = 0.01;
-  _heightOfTower                  = 20.0;
-  _heightOfReceiverAperture       = 1.0;
-  _widthOfReceiverAperture        = 1.0;
-  _receiverNumberOfTubes          = 0;
-  _receiverTubesDout              = 0.0;
-  _lengthOfHeliostats             = 1.0;
-  _widthOfHeliostats              = 1.0;
-  _nbOfHeliostats                 = 1;
-  _reflectiveArea                 = 0.0;
-  _totalMoltenSaltMass            = 0.0;
-  _turbineNominalPowerOutput      = 0.0;
-  _exchangerModel                 = 1;
-  _exchangerTubesOutterDiameter   = 0.0005;
-  _exchangerTubesLength           = 1.0;
-  _exchangerNumberOfTubes         = 1;
-  _exchangerTubePassesPerShell    = 1;
-  _exchangerNumberOfShell         = 1;
-}
-
-/*--------------------------------------------------------*/
-/*                         constructor #2                 */
+/*                       constructor                      */
 /*--------------------------------------------------------*/
 Economics::Economics ( int    numberOfHeliostats          ,
 		       double hotStorageInsul             ,
 		       double coldStorageInsul            ,
 		       double hotStorageHeight            ,
-		       double storageDiameter             ,
-		       double receiverInsul               ,
+		       double coldStorageHeight           , // new in V2 (P.B., 2025-07)
+		       double hotStorageDiameter          ,
+		       double coldStorageDiameter         , // new in V2 (P.B., SLD, 2025-07-24)
 		       double heightOfTower               ,
 		       double lengthOfHeliostats          ,
 		       double widthOfHeliostats           ,
 		       double turbinePower                ,
 		       double heightOfReceiverAperture    ,
 		       double widthOfAperture             ,
+		       int    receiverNbOfTubes           ,
+		       double receiverTubesOutsideDiam    ,
+		       int    exchangerModel              , // new in V2
 		       double exchangerTubesDiameter      ,
 		       double exchangerTubesLength        , 
 		       int    exchangerNumberOfTubes      ,
 		       int    exchangerTubePassesPerShell ,
 		       int    exchangerNumberOfShell        ) :
+  _nbOfHeliostats                 ( numberOfHeliostats          ) , 
   _hotStorageInsulationThickness  ( hotStorageInsul             ) ,
   _coldStorageInsulationThickness ( coldStorageInsul            ) ,
   _hotStorageHeight               ( hotStorageHeight            ) ,
-  _storageDiameter                ( storageDiameter             ) ,
-  _receiverInsulationThickness    ( receiverInsul               ) ,
+  _coldStorageHeight              ( coldStorageHeight           ) , // (P.B., 2025-07)
+  _hotStorageDiameter             ( hotStorageDiameter          ) ,
+  _coldStorageDiameter            ( coldStorageDiameter         ) , // (P.B., SLD, 2025-07-24)
   _heightOfTower                  ( heightOfTower               ) ,
-  _heightOfReceiverAperture       ( heightOfReceiverAperture    ) ,
-  _widthOfReceiverAperture        ( widthOfAperture             ) ,
   _lengthOfHeliostats             ( lengthOfHeliostats          ) ,
   _widthOfHeliostats              ( widthOfHeliostats           ) ,
-  _nbOfHeliostats                 ( numberOfHeliostats          ) ,
   _turbineNominalPowerOutput      ( turbinePower                ) ,
+  _heightOfReceiverAperture       ( heightOfReceiverAperture    ) ,
+  _widthOfReceiverAperture        ( widthOfAperture             ) ,
+  _receiverNumberOfTubes          ( receiverNbOfTubes           ) ,
+  _receiverTubesDout              ( receiverTubesOutsideDiam    ) , 
+  _exchangerModel                 ( exchangerModel              ) ,
   _exchangerTubesOutterDiameter   ( exchangerTubesDiameter      ) ,
   _exchangerTubesLength           ( exchangerTubesLength        ) ,
   _exchangerNumberOfTubes         ( exchangerNumberOfTubes      ) ,
@@ -109,8 +77,46 @@ Economics::Economics ( int    numberOfHeliostats          ,
   _costOfSteamGenerator  = 0.0;
   _costOfReceiver        = 0.0;
   _totalCost             = 0.0;
-  _receiverTubesDout     = 0.0;
-  _receiverNumberOfTubes = 0;
+
+
+  // below are some initializations from a previous version
+  // (we keep them here just in case):
+  
+  // module costs:
+  // _costOfField          = 0.0;
+  // _costPerHeliostat     = 0.0;
+  // _costOfTower          = 0.0;
+  // _costOfStorage        = 0.0;
+  // _costOfPowerblock     = 0.0;
+  // _costOfSteamGenerator = 0.0;
+  // _costOfReceiver       = 0.0;
+  // _totalCost            = 0.0;
+
+  // // parameters:
+  // _hotStorageInsulationThickness  = 0.01;
+  // _coldStorageInsulationThickness = 0.01;
+  // _hotStorageHeight               = 1.0;
+  // _coldStorageHeight              = 1.0;  // new attribute to compute the cost of storage without bugs (P.B., 2025-07)
+  // _hotStorageDiameter             = 1.0;
+  // _coldStorageDiameter            = 1.0;  // new in V2 (P.B., SLD, 2025-07-24) 
+  // _receiverInsulationThickness    = 0.01;
+  // _heightOfTower                  = 20.0;
+  // _heightOfReceiverAperture       = 1.0;
+  // _widthOfReceiverAperture        = 1.0;
+  // _receiverNumberOfTubes          = 0;
+  // _receiverTubesDout              = 0.0;
+  // _lengthOfHeliostats             = 1.0;
+  // _widthOfHeliostats              = 1.0;
+  // _nbOfHeliostats                 = 1;
+  // _reflectiveArea                 = 0.0;
+  // _totalMoltenSaltMass            = 0.0;
+  // _turbineNominalPowerOutput      = 0.0;
+  // _exchangerModel                 = 1;
+  // _exchangerTubesOutterDiameter   = 0.0005;
+  // _exchangerTubesLength           = 1.0;
+  // _exchangerNumberOfTubes         = 1;
+  // _exchangerTubePassesPerShell    = 1;
+  // _exchangerNumberOfShell         = 1;
 }
 
 /*--------------------------------------------------------*/
@@ -181,23 +187,37 @@ double Economics::evaluateCostOfStorage ( void ) {
   
   // Total molten salt inventory is assumed to be that of the volume of the full cold tank
 
-  double moltenSaltVolume     = _hotStorageHeight*1.1*PI*pow(_storageDiameter / 2.0, 2.0);
-  double _totalMoltenSaltMass = moltenSaltVolume*MS_DENSITY;
-  double moltenSaltCost       = moltenSaltPerKg * _totalMoltenSaltMass;
+  // double moltenSaltVolume  = _hotStorageHeight*1.1*PI*pow(_hotStorageDiameter / 2.0, 2.0); // OLD VERSION (v1)
+  double moltenSaltVolume     = _coldStorageHeight   *PI*pow(_hotStorageDiameter / 2.0, 2.0); // NEW VERSION (v2, P.B., SLD, 2025-07-23)
+  double totalMoltenSaltMass = moltenSaltVolume*MS_DENSITY;
+  double moltenSaltCost       = moltenSaltPerKg * totalMoltenSaltMass;
 
-  double insulationVolume = PI*_hotStorageHeight*(pow(_storageDiameter / 2.0 +
-						      _hotStorageInsulationThickness + 0.04, 2.0) -
-						  pow(_storageDiameter / 2.0 + 0.04, 2.0)) +
-    PI*_hotStorageHeight*1.1*(pow(_storageDiameter / 2.0 + _coldStorageInsulationThickness + 0.04, 2.0) -
-			      pow(_storageDiameter / 2.0 + 0.04, 2.0)) +
-    PI*pow(_storageDiameter / 2.0 + 0.04, 2.0)*(_coldStorageInsulationThickness + _hotStorageInsulationThickness);
+  // OLD VERSION (v1):
+  // double insulationVolume = PI*_hotStorageHeight*(pow(_hotStorageDiameter / 2.0 +
+  // 						      _hotStorageInsulationThickness + 0.04, 2.0) -
+  // 						  pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)) +
+  //   PI*_hotStorageHeight*1.1*(pow(_hotStorageDiameter / 2.0 + _coldStorageInsulationThickness + 0.04, 2.0) -
+  // 			      pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)) +
+  //   PI*pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)*(_coldStorageInsulationThickness + _hotStorageInsulationThickness);
 
+  // UPDATED VERSION (P.B., 2025-07): Replaced _hotStorageHeight*1.1 by the new attribute _coldStorageHeight:
+  // double insulationVolume = PI*_hotStorageHeight *(pow(_hotStorageDiameter / 2.0 + _hotStorageInsulationThickness  + 0.04, 2.0) - pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)) +
+  //                           PI*_coldStorageHeight*(pow(_hotStorageDiameter / 2.0 + _coldStorageInsulationThickness + 0.04, 2.0) - pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)) +
+  //                           PI*pow(_hotStorageDiameter / 2.0 + 0.04, 2.0)*(_coldStorageInsulationThickness + _hotStorageInsulationThickness);
+  
+  // VERSION for V2 (SLD and P.B., 2025-07-25): We use the other new attribute _coldStorageDiameter:
+  double insulationVolume
+    = PI*_hotStorageHeight *(pow(_hotStorageDiameter  / 2.0 + _hotStorageInsulationThickness  + 0.04, 2.0) - pow(_hotStorageDiameter  / 2.0 + 0.04, 2.0))
+    + PI*_coldStorageHeight*(pow(_coldStorageDiameter / 2.0 + _coldStorageInsulationThickness + 0.04, 2.0) - pow(_coldStorageDiameter / 2.0 + 0.04, 2.0))
+    + PI*pow(_hotStorageDiameter  / 2.0 + 0.04, 2.0) * _hotStorageInsulationThickness
+    + PI*pow(_coldStorageDiameter / 2.0 + 0.04, 2.0) * _coldStorageInsulationThickness;  
+  
   // The 4cm thick stainless steel tank is considered when evaluating the total volume of insulation needed.
   // The design tank diameter is the inner diameter
 
   double ceramicFiberCost = CERAMIC_FIBER_INSULATION_COST * insulationVolume;
 	
-  double foundationCost   = _totalMoltenSaltMass * STORAGE_TANK_FOUNDATION_COST_COEF + 1.*STORAGE_TANK_FOUNDATION_COST_CONST;
+  double foundationCost   = totalMoltenSaltMass * STORAGE_TANK_FOUNDATION_COST_COEF + 1.*STORAGE_TANK_FOUNDATION_COST_CONST;
   
   _costOfStorage = ceramicFiberCost + moltenSaltCost + foundationCost;
 

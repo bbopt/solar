@@ -2750,13 +2750,29 @@ void Scenario::construct_maxNrg_H1 ( bool & cnt_eval ) {
 				 _fieldAngularWidth      ,
 				 sun                       );
 
-    economics = new Economics;
-    economics->set_heightOfTower            ( _towerHeight            );
-    economics->set_heightOfReceiverAperture ( _receiverApertureHeight );
-    economics->set_widthOfReceiverAperture  ( _receiverApertureWidth  );
-    economics->set_lengthOfHeliostats       ( _heliostatLength        );
-    economics->set_widthOfHeliostats        ( _heliostatWidth         );
-    economics->set_exchangerModel           ( _exchangerModel         );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				0.0                             , // turbinePower = 0.0 (new in V2, P.B. and SLD, 2025-07-25)
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+
+    
   }
   catch ( const std::exception & e ) {   
     if ( field     ) delete field;
@@ -2835,21 +2851,27 @@ void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
 			   _coldMoltenSaltMinTemperature            );
 
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -2927,21 +2949,32 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
   
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+
+
+
+
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3030,21 +3063,29 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
     
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3133,21 +3174,29 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
 
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+    				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3223,21 +3272,28 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
 			   _coldMoltenSaltMinTemperature            );
 
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+    
   }
   catch ( const std::exception & e ) {
     if ( htfCycle   ) delete htfCycle;
@@ -3323,21 +3379,28 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
 
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                ); // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3417,21 +3480,28 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
     
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3521,21 +3591,28 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
     htfCycle->initiateColdStorage();
     
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+    
   }
   catch ( const std::exception & e ) {
     if ( field      ) delete field;
@@ -3605,21 +3682,29 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
 			   _coldMoltenSaltMinTemperature            );
 
     // investment cost model:
-    economics = new Economics;
-    economics->set_heightOfTower                  ( _towerHeight                     );
-    economics->set_heightOfReceiverAperture       ( _receiverApertureHeight          );
-    economics->set_widthOfReceiverAperture        ( _receiverApertureWidth           );
-    economics->set_receiverNumberOfTubes          ( _receiverNbOfTubes               );
-    economics->set_receiverTubesDout              ( _receiverTubesOutsideDiam        );
-    economics->set_lengthOfHeliostats             ( _heliostatLength                 );
-    economics->set_widthOfHeliostats              ( _heliostatWidth                  );
-    economics->set_hotStorageHeight               ( _hotStorageHeight                );  // P.B.
-    economics->set_storageDiameter                ( _hotStorageDiameter              );
-    economics->set_hotStorageInsulationThickness  ( _hotStorageInsulThickness        );
-    economics->set_coldStorageInsulationThickness ( _coldStorageInsulThickness       );
-    economics->set_receiverInsulationThickness    ( _receiverInsulThickness          );
-    economics->set_turbineNominalPowerOutput      ( powerblock->get_powerOfTurbine() );
-    economics->set_exchangerModel                 ( _exchangerModel                  );
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
+    				_hotStorageDiameter             ,
+				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				_receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				0.0005                          ,    // V2: should be _exchangerTubesDout;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1.0                             ,    // V2: should be _exchangerTubesLength;        it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfTubes;          it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                               ,    // V2: should be _exchangerNbOfPassesPerShell; it is kept to keep the same results as V1 (SLD, P.B.)
+    				1                                 ); // V2: should be _exchangerNbOfShells;         it is kept to keep the same results as V1 (SLD, P.B.)
+
+    
   }
   catch ( const std::exception & e ) {
     if ( htfCycle   ) delete htfCycle;

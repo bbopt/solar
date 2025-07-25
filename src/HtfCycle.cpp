@@ -531,6 +531,13 @@ void HtfCycle::fOperateCycle ( int    timeInSeconds       ,
 	hotLevel_avg = _hotStorage.fComputeStorageLevel(hotMass_avg);
 	Q_dot_i = _hotStorage.fComputeEnergyLosses(hotTemp_i, hotLevel_avg);
 	U_f = U_i + timeInSeconds*(hotMassFlow_in * Cp * hotTemp_in - hotMassFlow_out * Cp * hotTemp_i - Q_dot_i);
+
+	if ( U_f < 0 ) { // Added this condition to verify that the energy lost is not greater than the initial energy (P.B., 2025-07)
+	  std::ostringstream oss;
+	  oss << "Negative total energy: U_f=" << U_f;
+	  throw Simulation_Interruption ( oss.str() );
+	}
+	
 	hotTemp_f = U_f / (Cp*hotMass_f);
 	if (hotTemp_f < MELTING_POINT) {
 	  Q_heat_hot = (MELTING_POINT - hotTemp_f) * Cp * hotMass_f;

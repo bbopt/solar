@@ -30,22 +30,22 @@ class Economics {
   
 private:
 
+  int    _nbOfHeliostats;
   double _hotStorageInsulationThickness;
   double _coldStorageInsulationThickness;
   double _hotStorageHeight;
-  double _storageDiameter;
-  double _receiverInsulationThickness;
+  double _coldStorageHeight;   // New in V2 (P.B., 2025-07)
+  double _hotStorageDiameter;
+  double _coldStorageDiameter; // New in V2 (SLD, 2025-07-24)
   double _heightOfTower;
-  double _heightOfReceiverAperture;
-  double _widthOfReceiverAperture;
-  int    _receiverNumberOfTubes;
-  double _receiverTubesDout;
   double _lengthOfHeliostats;
   double _widthOfHeliostats;
-  int    _nbOfHeliostats;
-  double _reflectiveArea;
-  double _totalMoltenSaltMass;
   double _turbineNominalPowerOutput;
+  double _heightOfReceiverAperture;
+  double _widthOfReceiverAperture;  
+  int    _receiverNumberOfTubes;
+  double _receiverTubesDout;
+  double _reflectiveArea;
   int    _exchangerModel;
   double _exchangerTubesOutterDiameter;
   double _exchangerTubesLength;
@@ -62,23 +62,24 @@ private:
   double _totalCost;
 
 public:
-
-  // heliostats Field only:
-  Economics ( void );
   
-  // full plant:
+  // constructor:
   Economics ( int    numberOfHeliostats          ,
 	      double hotStorageInsul             ,
 	      double coldStorageInsul            ,
 	      double hotStorageHeight            ,
-	      double storageDiameter             ,
-	      double receiverInsul               ,
+	      double coldStorageHeight           , // new in V2 (P.B)
+	      double hotStorageDiameter          ,
+	      double coldStorageDiameter         , // new in V2 (SLD)
 	      double heightOfTower               ,
 	      double lengthOfHeliostats          ,
 	      double widthOfHeliostats           ,
 	      double turbinePower                ,
 	      double heightOfReceiverAperture    ,
 	      double widthOfAperture             ,
+	      int    receiverNbOfTubes           , // new in V2 (SLD)
+	      double receiverTubesOutsideDiam    , // new in V2 (SLD)
+	      int    exchangerModel              , // new in V2 (SLD)
 	      double exchangerTubesDiameter      ,
 	      double exchangerTubesLength        , 
 	      int    exchangerNumberOfTubes      ,
@@ -94,30 +95,10 @@ public:
   double evaluateCostOfPowerblock     ( void );
   double evaluateCostOfSteamGenerator ( void );
   double evaluateTotalInvestmentCost  ( void );
-
+  
   // set methods:
-  void set_heightOfTower                 ( double x ) { _heightOfTower                  = x; }
-  void set_heightOfReceiverAperture      ( double x ) { _heightOfReceiverAperture       = x; }
-  void set_widthOfReceiverAperture       ( double x ) { _widthOfReceiverAperture        = x; }
-  void set_lengthOfHeliostats            ( double x ) { _lengthOfHeliostats             = x; }
-  void set_widthOfHeliostats             ( double x ) { _widthOfHeliostats              = x; }
-  void set_exchangerModel                ( int    x ) { _exchangerModel                 = x; }
-  void set_hotStorageInsulationThickness ( double x ) { _hotStorageInsulationThickness  = x; }
-  void set_coldStorageInsulationThickness( double x ) { _coldStorageInsulationThickness = x; }
-  void set_hotStorageHeight              ( double x ) { _hotStorageHeight               = x; }
-  void set_storageDiameter               ( double x ) { _storageDiameter                = x; }
-  void set_receiverInsulationThickness   ( double x ) { _receiverInsulationThickness    = x; }
-  void set_receiverNumberOfTubes         ( int    x ) { _receiverNumberOfTubes          = x; }
-  void set_receiverTubesDout             ( double x ) { _receiverTubesDout              = x; }
-  void set_nbOfHeliostats                ( int    x ) { _nbOfHeliostats                 = x; }
-  void set_reflectiveArea                ( double x ) { _reflectiveArea                 = x; }
-  void set_totalMoltenSaltMass           ( double x ) { _totalMoltenSaltMass            = x; }
-  void set_turbineNominalPowerOutput     ( double x ) { _turbineNominalPowerOutput      = x; }
-  void set_exchangerTubesOutterDiameter  ( double x ) { _exchangerTubesOutterDiameter   = x; }
-  void set_exchangerTubesLength          ( double x ) { _exchangerTubesLength           = x; }
-  void set_exchangerNumberOfTubes        ( int    x ) { _exchangerNumberOfTubes         = x; }
-  void set_exchangerTubePassesPerShell   ( int    x ) { _exchangerTubePassesPerShell    = x; }
-  void set_exchangerNumberOfShell        ( int    x ) { _exchangerNumberOfShell         = x; }
+  void set_nbOfHeliostats ( int    n ) { _nbOfHeliostats = n; }
+  void set_reflectiveArea ( double r ) { _reflectiveArea = r; }
 
   // get methods:
   double get_costOfField          ( void ) const { return _costOfField;          }
