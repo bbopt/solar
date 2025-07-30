@@ -41,7 +41,7 @@
 #include "sampling.hpp"
 
 // version:
-const std::string VERSION = "1.0.5, 2025-07-25";
+const std::string VERSION = "1.0.6, 2025-07-30";
 
 // validation functions:
 bool check ( bool fast );

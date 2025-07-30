@@ -188,7 +188,7 @@ double Economics::evaluateCostOfStorage ( void ) {
   // Total molten salt inventory is assumed to be that of the volume of the full cold tank
 
   // double moltenSaltVolume  = _hotStorageHeight*1.1*PI*pow(_hotStorageDiameter / 2.0, 2.0); // OLD VERSION (v1)
-  double moltenSaltVolume     = _coldStorageHeight   *PI*pow(_hotStorageDiameter / 2.0, 2.0); // NEW VERSION (v2, P.B., SLD, 2025-07-23)
+  double moltenSaltVolume     = _coldStorageHeight   *PI*pow(_coldStorageDiameter / 2.0, 2.0); // NEW VERSION (v2, P.B., SLD, 2025-07-30)
   double totalMoltenSaltMass = moltenSaltVolume*MS_DENSITY;
   double moltenSaltCost       = moltenSaltPerKg * totalMoltenSaltMass;
 
