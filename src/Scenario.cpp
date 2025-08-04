@@ -63,6 +63,7 @@ Scenario::Scenario ( const std::string & problem , double fidelity ) :
   _hotStorageHeight                 ( 0.0     ) ,
   _coldStorageHeight                ( 0.0     ) ,
   _hotStorageDiameter               ( 0.0     ) ,
+  _coldStorageDiameter              ( 0.0     ) , // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         ( 0.0     ) ,
   _coldStorageInsulThickness        ( 0.0     ) ,
   _coldMoltenSaltMinTemperature     ( 0.0     ) ,
@@ -129,19 +130,25 @@ Scenario::Scenario ( const std::string & problem , double fidelity ) :
   // Problem #10:
   if ( _problem == "MINCOST_UNCONSTRAINED" )
     init_minCost_unconstrained ( fidelity );
+
+  // Problem #11: New in V2 by P.B. (2025-07-30)
+  if ( _problem == "MINCOST_CH" )
+    init_minCost_CH ( fidelity );
   
   // Check problem id:
   // -----------------
-  if ( problem != "MAXNRG_H1"             &&    // # 1
-       problem != "MINSURF_H1"            &&    // # 2
-       problem != "MINCOST_C1"            &&    // # 3
-       problem != "MINCOST_C2"            &&    // # 4
-       problem != "MAXCOMP_HTF1"          &&    // # 5
-       problem != "MINCOST_TS"            &&    // # 6
-       problem != "MAXEFF_RE"             &&    // # 7
-       problem != "MAXHF_MINCOST"         &&    // # 8
-       problem != "MAXNRG_MINPAR"         &&    // # 9
-       problem != "MINCOST_UNCONSTRAINED"    )  // # 10
+  if ( problem != "MAXNRG_H1"             &&    // #  1
+       problem != "MINSURF_H1"            &&    // #  2
+       problem != "MINCOST_C1"            &&    // #  3
+       problem != "MINCOST_C2"            &&    // #  4
+       problem != "MAXCOMP_HTF1"          &&    // #  5
+       problem != "MINCOST_TS"            &&    // #  6
+       problem != "MAXEFF_RE"             &&    // #  7
+       problem != "MAXHF_MINCOST"         &&    // #  8
+       problem != "MAXNRG_MINPAR"         &&    // #  9
+       problem != "MINCOST_UNCONSTRAINED" &&    // # 10
+       problem != "MINCOST_CH"               )  // # 11 // V2, P.B.
+    
     throw std::invalid_argument ( problem + " is not a valid problem ID" );
 }
 
@@ -167,6 +174,7 @@ bool Scenario::set_x ( const double * x ) {
   if ( _problem == "MAXHF_MINCOST"         ) { return set_x_maxHF_minCost         ( x ); } // # 8
   if ( _problem == "MAXNRG_MINPAR"         ) { return set_x_maxNrg_minPar         ( x ); } // # 9
   if ( _problem == "MINCOST_UNCONSTRAINED" ) { return set_x_minCost_unconstrained ( x ); } // #10
+  if ( _problem == "MINCOST_CH"            ) { return set_x_minCost_CH            ( x ); } // #11 // V2, P.B. (2025-07-30)
   return false;
 }
 
@@ -244,6 +252,7 @@ void Scenario::init_minSurf_H1 ( double fidelity ) {
 
   // design parameters:
   _hotStorageDiameter           = 23.0;
+  _coldStorageDiameter          = 23.0; // P.B.: New in V2 (2025-08-04)
   _hotStorageHeight             = 10.5;
   _coldStorageHeight            = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness     = 0.3;
@@ -356,6 +365,7 @@ bool Scenario::set_x_minCost_C1 ( const double * x ) {
   _hotStorageHeight                 = x[10];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
+  _coldStorageDiameter              = x[11]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
   _coldMoltenSaltMinTemperature     = x[14];
@@ -447,6 +457,7 @@ bool Scenario::set_x_minCost_C2 ( const double * x ) {
   _hotStorageHeight                 = x[10];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
+  _coldStorageDiameter              = x[11]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
   _coldMoltenSaltMinTemperature     = x[14];
@@ -536,6 +547,7 @@ bool Scenario::set_x_maxComp_HTF1 ( const double * x ) {
   _hotStorageHeight                 = x[ 1];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[ 2];
+  _coldStorageDiameter              = x[ 2]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[ 3];
   _coldStorageInsulThickness        = x[ 4];
   _coldMoltenSaltMinTemperature     = x[ 5];
@@ -619,6 +631,7 @@ bool Scenario::set_x_minCost_TS ( const double * x ) {
   _hotStorageHeight                 = x[1];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[2];
+  _coldStorageDiameter              = x[2]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[3];
   _coldStorageInsulThickness        = x[4];
 
@@ -652,6 +665,7 @@ void Scenario::init_maxEff_RE ( double fidelity ) {
   set_typeOfTurbine(1);
   
   _hotStorageDiameter           = 25;
+  _coldStorageDiameter          = 25; // P.B.: New in V2 (2025-08-04)
   _hotStorageHeight             = 30;
   _coldStorageHeight            = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness     = 5;
@@ -723,6 +737,7 @@ void Scenario::init_maxHF_minCost ( double fidelity ) {
   
   _centralReceiverOutletTemperature = 950;
   _hotStorageDiameter               = 25;
+  _coldStorageDiameter              = 25; // P.B.: New in V2 (2025-08-04)
   _hotStorageHeight                 = 30;
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageInsulThickness         = 5;
@@ -842,6 +857,7 @@ bool Scenario::set_x_maxNrg_minPar ( const double * x ) {
   _hotStorageHeight                 = x[10];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[11];
+  _coldStorageDiameter              = x[11]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[12];
   _coldStorageInsulThickness        = x[13];
   _coldMoltenSaltMinTemperature     = x[14];
@@ -930,6 +946,7 @@ bool Scenario::set_x_minCost_unconstrained ( const double * x ) {
   _hotStorageHeight                 = x[1];
   _coldStorageHeight                = _hotStorageHeight * 1.2;
   _hotStorageDiameter               = x[2];
+  _coldStorageDiameter              = x[2]; // P.B.: New in V2 (2025-08-04)
   _hotStorageInsulThickness         = x[3];
   _coldStorageInsulThickness        = x[4];
 
@@ -938,6 +955,112 @@ bool Scenario::set_x_minCost_unconstrained ( const double * x ) {
   if ( !check_bounds_minCost_TS() )
     throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
   
+  return true;
+}
+/*---------------------------------------------------------*/
+/*          initialize problem minCost_CH (#11)            */
+/*---------------------------------------------------------*/
+/*  New in V2: P.B.: Added init function for instance 11   */
+/*  The definition is the same as instance 4 (2025-07-30)  */  
+/*---------------------------------------------------------*/
+void Scenario::init_minCost_CH ( double fidelity ) {
+ 
+  // Demand profile : 1, from 3 pm to 9 pm
+  // Maximum demand : 25 MW
+  // Latitude : 35 deg
+  // Day : 1
+  // Duration : 24 hours
+  // maximum field surface of 200 hectares
+
+  // Scenario parameters:
+  _model_type           = 2; // whole plant
+  _heliostatsFieldModel = 1;
+  _exchangerModel       = 2;
+  
+  _latitude                = 35.0;
+  _day                     = 1;
+  _demandProfile           = 1;
+  _tStart                  = 900;  // 15x60
+  _tEnd                    = 1260; // 21x60
+  _maximumPowerDemand      = 25e6;
+  _storageStartupCondition = 50;
+  _minutesPerTimeIncrement = 60;
+
+  _fixedPointsPrecision   = 0.001;
+  _cFieldSurface          = 2000000; // 200 hectares
+  _cDemandComplianceRatio = 100;
+  _cParasitics            = 0.18;
+  
+  // variable fidelity surrogate:
+  _numberOfTimeIncrements = Scenario::compute_numberOfTimeIncrements (    1,   24, fidelity );
+  _raysPerSquareMeters    = Scenario::compute_raysPerSquareMeters    ( 1e-8, 0.01, fidelity );
+}
+
+/*---------------------------------------------------------------------------*/
+/*                set inputs for problem minCost_CH (#11)                    */
+/*---------------------------------------------------------------------------*/
+/*  New in V2: P.B.: Added set_x function for instance 11                    */
+/* _coldStorageHeight = x[29] and _coldStorageDiameter = x[30] (2025-07-30)  */
+/*---------------------------------------------------------------------------*/
+bool Scenario::set_x_minCost_CH ( const double * x ) {
+
+  // check discrete variables:
+  // -------------------------
+  if ( !is_int(x[ 5]) ||
+       !is_int(x[15]) ||
+       !is_int(x[24]) ||
+       !is_int(x[25]) ||
+       !is_int(x[26]) ||
+       !is_int(x[27]) ||
+       !is_int(x[28])    )
+    throw std::invalid_argument ( "Problem with input: One of the discrete variables has a non-integer value" );
+ 
+  // assign variables:
+  // -----------------
+
+  // Heliostats Field:
+  _heliostatLength        = x[0];
+  _heliostatWidth         = x[1];
+  _towerHeight            = x[2];
+  _receiverApertureHeight = x[3];
+  _receiverApertureWidth  = x[4];
+  _numberOfHeliostats     = myround(x[5]);
+  _fieldAngularWidth      = x[6];
+  _minimumDistanceToTower = x[7];
+  _maximumDistanceToTower = x[8];
+
+  // Htf cycle:
+  _centralReceiverOutletTemperature = x[ 9];
+  _hotStorageHeight                 = x[10];
+  _coldStorageHeight                = x[29];
+  _hotStorageDiameter               = x[11];
+  _coldStorageDiameter              = x[30];
+  _hotStorageInsulThickness         = x[12];
+  _coldStorageInsulThickness        = x[13];
+  _coldMoltenSaltMinTemperature     = x[14];
+  _receiverNbOfTubes                = myround(x[15]);
+  _receiverInsulThickness           = x[16];
+  _receiverTubesInsideDiam          = x[17];
+  _receiverTubesOutsideDiam         = x[18];
+  _exchangerTubesSpacing            = x[19];
+  _exchangerTubesLength             = x[20];
+  _exchangerTubesDin                = x[21];
+  _exchangerTubesDout               = x[22];
+  _exchangerBaffleCut               = x[23];
+  _exchangerNbOfBaffles             = myround(x[24]);
+  _exchangerNbOfTubes               = myround(x[25]);
+  _exchangerNbOfShells              = myround(x[26]);
+  _exchangerNbOfPassesPerShell      = myround(x[27]);
+
+  // Powerblock:
+  if ( !set_typeOfTurbine ( myround(x[28]) ) )
+    throw std::invalid_argument ( "Problem with input: Type of turbine is not in {1, 2, ..., 8}" );
+
+  // check bounds:
+  // -------------
+  if ( !check_bounds_minCost_CH() )
+    throw std::invalid_argument ( "Problem with input: One of the inputs is outside its bounds" );
+
   return true;
 }
 
@@ -987,6 +1110,10 @@ bool Scenario::simulate ( double fidelity, double * outputs, double * intermedia
   if ( _problem == "MINCOST_UNCONSTRAINED" )    
     return simulate_minCost_unconstrained ( fidelity, outputs, intermediate_outputs, fidelity <  1.0, cnt_eval );
 
+  // #11: New in V2, P.B., 2025-07-30
+  if ( _problem == "MINCOST_CH" )
+    return simulate_minCost_CH ( fidelity, outputs, cnt_eval );
+  
   return false;
 }
 
@@ -1168,7 +1295,7 @@ bool Scenario::simulate_minCost_C1 ( double fidelity, double * outputs , bool & 
   //  x9: _maximumDistanceToTower
   // x10: _centralReceiverOutletTemperature
   // x11: _hotStorageHeight
-  // x12: _hotStorageDiameter
+  // x12: _hotStorageDiameter and _coldStorageDiameter
   // x13: _hotStorageInsulThickness
   // x14: _coldStorageInsulThickness
   // x15: _coldMoltenSaltMinTemperature
@@ -1268,7 +1395,7 @@ bool Scenario::simulate_minCost_C2 ( double fidelity, double * outputs , bool & 
   //  x9: _maximumDistanceToTower
   // x10: _centralReceiverOutletTemperature
   // x11: _hotStorageHeight
-  // x12: _hotStorageDiameter
+  // x12: _hotStorageDiameter and _coldStorageDiameter
   // x13: _hotStorageInsulThickness
   // x14: _coldStorageInsulThickness
   // x15: _coldMoltenSaltMinTemperature
@@ -1381,7 +1508,7 @@ bool Scenario::simulate_maxComp_HTF1 ( double fidelity, double * outputs , bool 
 
   //  x1: _centralReceiverOutletTemperature
   //  x2: _hotStorageHeight
-  //  x3: _hotStorageDiameter
+  //  x3: _hotStorageDiameter and _coldStorageDiameter
   //  x4: _hotStorageInsulThickness
   //  x5: _coldStorageInsulThickness
   //  x6: _coldMoltenSaltMinTemperature
@@ -1478,7 +1605,7 @@ bool Scenario::simulate_minCost_TS ( double fidelity, double * outputs , bool & 
 
   // x1: _centralReceiverOutletTemperature
   // x2: _hotStorageHeight
-  // x3: _hotStorageDiameter
+  // x3: _hotStorageDiameter and _coldStorageDiameter
   // x4: _hotStorageInsulThickness
   // x5: _coldStorageInsulThickness
   
@@ -1708,7 +1835,7 @@ bool Scenario::simulate_maxNrg_minPar ( double fidelity, double * outputs , bool
   //  x9: _maximumDistanceToTower
   // x10: _centralReceiverOutletTemperature
   // x11: _hotStorageHeight
-  // x12: _hotStorageDiameter
+  // x12: _hotStorageDiameter and _coldStorageDiameter
   // x13: _hotStorageInsulThickness
   // x14: _coldStorageInsulThickness
   // x15: _coldMoltenSaltMinTemperature
@@ -1830,7 +1957,7 @@ bool Scenario::simulate_minCost_unconstrained ( double   fidelity             ,
  
   // x1: _centralReceiverOutletTemperature
   // x2: _hotStorageHeight
-  // x3: _hotStorageDiameter
+  // x3: _hotStorageDiameter and _coldStorageDiameter
   // x4: _hotStorageInsulThickness
   // x5: _coldStorageInsulThickness
 
@@ -1913,6 +2040,131 @@ bool Scenario::simulate_minCost_unconstrained ( double   fidelity             ,
     }
   }
   catch ( const std::exception & e ) {
+    throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
+  }
+  
+  return true;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                            simulate_minCost_CH (#11)                       */
+/*----------------------------------------------------------------------------*/
+/* New in V2: P.B.: added the simulate function for instance 11 (2025-07-30)  */
+/*----------------------------------------------------------------------------*/
+bool Scenario::simulate_minCost_CH ( double fidelity, double * outputs , bool & cnt_eval ) {
+
+  //  x1: _heliostatLength
+  //  x2: _heliostatWidth
+  //  x3: _towerHeight
+  //  x4: _receiverApertureHeight
+  //  x5: _receiverApertureWidth
+  //  x6: _numberOfHeliostats (int)
+  //  x7: _fieldAngularWidth
+  //  x8: _minimumDistanceToTower
+  //  x9: _maximumDistanceToTower
+  // x10: _centralReceiverOutletTemperature
+  // x11: _hotStorageHeight
+  // x12: _hotStorageDiameter
+  // x13: _hotStorageInsulThickness
+  // x14: _coldStorageInsulThickness
+  // x15: _coldMoltenSaltMinTemperature
+  // x16: _receiverNbOfTubes (int)
+  // x17: _receiverInsulThickness
+  // x18: _receiverTubesInsideDiam
+  // x19: _receiverTubesOutsideDiam
+  // x20: _exchangerTubesSpacing
+  // x21: _exchangerTubesLength
+  // x22: _exchangerTubesDin
+  // x23: _exchangerTubesDout
+  // x24: _exchangerBaffleCut
+  // x25: _exchangerNbOfBaffles (int)
+  // x26: _exchangerNbOfTubes (int)
+  // x27: _exchangerNbOfShells (int)
+  // x28: _exchangerNbOfPassesPerShell (int)
+  // x29: _typeOfTurbine (int)
+  // x30: _coldStorageHeight
+  // x31: _coldStorageDiameter
+  
+  for ( int i = 0 ; i < 17 ; ++i )
+    outputs[i] = 1e20;
+
+  cnt_eval = true;
+  
+  try {
+
+    // set and check a priori constraints:
+    if ( !check_apriori_constraints_minCost_CH ( outputs ) ) {
+      cnt_eval = false;
+      throw std::invalid_argument ( "one of the a priori constraints (possibly hidden) is violated" );
+    }
+
+    // check if fidelity is equal to zero:
+    if ( fidelity == 0.0 ) {
+      cnt_eval = false;
+    }
+
+    // fidelity is in ]0;1]:
+    else {
+    
+      // creating required objects:
+      construct_minCost_CH ( cnt_eval );
+    
+      // launching simulation:
+      _powerplant->fSimulatePowerplant ( false );
+
+      // objective function: total investment cost:
+      outputs[0] = _powerplant->get_costOfHeliostatField()
+	+ _powerplant->get_costOfTower()
+	+ _powerplant->get_costOfReceiver()
+	+ _powerplant->get_costOfStorage()
+	+ _powerplant->get_costOfSteamGenerator()
+	+ _powerplant->get_costOfPowerblock();
+      
+      // c1: total land area is below 200 hectares: A priori
+      // PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000
+    
+      // c2: compliance to demand is 100%:
+      outputs[2] = _cDemandComplianceRatio - _powerplant->get_overallComplianceToDemand();
+
+      // c3: tower at least twice as high as heliostats: A priori: 2x1-x3 <= 0:
+
+      // c4: Rmin <= Rmax: A priori: x8 <= x9:
+    
+      // c5: Check that _numberOfHeliostats (x6) heliostats can fit in the field:
+      outputs[5] = _numberOfHeliostats - 1.0*_powerplant->get_heliostatField()->get_nb_heliostats();
+    
+      // c6: maximum pressure in receiver tubes do not exceed yield pressure
+      outputs[6] = _powerplant->get_maximumPressureInReceiver() - _powerplant->get_yieldPressureInReceiver();
+
+      // molten Salt temperature does not drop below the melting point: c7, c8, and c9:
+      outputs[7] = MELTING_POINT - _powerplant->get_minHotStorageTemp();
+      outputs[8] = MELTING_POINT - _powerplant->get_minColdStorageTemp();
+      outputs[9] = MELTING_POINT - _powerplant->get_minSteamGenTemp();
+    
+      // c10: Receiver tubes Din < Dout: A priori: x18 <= x19:
+
+      // c11: Tubes fit in receiver: A priori: x16*x19 <= x5*PI/2:
+
+      // c12: central receiver outlet is higher than that required by the turbine:
+      outputs[12] = _powerplant->get_steamTurbineInletTemperature() - _centralReceiverOutletTemperature;
+ 
+      // c13: Parasitics do not exceed 20% of energy production
+      {
+	double sum = 1.0;
+	for ( unsigned int i = 0; i < _powerplant->get_powerplantPowerOutput().size(); ++i )
+	  sum += _powerplant->get_powerplantPowerOutput()[i];
+	outputs[13] = _powerplant->fComputeParasiticLosses()/sum - _cParasitics;
+      }
+   
+      // c14: A priori: x23 <= x20:
+
+      // c15: A priori: x22 <= x23:
+
+      // c16: Pressure in steam generator tubes does not exceed yield pressure:
+      outputs[16] = _powerplant->get_maximumPressureInExchanger() - _powerplant->get_yieldPressureInExchanger();
+    }
+  }
+  catch ( const std::exception & e ) {   
     throw Simulation_Interruption ( "Simulation could not go through: " + std::string(e.what()) );
   }
   
@@ -2721,8 +2973,153 @@ bool Scenario::check_apriori_constraints_minCost_unconstrained ( void ) const {
   return true;
 }
 
+/*----------------------------------------------------------------------------*/
+/*                  check bounds for problem minCost_CH (#11)                 */
+/*----------------------------------------------------------------------------*/
+/* New in V2: P.B.: added check_bounds function for instance 11 (2025-07-30)  */
+/*----------------------------------------------------------------------------*/
+bool Scenario::check_bounds_minCost_CH ( void ) const {
+
+  if ( _heliostatLength < 1 || _heliostatLength > 40 )
+    return false;
+
+  if ( _heliostatWidth < 1 || _heliostatWidth > 40 )
+    return false;
+
+  if ( _towerHeight < 20 || _towerHeight > 250 )
+    return false;
+   
+  if ( _receiverApertureHeight < 1 || _receiverApertureHeight > 30 )
+    return false;
+  
+  if ( _receiverApertureWidth < 1 || _receiverApertureWidth > 30 )
+    return false;
+  
+  if ( _numberOfHeliostats < 1 )
+    return false;
+  
+  if ( _fieldAngularWidth < 1 || _fieldAngularWidth > 89 )
+    return false;
+  
+  if ( _minimumDistanceToTower < 0 || _minimumDistanceToTower > 20 )
+    return false;
+  
+  if ( _maximumDistanceToTower < 1 || _maximumDistanceToTower > 20 )
+    return false;
+  
+  if ( _centralReceiverOutletTemperature > 995 )
+    return false;
+ 
+  if ( _hotStorageHeight < 1 || _hotStorageHeight > 50 )
+    return false;
+  
+  if ( _hotStorageDiameter < 1 || _hotStorageDiameter > 30 )
+    return false;
+ 
+  if ( _hotStorageInsulThickness < 0.01 || _hotStorageInsulThickness > 5 )
+    return false;
+  
+  if ( _coldStorageInsulThickness < 0.01 || _coldStorageInsulThickness > 5 )
+    return false;
+  
+  if ( _coldMoltenSaltMinTemperature < MELTING_POINT || _coldMoltenSaltMinTemperature > 650 )
+    return false;
+  
+  if ( _receiverNbOfTubes < 1 || _receiverNbOfTubes > 7853 )
+    return false;
+  
+  if ( _receiverInsulThickness < 0.01 || _receiverInsulThickness > 5 )
+    return false;
+
+  if ( _receiverTubesInsideDiam < 0.005 || _receiverTubesInsideDiam > 0.1 )
+    return false;
+
+  if ( _receiverTubesOutsideDiam < 0.006 || _receiverTubesOutsideDiam > 0.1 )
+    return false;
+
+  if ( _exchangerTubesSpacing > 0.3 )
+    return false;
+
+  if ( _exchangerTubesLength < 0.5 || _receiverTubesOutsideDiam > 10 )
+    return false;
+  
+  if ( _exchangerTubesDin < 0.005 || _exchangerTubesDin > 0.1 )
+    return false;
+
+  if ( _exchangerTubesDout < 0.006 || _exchangerTubesDout > 0.1 )
+    return false;
+
+  if ( _exchangerNbOfBaffles < 2 )
+    return false;
+
+  if ( _exchangerBaffleCut < 0.15 || _exchangerBaffleCut > 0.4 )
+    return false;
+
+  if ( _exchangerNbOfTubes < 1 )
+    return false;
+
+  if ( _exchangerNbOfShells < 1 || _exchangerNbOfShells > 10 )
+    return false;
+
+  if ( _exchangerNbOfPassesPerShell < 1 || _exchangerNbOfPassesPerShell > 9 )
+    return false;
+
+  if ( _typeOfTurbine < 1 || _typeOfTurbine >  8 )
+    return false;
+  
+  if ( _coldStorageHeight < 1 || _coldStorageHeight > 50 )
+    return false;
+
+  if ( _coldStorageDiameter < 1 || _coldStorageDiameter > 30 )
+    return false;
+
+   return true;
+}
+
+/*----------------------------------------------------------------------------*/
+/*             set and check a priori constraints for instance #11            */
+/*----------------------------------------------------------------------------*/
+/* New in V2: P.B.: added check_apriori_constraints function for instance 11  */
+/* the definition is the same as instance 4 (2025-07-30)                      */
+/*----------------------------------------------------------------------------*/
+bool Scenario::check_apriori_constraints_minCost_CH ( double * outputs ) const {
+
+  // c1: total land area is below 200 hectares: A priori
+  // PI*x3*x3(x9*x9- x8*x8) * x7 / 180.0 <= 2000000
+  outputs[1] = PI*(pow(_maximumDistanceToTower*_towerHeight, 2.0) - pow(_minimumDistanceToTower*_towerHeight, 2.0))
+    * (_fieldAngularWidth / 180.0) - _cFieldSurface;
+    
+  // c3: tower at least twice as high as heliostats: A priori: 2x1-x3 <= 0:
+  outputs[3] = 2 * _heliostatLength - _towerHeight;
+
+  // c4: Rmin <= Rmax: A priori: x8 <= x9:
+  outputs[4]= _minimumDistanceToTower - _maximumDistanceToTower;
+    
+  // c10: Receiver tubes Din < Dout: A priori: x18 <= x19:
+  outputs[10] = _receiverTubesInsideDiam - _receiverTubesOutsideDiam;
+
+  // c11: Tubes fit in receiver: A priori: x16*x19 <= x5*PI/2:
+  outputs[11] = _receiverNbOfTubes*_receiverTubesOutsideDiam - _receiverApertureWidth * PI / 2.0;
+
+  // c14: A priori: x23 <= x20:
+  outputs[14] = _exchangerTubesDout - _exchangerTubesSpacing;
+
+  // c15: A priori: x22 <= x23:
+  outputs[15] = _exchangerTubesDin  - _exchangerTubesDout;
+
+  // hidden constraint:
+  if ( _centralReceiverOutletTemperature < _minReceiverOutletTemp )
+    return false;
+  
+  if ( outputs[ 1] > 0.0 || outputs[ 3] > 0.0 || outputs[ 4] > 0.0 || outputs[10] > 0.0 ||
+       outputs[11] > 0.0 || outputs[14] > 0.0 || outputs[15] > 0.0 )
+    return false;
+
+   return true;
+}
+
 /*-----------------------------------------------*/
-/*      constructing model components (1/10)     */
+/*      constructing model components (1/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_maxNrg_H1 ( bool & cnt_eval ) {
 
@@ -2756,7 +3153,7 @@ void Scenario::construct_maxNrg_H1 ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -2792,7 +3189,7 @@ void Scenario::construct_maxNrg_H1 ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (2/10)     */
+/*      constructing model components (2/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
 
@@ -2834,6 +3231,7 @@ void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -2857,7 +3255,7 @@ void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -2893,7 +3291,7 @@ void Scenario::construct_minSurf_H1 ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (3/10)     */
+/*      constructing model components (3/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
 
@@ -2935,6 +3333,7 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -2955,7 +3354,7 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -2997,7 +3396,7 @@ void Scenario::construct_minCost_C1 ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (4/10)     */
+/*      constructing model components (4/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
 
@@ -3039,6 +3438,7 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3069,7 +3469,7 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3108,7 +3508,7 @@ void Scenario::construct_minCost_C2 ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (5/10)     */
+/*      constructing model components (5/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
 
@@ -3150,6 +3550,7 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3180,7 +3581,7 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3226,7 +3627,7 @@ void Scenario::construct_maxComp_HTF1 ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (6/10)     */
+/*      constructing model components (6/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
 
@@ -3255,6 +3656,7 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3278,7 +3680,7 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3323,7 +3725,7 @@ void Scenario::construct_minCost_TS ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (7/10)     */
+/*      constructing model components (7/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
 
@@ -3365,6 +3767,7 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3385,7 +3788,7 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3424,7 +3827,7 @@ void Scenario::construct_maxEff_RE ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (8/10)     */
+/*      constructing model components (8/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
 
@@ -3466,6 +3869,7 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3486,7 +3890,7 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3525,7 +3929,7 @@ void Scenario::construct_maxHF_minCost ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (9/10)     */
+/*      constructing model components (9/11)     */
 /*-----------------------------------------------*/
 void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
 
@@ -3567,6 +3971,7 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3597,7 +4002,7 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3636,7 +4041,7 @@ void Scenario::construct_maxNrg_minPar ( bool & cnt_eval ) {
 }
 
 /*-----------------------------------------------*/
-/*      constructing model components (10/10)    */
+/*      constructing model components (10/11)    */
 /*-----------------------------------------------*/
 void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
 
@@ -3665,6 +4070,7 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
 			      _hotStorageHeight                 ,
 			      _coldStorageHeight                , // P.B.: New in V2
 			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              , // P.B.: Is equal to _hotStorageDiameter (2025-07-30)
 			      _hotStorageInsulThickness         , // P.B.: New in V2: The three thicknesses are left to be equal to _hotStorageInsulThickness.
 			      _hotStorageInsulThickness         , // This was a bug in V1, but we decided to leave it as here so that the results of V1 remain
 			      _hotStorageInsulThickness         , // the same. This behaviour is desirable in the context of BBO benchmarkink. Instances >= 11 are ok.
@@ -3688,7 +4094,7 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
     				_hotStorageHeight               ,
     				_hotStorageHeight*1.1           , // V2: should be _coldStorageHeight; it is kept to keep the same results as V1 (P.B.)
     				_hotStorageDiameter             ,
-				_hotStorageDiameter             , // V2: should be _coldStorageDiameter; it is kept to keep the same results as V1 (SLD, P.B.)
+				_coldStorageDiameter            , // new in V2 (P.B.)
     				_towerHeight                    ,
     				_heliostatLength                ,
     				_heliostatWidth                 ,
@@ -3731,6 +4137,119 @@ void Scenario::construct_minCost_unconstrained ( bool & cnt_eval ) {
     cnt_eval    = false;
     throw Simulation_Interruption ( "error in the construction of the problem" );
   }
+}
+
+/*----------------------------------------------------------------------*/
+/*                 constructing model components (11/11)                */
+/*----------------------------------------------------------------------*/
+/* New in V2: P.B.: Added this function, without the bugs related       */
+/* to the insulation thicknesses and Economics, and with new variables  */
+/*----------------------------------------------------------------------*/
+void Scenario::construct_minCost_CH ( bool & cnt_eval ) {
+
+  if ( _powerplant ) {
+    delete _powerplant;
+    _powerplant = NULL;
+  }
+  
+  _model_type = 2; // whole plant
+	
+  Time_Manager time ( _numberOfTimeIncrements, 0, _minutesPerTimeIncrement );
+  Sun          sun  ( _latitude, time, _day, _raysPerSquareMeters );
+  fFillDemandVector();
+	
+  HeliostatField * field      = NULL;
+  HtfCycle       * htfCycle   = NULL;
+  Powerblock     * powerblock = NULL;
+  Economics      * economics  = NULL;
+
+  try {
+    
+    // powerblock model:
+    powerblock = new Powerblock ( _typeOfTurbine );
+
+    // constructing heliostats field:
+    field = new HeliostatField ( _numberOfHeliostats     ,
+				 _heliostatLength        ,
+				 _heliostatWidth         ,
+				 _towerHeight            ,
+				 _receiverApertureHeight ,
+				 _receiverApertureWidth  ,
+				 _minimumDistanceToTower ,
+				 _maximumDistanceToTower ,
+				 _fieldAngularWidth      ,
+				 sun                       );
+  
+    // constructing Htf Cycle with desired steam generator model:
+    htfCycle = new HtfCycle ( _centralReceiverOutletTemperature ,
+			      _hotStorageHeight                 ,
+			      _coldStorageHeight                ,
+			      _hotStorageDiameter               ,
+			      _coldStorageDiameter              ,
+			      _receiverInsulThickness           ,
+			      _hotStorageInsulThickness         ,
+			      _coldStorageInsulThickness        ,
+			      _coldMoltenSaltMinTemperature     ,
+			      powerblock                        ,
+			      _receiverApertureHeight           ,
+			      _receiverApertureWidth            ,
+			      _receiverTubesInsideDiam          ,
+			      _receiverTubesOutsideDiam         ,
+			      _receiverNbOfTubes                ,
+			      _minutesPerTimeIncrement          ,
+			      _exchangerTubesDin                , 
+			      _exchangerTubesDout               , 
+			      _exchangerTubesLength             ,
+			      _exchangerTubesSpacing            ,
+			      _exchangerBaffleCut               ,
+			      _exchangerNbOfBaffles             ,
+			      _exchangerNbOfTubes               ,
+			      _exchangerNbOfPassesPerShell      ,
+			      _exchangerNbOfShells                );
+    
+    htfCycle->initiateColdStorage();
+    
+    // investment cost model:
+    economics = new Economics ( 1                               , // the number of heliostats will be set in Powerplant.cpp
+    				_hotStorageInsulThickness       ,
+    				_coldStorageInsulThickness      ,
+    				_hotStorageHeight               ,
+    				_coldStorageHeight              ,
+    				_hotStorageDiameter             ,
+            _coldStorageDiameter            ,
+    				_towerHeight                    ,
+    				_heliostatLength                ,
+    				_heliostatWidth                 ,
+    				powerblock->get_powerOfTurbine(),
+				    _receiverApertureHeight         ,
+    				_receiverApertureWidth          ,
+    				_receiverNbOfTubes              ,
+    				_receiverTubesOutsideDiam       ,
+    				_exchangerModel                 ,
+    				_exchangerTubesDout             ,  
+    				_exchangerTubesLength           ,  
+    				_exchangerNbOfTubes             ,  
+    				_exchangerNbOfPassesPerShell    ,  
+    				_exchangerNbOfShells            ); 
+  }
+  catch ( const std::exception & e ) {
+    if ( field      ) delete field;
+    if ( htfCycle   ) delete htfCycle;
+    if ( powerblock ) delete powerblock;
+    if ( economics  ) delete economics;
+    cnt_eval = false;
+    throw Simulation_Interruption ( e.what() );
+  }
+    
+  _powerplant = new Powerplant ( time        ,
+				 _model_type ,
+				 field       ,
+				 htfCycle    ,
+				 powerblock  ,
+				 economics     );
+
+  _powerplant->set_demand         ( _demand               );
+  _powerplant->set_heliostatModel ( _heliostatsFieldModel );
 }
 
 /*-------------------------------------------*/

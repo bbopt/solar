@@ -78,6 +78,11 @@ bool Problem::is_stochastic ( int output_index ) const {
   // SOLAR10: Deterministic
   if ( _pb_id == "MINCOST_UNCONSTRAINED" )
     return false;
+
+  // SOLAR11:
+  if ( _pb_id == "MINCOST_CH" &&
+       ( output_index == -1 || output_index == 2 || output_index == 6 || output_index == 7 || output_index == 8 || output_index == 9 || output_index == 13 ) )
+    return true; 
   
   return false;
 }
@@ -98,6 +103,7 @@ void create_problems ( std::vector<Problem> & problems ) {
   problems.push_back ( Problem ( "MAXHF_MINCOST"        , "heliostat field performance and cost" ,  8, 2, 13,  9 ) ); // #8
   problems.push_back ( Problem ( "MAXNRG_MINPAR"        , "power and losses"                     ,  9, 2, 29, 17 ) ); // #9
   problems.push_back ( Problem ( "MINCOST_UNCONSTRAINED", "cost of storage + penalties"          , 10, 1,  5,  0 ) ); // #10
+  problems.push_back ( Problem ( "MINCOST_CH"           , "total investment cost"                ,  4, 1, 31, 16 ) ); // #11
 }
 
 /*---------------------------------------------------------*/

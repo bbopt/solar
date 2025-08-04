@@ -1,4 +1,4 @@
-# SOLAR v1.0.6 (July 2025)
+# SOLAR v1.0.7 (August 2025)
 The **SOLAR** blackbox optimization benchmarking framework.
 
 ### Compilation
@@ -83,23 +83,23 @@ The list of instances is:
  8  MAXHF_MINCOST          heliostat field performance and cost   2           13              9
  9  MAXNRG_MINPAR          power and losses                       2           29             17
 10  MINCOST_UNCONSTRAINED  cost of storage + penalties            1            5              0
+11  MINCOST_CH             total investment cost                  1           31             16
 ```
 List of best know values for single-objective instances (one replication, full fidelity, default seed of zero):
 ```
-	SOLAR1.1 	-902,503.692418
-	SOLAR2.1 	841,839.671915
-	SOLAR3.1 	62,775,886.3251
-	SOLAR4.1 	108,197,236.146
-	SOLAR5.1 	-28.8817193932
-	SOLAR6.1 	43,954,935.1836
-	SOLAR7.1 	-4,972.88689831
-	SOLAR10.1	42.416671
+	SOLAR1 	-902,503.692418
+	SOLAR2 	841,839.671915
+	SOLAR3 	62,775,886.3251
+	SOLAR4 	108,197,236.146
+	SOLAR5 	-28.8817193932
+	SOLAR6 	43,954,935.1836
+	SOLAR7 	-4,972.88689831
+	SOLAR10	42.416671
+	SOLAR11 TBD
 ```
-The `.1` notation highlights that these values are valid for the
-versions 1.X of  **SOLAR**.
 
-`SOLAR3.1` best solution found by Xavier Lebeuf.
-`SOLAR10.1` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
+`SOLAR3` best solution found by Xavier Lebeuf.
+`SOLAR10` best solutions found by Jeff Larson and GOOMBAH in the [IBCDFO package](https://github.com/POptUS/IBCDFO),
 and Tom Ragonneau with COBYQA.
 
 

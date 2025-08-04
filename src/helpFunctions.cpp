@@ -27,14 +27,15 @@
 /*       display best known values (valid for version 1)     */
 /*-----------------------------------------------------------*/
 void display_best_solutions ( std::ostream & out ) {
-  out << "\tSOLAR1.1 \t-902,503.692418" << std::endl
-      << "\tSOLAR2.1 \t841,839.671915"  << std::endl
-      << "\tSOLAR3.1 \t62,775,886.3251" << std::endl
-      << "\tSOLAR4.1 \t108,197,236.146" << std::endl
-      << "\tSOLAR5.1 \t-28.8817193932"  << std::endl
-      << "\tSOLAR6.1 \t43,954,935.1836" << std::endl  
-      << "\tSOLAR7.1 \t-4,972.88689831" << std::endl
-      << "\tSOLAR10.1\t42.416671"       << std::endl;
+  out << "\tSOLAR1 \t-902,503.692418" << std::endl
+      << "\tSOLAR2 \t841,839.671915"  << std::endl
+      << "\tSOLAR3 \t62,775,886.3251" << std::endl
+      << "\tSOLAR4 \t108,197,236.146" << std::endl
+      << "\tSOLAR5 \t-28.8817193932"  << std::endl
+      << "\tSOLAR6 \t43,954,935.1836" << std::endl  
+      << "\tSOLAR7 \t-4,972.88689831" << std::endl
+      << "\tSOLAR10\t42.416671"       << std::endl
+      << "\tSOLAR11\tTBD"             << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -68,7 +69,7 @@ void display_usage ( std::ostream & out ) {
   out << std::endl
       << "Run SOLAR (basic)   : solar pb_id x.txt (add -v for verbose mode)"    << std::endl
       << "Run SOLAR (advanced): solar pb_id x.txt -seed=S -fid=F -rep=R -v"     << std::endl
-      << " pb_id: Problem instance: integer in {1, 2, ..., 10}"                 << std::endl
+      << " pb_id: Problem instance: integer in {1, 2, ..., 11}"                 << std::endl
       << "     S: Random seed     : integer >=0 or \"diff\"; Default=0"         << std::endl
       << "     F: Fidelity        : real in [0;1]; Default=1.0 (truth)"         << std::endl
       << "     R: Replications    : integer >= 1 or real in ]0;1[; Default=1\n" << std::endl
@@ -131,8 +132,9 @@ void display_help ( std::ostream & out , const std::vector<Problem> & problems )
       << "Best known values for single-objective instances, with one replication, full fidelity, and default seed of zero:"
       << std::endl << std::endl;
   display_best_solutions ( out );
-  out << std::endl << "\t--> These values are valid only for SOLAR version 1"
-      << std::endl << std::endl;
+  // We designed V2 so that the 10 first instances do not change:
+  // out << std::endl << "\t--> These values are valid only for SOLAR version 1"
+  // << std::endl << std::endl;
 }
 
 /*-----------------------------------------------------------*/
@@ -194,6 +196,10 @@ void display_help ( std::ostream               & out      ,
     else if ( pb->get_pb_id() == "MINCOST_UNCONSTRAINED" )
       print_minCost_unconstrained ( out );
 
+    // #11:
+    else if ( pb->get_pb_id() == "MINCOST_CH" ) // new in V2 (by P.B., 2025-07-30)
+      print_minCost_CH ( out );
+    
     else {
       out << "Cannot find detailed help for this instance" << std::endl;
       return;
@@ -812,4 +818,92 @@ void print_minCost_unconstrained ( std::ostream & out ) {
       << "\tLOWER_BOUND      " << "( 793.0  2.0  2.0 0.01 0.01 )" << std::endl
       << "\tX0               " << "( 900.0 10.0 12.0 0.20 0.20 )" << std::endl
       << "\tUPPER_BOUND      " << "( 995.0 50.0 30.0 5.00 5.00 )" << std::endl;
+}
+
+/*-------------- #11 --------------------------------------*/
+void print_minCost_CH ( std::ostream & out ) {
+/*---------------------------------------------------------*/
+  // New in V2 by P.B., 2025-07-30
+  out << "\n-----------------------------------------------------------------\n"
+      << "Parameters:\n"
+      << "\tWhole plant\n"
+      << "\tLatitude: 35 deg N\n"
+      << "\tDay: January 1st\n"
+      << "\tDuration: 24 hours\n"
+      << "\tDemand profile: 25MW, starting at 3PM and ending at 9PM, 3 consecutive days\n"
+      << "\tMaximum field surface area: 200 hectares\n"
+      << "\tMust provide 100% of the demand requirement\n"
+      << "\tThis instance is the same as instance 4 but with new variables\n"
+      << "\tcold storage height and diameter, and fixed bugs related to\n"
+      << "\teconomics and insulation thicknesses"
+      << std::endl
+
+      << "Objective (first output)\n"
+      << "\tMinimize the cost of powerplant to respect a given demand with a limited size of field ($)\n"
+      << std::endl  
+
+      << "Variables:\n"
+      << "\tHeliostats Field:\n"
+      << "\t\t x1: Heliostats length (m)                          : Real in [ 1; 40]\n"
+      << "\t\t x2: Heliostats width  (m)                          : Real in [ 1; 40]\n"
+      << "\t\t x3: Tower height      (m)                          : Real in [20;250]\n"
+      << "\t\t x4: Receiver aperture height (m)                   : Real in [ 1; 30]\n"
+      << "\t\t x5: Receiver aperture width  (m)                   : Real in [ 1; 30]\n"
+      << "\t\t x6: Number of heliostats to fit in the field       : Integer >= 1\n"
+      << "\t\t x7: Field angular width (deg)                      : Real in [1;89]\n"
+      << "\t\t x8: Minimum distance from tower (% of tower height): Real in [0;20]\n"
+      << "\t\t x9: Maximum distance from tower (% of tower height): Real in [1;20]\n"
+      << "\tHeat transfer loop:\n"
+      << "\t\tx10: Receiver outlet temperature (K)      : Real in [793;995]\n"
+      << "\t\tx11: Hot storage height    (m)            : Real in [1;50]\n"
+      << "\t\tx30: Cold storage height   (m)            : Real in [1;50]\n" 
+      << "\t\tx12: Hot storage diameter  (m)            : Real in [1;30]\n"
+      << "\t\tx31: Cold storage diameter (m)            : Real in [1;30]\n"
+      << "\t\tx13: Hot storage insulation thickness  (m): Real in [0.01;5]\n"
+      << "\t\tx14: Cold storage insulation thickness (m): Real in [0.01;5]\n"
+      << "\t\tx15: Mininum cold storage temperature  (K): Real in [495;650]\n"
+      << "\t\tx16: Receiver number of tubes             : Integer in {1,2,...,7853}\n"
+      << "\t\tx17: Receiver insulation thickness     (m): Real in [0.01 ;5  ]\n"
+      << "\t\tx18: Receiver tubes inner diameter     (m): Real in [0.005;0.1]\n"
+      << "\t\tx19: Receiver tubes outer diameter     (m): Real in [0.006;0.1]\n"
+      << "\tSteam generator:\n"
+      << "\t\tx20: Tubes spacing (m)       : Real in [0.007;0.2]\n"
+      << "\t\tx21: Tubes length  (m)       : Real in [0.5;10]\n"
+      << "\t\tx22: Tubes inner diameter (m): Real in [0.005;0.1]\n"
+      << "\t\tx23: Tubes outer diameter (m): Real in [0.006;0.1]\n"
+      << "\t\tx24: Baffles cut             : Real in [0.15;0.4]\n"
+      << "\t\tx25: Number of baffles       : Integer >= 2\n"   
+      << "\t\tx26: Number of tubes         : Integer >= 1\n"
+      << "\t\tx27: Number of shell passes  : Integer in {1, 2, ..., 10}\n"
+      << "\t\tx28: Number of tubes passes  : Integer in {1, 2, ..., 9}\n"   
+      << "\tPowerblock:\n"
+      << "\t\tx29: Type of turbine: Categorical: Integer in {1, 2, ..., 8}\n"
+      << std::endl
+      << "Constraints (outputs 2 to 17 with format ci <= 0):\n"
+      << "\t c1: Field surface area: A priori constraint: PI*x3*x3(x9*x9-x8*x8) * x7/180 <= 2e6\n"
+      << "\t c2: Compliance to demand (stochastic)\n"
+      << "\t c3: Tower is at least twice as high as heliostats       : A priori, linear constraint: 2x1 <= x3\n"
+      << "\t c4: Min. distance from tower <= max. distance from tower: A priori, linear constraint:  x8 <= x9\n"   
+      << "\t c5: Check that x6 heliostats can fit in the field\n"
+      << "\t c6: Pressure in receiver tubes <= yield pressure (stochastic)\n"
+      << "\t c7: Molten salt melting point  <= hot storage lowest temperature     (stochastic)\n"  
+      << "\t c8: Molten salt melting point  <= cold storage lowest temperature    (stochastic)\n"
+      << "\t c9: Molten salt melting point  <= steam generator outlet temperature (stochastic)\n"   
+      << "\tc10: Receiver tubes inside diameter <= outside diameter: A priori, linear constraint: x18 <= x19\n"
+      << "\tc11: Number of tubes in receiver fit inside receiver: A priori constraint: x16*x19 <= x5*PI/2\n"
+      << "\tc12: Receiver outlet temperature >= steam turbine inlet temperature\n"
+      << "\tc13: Parasitic losses <= 18% of the generated output (stochastic)\n"
+      << "\tc14: Steam generator tubes outer diameter  <= tubes spacing: A priori, linear constraint: x23 <= x20\n"
+      << "\tc15: Steam generator tubes inside diameter <= Steam generator tubes outer diameter: A priori, linear constraint: x22 <= x23\n"
+      << "\tc16: Pressure in steam generator tubes <= yield pressure\n"
+
+      << "\n-----------------------------------------------------------------\n"
+      << "NOMAD parameters:\n\n"
+      << "\tDIMENSION        " << 31 << std::endl
+      << "\tBB_EXE           " << "$SOLAR_HOME/bin/solar $11" << std::endl
+      << "\tBB_OUTPUT_TYPE   " << "OBJ CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR CSTR" << std::endl
+      << "\tBB_INPUT_TYPE    " << "(    R    R     R    R    R    I    R    R    R     R    R    R    R    R     R    I    R      R     R     R    R      R     R    R I     I  I I I R    R)"    << std::endl
+      << "\tLOWER_BOUND      " << "(  1.0  1.0  20.0  1.0  1.0    1  1.0  0.0  1.0 793.0  1.0  1.0 0.01 0.01 495.0    1 0.01 0.0050 0.006 0.007  0.5 0.0050 0.006 0.15 2     1  1 1 1 1.0  1.0)"  << std::endl
+      << "\tX0               " << "(  9.0  9.0 150.0  6.0  8.0 1000 45.0  0.5  5.0 900.0  9.0  9.0 0.30 0.20 560.0  500 0.30 0.0165 0.018 0.017 10.0 0.0155 0.016 0.20 3 12000  1 2 2 9.0  9.0)"  << std::endl  
+      << "\tUPPER_BOUND      " << "( 40.0 40.0 250.0 30.0 30.0    - 89.0 20.0 20.0 995.0 50.0 30.0 5.00 5.00 650.0 7853 5.00 0.1000 0.100 0.200 10.0 0.1000 0.100 0.40 -     - 10 9 8 50.0 30.0)" << std::endl;
 }

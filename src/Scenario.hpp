@@ -93,8 +93,9 @@ private:
   // Heat Transfer loop:
   double _centralReceiverOutletTemperature; // K
   double _hotStorageHeight;                 // m
-  double _coldStorageHeight;                // m  // P.B.: New in V2
+  double _coldStorageHeight;                // m // P.B.: New in V2
   double _hotStorageDiameter;               // m
+  double _coldStorageDiameter;              // m // P.B.: New in V2
   double _hotStorageInsulThickness;         // m
   double _coldStorageInsulThickness;        // m
   double _coldMoltenSaltMinTemperature;     // K
@@ -143,6 +144,7 @@ private:
   void init_maxHF_minCost         ( double fidelity ); // # 8
   void init_maxNrg_minPar         ( double fidelity ); // # 9
   void init_minCost_unconstrained ( double fidelity ); // #10
+  void init_minCost_CH            ( double fidelity ); // #11
 
   bool set_typeOfTurbine ( int tot );
   
@@ -156,6 +158,7 @@ private:
   bool set_x_maxHF_minCost         ( const double * x ); // # 8
   bool set_x_maxNrg_minPar         ( const double * x ); // # 9
   bool set_x_minCost_unconstrained ( const double * x ); // #10
+  bool set_x_minCost_CH            ( const double * x ); // #11
 
   bool check_bounds_maxNrg_H1             ( void ) const; // # 1
   bool check_bounds_minSurf_H1            ( void ) const; // # 2
@@ -167,7 +170,8 @@ private:
   bool check_bounds_maxHF_minCost         ( void ) const; // # 8
   bool check_bounds_maxNrg_minPar         ( void ) const; // # 9
   bool check_bounds_minCost_unconstrained ( void ) const; // #10
-  
+  bool check_bounds_minCost_CH            ( void ) const; // #11
+   
   bool check_apriori_constraints_maxNrg_H1             ( double * outputs ) const; // # 1
   bool check_apriori_constraints_minSurf_H1            ( double * outputs ) const; // # 2
   bool check_apriori_constraints_minCost_C1            ( double * outputs ) const; // # 3
@@ -178,6 +182,7 @@ private:
   bool check_apriori_constraints_maxHF_minCost         ( double * outputs ) const; // # 8
   bool check_apriori_constraints_maxNrg_minPar         ( double * outputs ) const; // # 9
   bool check_apriori_constraints_minCost_unconstrained ( void             ) const; // #10
+  bool check_apriori_constraints_minCost_CH            ( double * outputs ) const; // #11
   
   void fFillDemandVector ( void );
 
@@ -191,6 +196,7 @@ private:
   void construct_maxHF_minCost         ( bool & cnt_eval ); // # 8
   void construct_maxNrg_minPar         ( bool & cnt_eval ); // # 9
   void construct_minCost_unconstrained ( bool & cnt_eval ); // #10
+  void construct_minCost_CH            ( bool & cnt_eval ); // #11
 
   bool simulate_maxNrg_H1             ( double fidelity, double * outputs, bool & cnt_eval ); // # 1
   bool simulate_minSurf_H1            ( double fidelity, double * outputs, bool & cnt_eval ); // # 2
@@ -205,7 +211,9 @@ private:
 					double * outputs              ,
 					double * intermediate_outputs ,
 					bool     low_fid              ,
-					bool   & cnt_eval               ); // #10
+					bool   & cnt_eval               );                    // #10
+  bool simulate_minCost_CH            ( double fidelity, double * outputs, bool & cnt_eval ); // #11
+
 
   void display_x ( const double * , std::ostream & out ) const;
   

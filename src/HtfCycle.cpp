@@ -29,7 +29,8 @@
 HtfCycle::HtfCycle ( double       receiverTemp            ,
 		     double       hot_storageHeight       ,  // New in version 2: Separated the two heights to allow
 		     double       cold_storageHeight      ,  // for an additionnal variable in new instances (P.B.)
-		     double       storageDiameter         ,
+		     double       hot_storageDiameter     ,  // New in version 2:  Separated the two diameters to allow
+		     double       cold_storageDiameter    ,  // for an additionnal variable in new instances (P.B.)
 		     double       receiver_insulThickness ,  // New in version 2: Replaced "insulationThickness" with
 		     double       hot_insulThickness      ,  // 3 separate thicknesses for 2 additionnal variables
 		     double       cold_insulThickness     ,  // in new instances (P.B.)	     
@@ -55,13 +56,13 @@ HtfCycle::HtfCycle ( double       receiverTemp            ,
   _hotStorage  ( &_centralReceiverOutlet ,
 		 &_steamGeneratorInlet   ,
 		 hot_storageHeight       ,
-		 storageDiameter         ,
+		 hot_storageDiameter     ,     // P.B.: Instead of "storageDiameter" in V1
 		 hot_insulThickness        ) , // P.B.: Instead of "insulationThickness" in V1
   
   _coldStorage ( &_steamGeneratorOutlet ,
 		 &_centralReceiverInlet ,
 		 cold_storageHeight     ,      // P.B.: Instead of "1.2*storageHeight" in V1
-		 storageDiameter        ,
+		 cold_storageDiameter   ,      // P.B.: Instead of "storageDiameter" in V1
 		 cold_insulThickness      ) ,  // P.B.: Instead of "insulationThickness" in V1
 
   _steamGenerator ( &_steamGeneratorInlet, &_steamGeneratorOutlet, powerblock ) ,
@@ -89,7 +90,8 @@ HtfCycle::HtfCycle ( double       receiverTemp            ,
 HtfCycle::HtfCycle ( double       receiverTemp                ,
 		     double       hot_storageHeight           ,  // New in version 2: Separated the two heights to allow
 		     double       cold_storageHeight          ,  // for an additionnal variable in new instances (P.B.)
-		     double       storageDiameter             ,
+		     double       hot_storageDiameter         ,  // New in version 2:  Separated the two diameters to allow
+		     double       cold_storageDiameter        ,  // for an additionnal variable in new instances (P.B.)
 		     double       receiver_insulThickness     ,  // New in version 2: Replaced "insulationThickness" with
 		     double       hot_insulThickness          ,  // 3 separate thicknesses for 2 additionnal variables
 		     double       cold_insulThickness         ,  // in new instances (P.B.)	     
@@ -124,13 +126,13 @@ HtfCycle::HtfCycle ( double       receiverTemp                ,
   _hotStorage ( &_centralReceiverOutlet ,
 		&_steamGeneratorInlet   ,
 		hot_storageHeight       ,
-		storageDiameter         ,
+		hot_storageDiameter     , // P.B.: Instead of "storageDiameter" in V1
 		hot_insulThickness        ) ,
 
   _coldStorage ( &_steamGeneratorOutlet ,
 		 &_centralReceiverInlet ,
 		 cold_storageHeight     ,    // P.B.: Instead of "1.2*storageHeight" in V1
-		 storageDiameter        ,
+		 cold_storageDiameter   ,    // P.B.: Instead of "storageDiameter" in V1
 		 cold_insulThickness      ) ,
 
   _steamGenerator ( &_steamGeneratorInlet      ,

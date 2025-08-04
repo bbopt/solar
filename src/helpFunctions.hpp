@@ -48,5 +48,6 @@ void print_maxEff_RE             ( std::ostream & out ); // # 7
 void print_maxHF_minCost         ( std::ostream & out ); // # 8
 void print_maxNrg_minPar         ( std::ostream & out ); // # 9
 void print_minCost_unconstrained ( std::ostream & out ); // #10
+void print_minCost_CH            ( std::ostream & out ); // #11
 
 #endif
